@@ -1,0 +1,151 @@
+#!/bin/bash
+# chkconfig: 2345 90 10
+# description: A secure socks5 proxy, designed to protect your Internet traffic.
+
+### BEGIN INIT INFO
+# Provides:          Shadowsocks-libev
+# Required-Start:    $network $syslog
+# Required-Stop:     $network
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: Fast tunnel proxy that helps you bypass firewalls
+# Description:       Start or stop the Shadowsocks-libev server
+### END INIT INFO
+
+PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
+# Source function library
+if [ -f /etc/rc.d/init.d/functions ]; then
+    . /etc/rc.d/init.d/functions
+# Check that networking is up.
+    [ ${NETWORKING} ="yes" ] || exit 0
+fi
+if [ -f /usr/local/bin/ss-server ]; then
+    ProgramPath=/usr/local/bin
+elif [ -f /usr/bin/ss-server ]; then
+    ProgramPath=/usr/bin
+fi
+ProgramName=Shadowsocks-libve
+NAME=ss-server
+BIN=${ProgramPath}/${NAME}
+CONFIGFILE=/etc/shadowsocks-libev/config.json
+LOGFILE=/var/log/${NAME}.log
+SCRIPTNAME=/etc/init.d/shadowsocks
+PID_DIR=/var/run
+PID_FILE=${PID_DIR}/shadowsocks-libev.pid
+version="2.0"
+RET_VAL=0
+
+[ -x ${BIN} ] || exit 0
+if [ ! -r ${CONFIGFILE} ]; then
+    echo "config file ${CONFIGFILE} not found"
+    exit 1
+fi
+
+if [ ! -d $PID_DIR ]; then
+    mkdir -p $PID_DIR
+    if [ $? -ne 0 ]; then
+        echo "Creating PID directory $PID_DIR failed"
+        exit 1
+    fi    
+fi
+
+fun_check_run(){
+    PID=`ps -ef | grep -v grep | grep -i "${BIN}" | awk '{print $2}'`
+    if [ ! -z $PID ]; then
+        return 0
+    else
+        rm -f ${PID_FILE}
+        return 1
+    fi
+}
+fun_start(){
+    log_flag="$1"
+
+    if [ ! -d ${PID_DIR} ]; then
+        mkdir -p ${PID_DIR} || echo "failed creating PID directory ${PID_DIR}"; exit 1
+    fi
+    if fun_check_run; then
+        echo "${ProgramName} (pid $PID) already running."
+        return 0
+    fi
+    if [[ "${log_flag}" =~ ^[Ll][Oo][Gg]$ ]]; then
+        strLog="${LOGFILE}"
+    else
+        strLog="/dev/null"
+    fi
+    echo -n "Starting ${ProgramName}..."
+    ${BIN} -c $CONFIGFILE -u -f $PID_FILE > ${strLog} 2>&1 &
+    sleep 0.3
+    if ! fun_check_run; then
+        echo "start failed"
+        return 1
+    fi
+    echo " done"
+    fun_version
+    echo "${ProgramName} (pid $PID)is running."
+    if [[ "${log_flag}" =~ ^[Ll][Oo][Gg]$ ]]; then
+        echo "read ${LOGFILE} for log" 
+    fi
+    return 0
+}
+fun_stop(){
+
+    if fun_check_run; then
+        echo -n "Stoping ${ProgramName} (pid $PID)... "
+        kill $PID
+        if [ "$?" != 0 ] ; then
+            echo " failed"
+            exit 1
+        else
+            echo " done"
+            rm -f $PID_FILE
+        fi
+    else
+        echo "${ProgramName} is not running."
+    fi
+}
+fun_restart(){
+    local restart_log_flag="$1"
+    fun_stop
+    if [[ "${restart_log_flag}" =~ ^[Ll][Oo][Gg]$ ]]; then
+        fun_start log
+    else
+        fun_start
+    fi
+}
+fun_status(){
+    PID=`ps -ef | grep -v grep | grep -i "${BIN}" | awk '{print $2}'`
+    if [ ! -z $PID ]; then
+        echo "${ProgramName} (pid $PID) is running..."
+    else
+        echo "${ProgramName} is stopped"
+        exit 0
+    fi
+}
+fun_config(){
+    vi ${CONFIGFILE}
+}
+fun_viewconfig(){
+    cat ${CONFIGFILE}
+    echo
+}
+fun_version(){
+     echo "${ProgramName} version $(${BIN} --help | grep -i "shadowsocks-libev" | awk '{print $2}')"
+}
+
+arg1=$1
+arg2=$2
+[  -z ${arg1} ]
+case "${arg1}" in
+    start|stop|restart|status|config|viewconfig)
+        fun_${arg1} ${arg2}
+    ;;
+    [vV][eE][rR][sS][iI][oO][nN]|-[vV][eE][rR][sS][iI][oO][nN]|--[vV][eE][rR][sS][iI][oO][nN]|-[vV]|--[vV])
+        fun_version
+    ;;
+    *)
+        echo "Usage: $SCRIPTNAME {start|stop|restart|status|config|viewconfig|version}"
+        RET_VAL=1
+    ;;
+esac
+exit $RET_VAL
