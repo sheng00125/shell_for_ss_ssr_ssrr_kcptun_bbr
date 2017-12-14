@@ -79,7 +79,7 @@ check_ssr_ssrr_installed(){
     fi
 }
 update_programe(){
- ./ss_ssr_ssrr_kcp.sh update
+ ./ss_ssr_ssrr_kcp_bbr.sh update
 }
 
 switch_ssr_config(){
