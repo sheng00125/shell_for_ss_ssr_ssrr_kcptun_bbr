@@ -11,7 +11,7 @@ ssrr_config="/usr/local/shadowsocksRR/user-config.json"
 kcptun_config="/usr/local/kcptun/config.json"
 
 if [ $(id -u) != "0" ]; then
-    echo "Error: You must be root to run this script, please use root to install SS/SSR/SSRR/KCPTUN"
+    echo "Error: You must be root to run this script, please use root to install SS/SSR/SSRR/KCPTUN/BBR"
     exit 1
 fi
 
