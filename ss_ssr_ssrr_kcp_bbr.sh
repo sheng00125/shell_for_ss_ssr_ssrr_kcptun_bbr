@@ -369,11 +369,11 @@ BBR_Selection(){
     case "${bbr_select}" in
     1)
         echo
-        echo -e "${COLOR_PINK}You will install BBR with Rinetd ${SS_LIBEV_VER}${COLOR_END}"
+        echo -e "${COLOR_PINK}You will install BBR with Rinetd.${COLOR_END}"
         ;;
     2)
         echo
-        echo -e "${COLOR_PINK}You will install Install BBR with LKL ${SSR_VER}${COLOR_END}"
+        echo -e "${COLOR_PINK}You will install Install BBR with LKL.${COLOR_END}"
         ;;
     [eE][xX][iI][tT])
         echo -e "${COLOR_PINK}You select <Exit>, shell exit now!${COLOR_END}"
@@ -381,7 +381,7 @@ BBR_Selection(){
         ;;
     *)
         echo
-        echo -e "${COLOR_PINK}No input,You will install install BBR with LML ${COLOR_END}"
+        echo -e "${COLOR_PINK}No input,You will install install BBR with LML.${COLOR_END}"
         bbr_select="${def_bbr_select}"
     esac
 }
