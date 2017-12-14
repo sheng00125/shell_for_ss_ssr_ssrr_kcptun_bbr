@@ -12,7 +12,7 @@
 # Description:       Start or stop the BBR server
 ### END INIT INFO
 
-NAME="Bottleneck Bandwidth and RTT(BBR)"
+NAME="BBR"
 BIN=/usr/bin/rinetd-bbr
 CONF=/etc/rinetd-bbr/bbr.conf
 version="1.0"
@@ -20,7 +20,7 @@ RETVAL=0
 
 [ -x ${BIN} ] || exit 0
 if [ ! -r ${CONF} ]; then
-    echo "config file ${CONF} not found"
+    echo "config file ${CONF} not found!"
     exit 1
 fi
 check_running(){
@@ -35,18 +35,19 @@ check_running(){
 do_start(){
     check_running
     if [ $? -eq 0 ]; then
-        echo "$NAME (pid $PID) is already running..."
+        echo "$NAME (pid $PID) is already running!"
         exit 0
     else
+        echo "starting BBR..."
         #nohup $BIN -f -c $CONF raw venet0:0 >/dev/null 2>&1 &
         $BIN -f -c $CONF raw venet0:0 >/dev/null 2>&1 &
         RETVAL=$?
         if [ $RETVAL -eq 0 ]; then
             sleep 0.3
             check_running
-            echo "Starting $NAME(pid:$PID) success"
+            echo "Starting $NAME success!pid:$PID ."
         else
-            echo "Starting $NAME failed"
+            echo "Starting $NAME failed!"
         fi
     fi
 }
@@ -54,12 +55,13 @@ do_start(){
 do_stop(){
     check_running
     if [ $? -eq 0 ]; then
+        echo "stopping BBR with pid:$PID..."
         kill -9 $PID
         RETVAL=$?
         if [ $RETVAL -eq 0 ]; then
-            echo "Stopping $NAME success"
+            echo "Stopping $NAME success!"
         else
-            echo "Stopping $NAME failed"
+            echo "Stopping $NAME failed!"
         fi
     else
         echo "$NAME is stopped"
