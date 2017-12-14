@@ -2,7 +2,9 @@
 # Usage:
 #   curl https://raw.githubusercontent.com/linhua55/lkl_study/master/get-rinetd.sh | bash
 
-export RINET_URL="https://github.com/linhua55/lkl_study/releases/download/v1.2/rinetd_bbr_powered"
+
+BBR_VER=$(wget --no-check-certificate -qO- https://api.github.com/repos/linhua55/lkl_study/releases/latest | grep 'tag_name' | cut -d\" -f4)
+RINET_BBR_URL="https://github.com/linhua55/lkl_study/releases/download/${BBR_VER}/rinetd_bbr_powered"
 export BBR_INIT_URL="https://raw.githubusercontent.com/Jenking-Zhang/shell_for_ss_ssr_ssrr_kcptun_bbr/master/bbr.init"
 
 
@@ -21,13 +23,14 @@ fi
 #	fi
 #done
 
-echo "1. Download rinetd-bbr from $RINET_URL"
-curl -L "${RINET_URL}" >/usr/bin/rinetd-bbr
+echo "1. Download rinetd-bbr from $RINET_BBR_URL"
+curl -L "${RINET_BBR_URL}" >/usr/bin/rinetd-bbr
 chmod +x /usr/bin/rinetd-bbr
 
 echo "2. Generate /etc/rinetd-bbr/bbr.conf"
 mkdir /etc/rinetd-bbr/
 cat <<EOF > /etc/rinetd-bbr/bbr.conf
+#version="${BBR_VER}"
 # bindadress bindport connectaddress connectport
 0.0.0.0 443 0.0.0.0 443
 EOF
