@@ -3,7 +3,7 @@
 #   curl https://raw.githubusercontent.com/linhua55/lkl_study/master/get-rinetd.sh | bash
 
 export RINET_URL="https://github.com/linhua55/lkl_study/releases/download/v1.2/rinetd_bbr_powered"
-export BBR_INIT_URL="https://raw.githubusercontent.com/Jenking-Zhang/shell/master/ss_ssr_kcp_bbr_netspeeder/bbr.init"
+export BBR_INIT_URL="https://raw.githubusercontent.com/Jenking-Zhang/shell_for_ss_ssr_ssrr_kcptun_bbr/master/bbr.init"
 
 
 
