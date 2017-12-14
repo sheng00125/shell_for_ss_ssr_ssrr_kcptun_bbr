@@ -4,7 +4,7 @@ export PATH
 
 version="2.0.5"
 shell_download_link="https://raw.githubusercontent.com/onekeyshell/kcptun_for_ss_ssr/master/kcptun_for_ss_ssr-install.sh"
-program_version_link="https://raw.githubusercontent.com/Jenking-Zhang/shell/master/ss_ssr_kcp_bbr_netspeeder/version.sh"
+program_version_link="https://raw.githubusercontent.com/Jenking-Zhang/shell_for_ss_ssr_ssrr_kcptun_bbr/master/version.sh"
 ss_libev_config="/etc/shadowsocks-libev/config.json"
 ssr_config="/usr/local/shadowsocksR/shadowsocksR.json"
 ssrr_config="/usr/local/shadowsocksRR/user-config.json"
@@ -860,12 +860,12 @@ install_ss_ssr_ssrr_kcptun(){
 install_bbr(){
     if [ "${bbr_select}" == "1" ] ;then
         echo -e "${COLOR_PINK}install BBR with Rinetd...${COLOR_END}"
-        wget --no-check-certificate https://raw.githubusercontent.com/Jenking-Zhang/shell/master/ss_ssr_kcp_bbr_netspeeder/get-rinetd-bbr.sh
+        wget --no-check-certificate https://raw.githubusercontent.com/Jenking-Zhang/shell_for_ss_ssr_ssrr_kcptun_bbr/master/get-rinetd-bbr.sh
         chmod +x get-rinetd-bbr.sh
         ./get-rinetd-bbr.sh
     else
         echo -e "${COLOR_PINK}install BBR with LKL...${COLOR_END}"
-        wget --no-check-certificate https://raw.githubusercontent.com/Jenking-Zhang/shell/master/ss_ssr_kcp_bbr_netspeeder/ovz-bbr-installer.sh
+        wget --no-check-certificate https://github.com/Jenking-Zhang/shell_for_ss_ssr_ssrr_kcptun_bbr/blob/master/ovz-bbr-installer.sh
         chmod +x ovz-bbr-installer.sh
         ./ovz-bbr-installer.sh
     fi
