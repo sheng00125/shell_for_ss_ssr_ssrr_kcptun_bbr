@@ -5,9 +5,6 @@ export PATH
 cur_dir=$(pwd)
 ssr_origin_config=/root/shadowsocksR-Origin.json
 ssrr_origin_config=/root/shadowsocksRR-Origin.json
-bbr_version=`cat /etc/rinetd-bbr/bbr.conf |sed -n '/'^#bbr_version='/p' | cut -d\" -f2`
-remote_bbr_version=$(wget --no-check-certificate -qO- https://api.github.com/repos/linhua55/lkl_study/releases/latest | grep 'tag_name' | cut -d\" -f4)
-RINET_BBR_URL="https://github.com/linhua55/lkl_study/releases/download/${remote_bbr_version}/rinetd_bbr_powered"
 
 set_text_color(){
     COLOR_RED='\E[1;31m'
@@ -39,7 +36,7 @@ shell_update(){
 Dispaly_Selection(){
     def_Select=1
     echo -e "${COLOR_YELOW}You have 3 options for your ss/ssr/ssrr/kcptun operation.${COLOR_END}"
-    echo "1: Update All Programe（SS-libev,SSR,SSRR,KCPTUN,BBR）"
+    echo "1: Update All Programe（SS-libev,SSR,SSRR,KCPTUN,Rinetd-BBR）"
     echo "2: Switch ShadowsocksR(python) Config"
     echo "3: Switch ShadowsocksRR(python) Config"
     read -p "Enter your choice (1, 2,3 or exit. default [${def_Select}]): " Select
@@ -93,38 +90,49 @@ check_ssr_ssrr_installed(){
         fi
     fi
 }
-check_bbr_update(){
-echo -e "BBR remote version :${COLOR_GREEN}${remote_bbr_version}${COLOR_END}"
-echo -e "BBR local version :${COLOR_GREEN}${bbr_version}${COLOR_END}"
+check_rinetd_bbr_update(){
+    echo "+ Check updates for Rinetd-BBR..."
+    if [ ! -f /etc/rinetd-bbr/bbr.conf ] || [ ! -f /usr/bin/rinetd-bbr ]; then
+        echo -e "${COLOR_RED}Error,Rinetd-BBR not installed${COLOR_END}"
+        exit 1
+    fi
+    bbr_version=`cat /etc/rinetd-bbr/bbr.conf |sed -n '/'^#bbr_version='/p' | cut -d\" -f2`
+    remote_bbr_version=$(wget --no-check-certificate -qO- https://api.github.com/repos/linhua55/lkl_study/releases/latest | grep 'tag_name' | cut -d\" -f4)
+    RINET_BBR_URL="https://github.com/linhua55/lkl_study/releases/download/${remote_bbr_version}/rinetd_bbr_powered"
+    echo -e "Rinetd-BBR remote version :${COLOR_GREEN}${remote_bbr_version}${COLOR_END}"
+    echo -e "Rinetd-BBR local version :${COLOR_GREEN}${bbr_version}${COLOR_END}"
     if [ ! -z ${remote_bbr_version} ]; then
         if [[ "${bbr_version}" != "${remote_bbr_version}" ]];then
-            echo -e "${COLOR_GREEN}Found a new version of BBR,update now...${COLOR_END}"
+            echo -e "${COLOR_GREEN}Found a new version of Rinetd-BBR,update now...${COLOR_END}"
             Press_Start
-            update_bbr
+            update_rinetd_bbr
         else
-            echo "BBR local version is up-to-date."
+            echo "Rinetd-BBR local version is up-to-date."
         fi
     else
-        echo -e "${COLOR_RED}Error: ${COLOR_END}Get BBR version failed!"
+        echo -e "${COLOR_RED}Error: ${COLOR_END}Get Rinetd-BBR version failed!"
         exit 1
     fi
 }
-update_bbr(){
-/etc/init.d/bbr stop
-if [ -f /etc/rinetd-bbr/bbr.conf ]; then rm -rf /etc/rinetd-bbr/bbr.conf;fi
-if [ -f /usr/bin/rinetd-bbr ]; then rm -rf /usr/bin/rinetd-bbr;fi
-curl -L "${RINET_BBR_URL}" >/usr/bin/rinetd-bbr
-chmod +x /usr/bin/rinetd-bbr
-cat <<EOF > /etc/rinetd-bbr/bbr.conf
+update_rinetd_bbr(){
+    /etc/init.d/bbr stop
+    echo "starting update Rinetd-BBR..."
+    if [ -f /etc/rinetd-bbr/bbr.conf ]; then rm -rf /etc/rinetd-bbr/bbr.conf;fi
+    if [ -f /usr/bin/rinetd-bbr ]; then rm -rf /usr/bin/rinetd-bbr;fi
+    echo "Download Rinetd-BBR from $RINET_BBR_URL"
+    curl -L "${RINET_BBR_URL}" >/usr/bin/rinetd-bbr
+    chmod +x /usr/bin/rinetd-bbr
+    cat <<EOF > /etc/rinetd-bbr/bbr.conf
 #bbr_version="${remote_bbr_version}"
 # bindadress bindport connectaddress connectport
 0.0.0.0 443 0.0.0.0 443
 EOF
+    echo "Rinetd-BBR updated."
     /etc/init.d/bbr start
 }
 update_programe(){
- ./ss_ssr_ssrr_kcp_bbr.sh update
-check_bbr_update
+    ./ss_ssr_ssrr_kcp_bbr.sh update
+    check_rinetd_bbr_update
 }
 switch_ssr_config(){
 if [ -f "$ssr_origin_config" ]; then
