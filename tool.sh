@@ -97,8 +97,8 @@ check_bbr_update(){
         echo -e "${COLOR_RED}Error,Rinetd-BBR not installed${COLOR_END}"
         exit 1
     fi
-    bbr_version=`cat /etc/rinetd-bbr/bbr.conf |sed -n '/'^#bbr_version='/p' | cut -d\" -f2 | sed s/[[:space:]]//g`
-    remote_bbr_version=$(wget --no-check-certificate -qO- https://api.github.com/repos/linhua55/lkl_study/releases/latest | grep 'tag_name' | cut -d\" -f4 | sed s/[[:space:]]//g )
+    bbr_version=`cat /etc/rinetd-bbr/bbr.conf |sed -n '/'^#bbr_version='/p' | cut -d\" -f2 | sed s/v//g`
+    remote_bbr_version=$(wget --no-check-certificate -qO- https://api.github.com/repos/linhua55/lkl_study/releases/latest | grep 'tag_name' | cut -d\" -f4 | sed s/v//g )
     RINET_BBR_URL="https://github.com/linhua55/lkl_study/releases/download/${remote_bbr_version}/rinetd_bbr_powered"
     echo -e "Rinetd-BBR remote version :${COLOR_GREEN}${remote_bbr_version}${COLOR_END}"
     echo -e "Rinetd-BBR local version :${COLOR_GREEN}${bbr_version}${COLOR_END}"
