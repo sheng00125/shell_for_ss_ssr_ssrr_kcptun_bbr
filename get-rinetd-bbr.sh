@@ -31,13 +31,13 @@ fi
 
 echo -e "Get the Rinetd-BBR version:${COLOR_GREEN}${remote_bbr_version}${COLOR_END}"
 echo " Download Rinetd-BBR from $RINET_BBR_URL"
-curl -L "${RINET_BBR_URL}" >/usr/bin/Rinetd-BBR
-chmod +x /usr/bin/Rinetd-BBR
+curl -L "${RINET_BBR_URL}" >/usr/bin/rinetd-bbr
+chmod +x /usr/bin/rinetd-bbr
 
 echo "Config Rinetd-BBR..."
-[ ! -d /etc/Rinetd-BBR/ ] && mkdir /etc/Rinetd-BBR/
-[ -d /etc/Rinetd-BBR/bbr.conf ] && rm -rf /etc/Rinetd-BBR/bbr.conf
-cat <<EOF > /etc/Rinetd-BBR/bbr.conf
+[ ! -d /etc/rinetd-bbr/ ] && mkdir /etc/rinetd-bbr/
+[ -d /etc/rinetd-bbr/bbr.conf ] && rm -rf /etc/rinetd-bbr/bbr.conf
+cat <<EOF > /etc/rinetd-bbr/bbr.conf
 #bbr_version="${remote_bbr_version}"
 # bindadress bindport connectaddress connectport
 0.0.0.0 443 0.0.0.0 443
