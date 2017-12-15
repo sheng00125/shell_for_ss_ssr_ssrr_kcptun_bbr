@@ -3,8 +3,8 @@ PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
 export PATH
 
 cur_dir=$(pwd)
-remote_bbr_version=$(wget --no-check-certificate -qO- https://api.github.com/repos/linhua55/lkl_study/releases/latest | grep 'tag_name' | cut -d\" -f4)
-RINET_BBR_URL="https://github.com/linhua55/lkl_study/releases/download/${remote_bbr_version}/rinetd_bbr_powered"
+remote_bbr_version=$(wget --no-check-certificate -qO- https://api.github.com/repos/linhua55/lkl_study/releases/latest | grep 'tag_name' | cut -d\" -f4 | sed s/v//g )
+RINET_BBR_URL="https://github.com/linhua55/lkl_study/releases/download/v${remote_bbr_version}/rinetd_bbr_powered"
 BBR_INIT_URL="https://raw.githubusercontent.com/Jenking-Zhang/shell/master/ss_ssr_kcp_bbr_netspeeder/bbr.init"
 
 COLOR_RED='\E[1;31m'
