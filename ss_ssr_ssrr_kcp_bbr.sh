@@ -860,15 +860,39 @@ install_ss_ssr_ssrr_kcptun(){
 install_bbr(){
     if [ "${bbr_select}" == "1" ] ;then
         echo -e "${COLOR_PINK}install BBR with Rinetd...${COLOR_END}"
-        wget --no-check-certificate https://raw.githubusercontent.com/Jenking-Zhang/shell_for_ss_ssr_ssrr_kcptun_bbr/master/get-rinetd-bbr.sh
-        chmod +x get-rinetd-bbr.sh
-        ./get-rinetd-bbr.sh
+	install_rinetd_bbr
     else
         echo -e "${COLOR_PINK}install BBR with LKL...${COLOR_END}"
         wget --no-check-certificate https://github.com/Jenking-Zhang/shell_for_ss_ssr_ssrr_kcptun_bbr/blob/master/ovz-bbr-installer.sh
         chmod +x ovz-bbr-installer.sh
         ./ovz-bbr-installer.sh
     fi
+}
+install_rinetd_bbr(){
+#Get Rinetd-BBR version.
+    remote_bbr_version=$(wget --no-check-certificate -qO- https://api.github.com/repos/linhua55/lkl_study/releases/latest | grep 'tag_name' | cut -d\" -f4)
+    RINET_BBR_URL="https://github.com/linhua55/lkl_study/releases/download/${remote_bbr_version}/rinetd_bbr_powered"
+#Download Rinetd-BBR.
+    echo -e "Get the Rinetd-BBR version:${COLOR_GREEN}${remote_bbr_version}${COLOR_END}"
+    echo " Download Rinetd-BBR from $RINET_BBR_URL"
+    curl -L "${RINET_BBR_URL}" >/usr/bin/Rinetd-BBR
+    chmod +x /usr/bin/Rinetd-BBR
+#Config Rinetd-BBR.
+    echo "Config Rinetd-BBR..."
+    [ ! -d /etc/Rinetd-BBR/ ] && mkdir /etc/Rinetd-BBR/
+    [ -d /etc/Rinetd-BBR/bbr.conf ] && rm -rf /etc/Rinetd-BBR/bbr.conf
+    cat <<EOF > /etc/Rinetd-BBR/bbr.conf
+#bbr_version="${remote_bbr_version}"
+# bindadress bindport connectaddress connectport
+0.0.0.0 443 0.0.0.0 443
+EOF
+#Config Rinetd-BBR service.
+    echo "Config service..."
+    wget --no-check-certificate "${BBR_INIT_URL}" -O /etc/init.d/bbr
+    chmod +x /etc/init.d/bbr
+    chkconfig --add bbr
+    chkconfig bbr on
+    /etc/init.d/bbr start
 }
 set_crontab(){
     if centosversion 6; then
