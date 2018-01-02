@@ -94,7 +94,7 @@ check_ssr_ssrr_installed(){
 check_bbr_update(){
     echo "+ Check updates for Rinetd-BBR..."
     if [ ! -f /etc/rinetd-bbr/bbr.conf ] || [ ! -f /usr/bin/rinetd-bbr ]; then
-        echo -e "${COLOR_RED}Error,Rinetd-BBR not installed${COLOR_END}"
+        echo -e "${COLOR_RED}Error,Rinetd-BBR not install!${COLOR_END}"
         exit 1
     fi
     bbr_version=`cat /etc/rinetd-bbr/bbr.conf |sed -n '/'^#bbr_version='/p' | cut -d\" -f2 | sed s/v//g`
