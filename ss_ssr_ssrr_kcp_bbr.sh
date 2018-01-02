@@ -24,8 +24,12 @@ set_timezone(){
 shell_update(){
     clear
     echo "+ Check updates for shell..."
-    echo -e "Current version:${COLOR_GREEN}${version}${COLOR_END}"
+    echo
+    version=`cat ss_ssr_ssrr_kcp_bbr.sh |sed -n '/'^version'/p' | cut -d\" -f2`
+    shell_download_link=`cat ss_ssr_ssrr_kcp_bbr.sh |sed -n '/'^shell_download_link'/p' | cut -d\" -f2`
     remote_shell_version=`wget --no-check-certificate -qO- ${shell_download_link} | sed -n '/'^version'/p' | cut -d\" -f2`
+    echo -e "Shell remote version :${COLOR_GREEN}${remote_shell_version}${COLOR_END}"
+    echo -e "Shell local version :${COLOR_GREEN}${version}${COLOR_END}"
     if [ ! -z ${remote_shell_version} ]; then
         if [[ "${version}" != "${remote_shell_version}" ]];then
             echo -e "${COLOR_GREEN}Found a new version of shell(ver:${remote_shell_version})!${COLOR_END}"
@@ -863,7 +867,7 @@ install_bbr(){
 	install_rinetd_bbr
     else
         echo -e "${COLOR_PINK}install BBR with LKL...${COLOR_END}"
-        wget --no-check-certificate https://github.com/Jenking-Zhang/shell_for_ss_ssr_ssrr_kcptun_bbr/blob/master/ovz-bbr-installer.sh
+        wget --no-check-certificate https://raw.githubusercontent.com/Jenking-Zhang/shell_for_ss_ssr_ssrr_kcptun_bbr/master/ovz-bbr-installer.sh
         chmod +x ovz-bbr-installer.sh
         ./ovz-bbr-installer.sh
     fi
