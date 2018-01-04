@@ -1,4 +1,4 @@
-#! /bin/bash
+﻿#! /bin/bash
 # chkconfig: 2345 55 25
 # Description: Startup script for kcptun on Debian. Place in /etc/init.d and
 # run 'update-rc.d -f kcptun defaults', or use the appropriate command on your

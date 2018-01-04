@@ -1,4 +1,4 @@
-#!/bin/sh
+﻿#!/bin/sh
 
 : <<-'EOF'
 Copyright 2017 Xingwang Liao <kuoruan@gmail.com>

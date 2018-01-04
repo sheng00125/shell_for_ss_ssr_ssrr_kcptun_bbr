@@ -1,4 +1,4 @@
-#!/bin/bash
+﻿#!/bin/bash
 # chkconfig: 2345 90 10
 # description: This commit implements a new TCP congestion control algorithm: BBR (Bottleneck Bandwidth and RTT)
 

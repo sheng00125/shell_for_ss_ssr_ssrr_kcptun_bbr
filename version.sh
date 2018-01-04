@@ -1,4 +1,4 @@
-#!/bin/bash
+﻿#!/bin/bash
 
 # LIBSODIUM
 #export LIBSODIUM_VER=1.0.16
