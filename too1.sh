@@ -37,7 +37,7 @@ shell_update(){
 Dispaly_Selection(){
     def_Select=1
     echo -e "${COLOR_YELOW}You have 3 options for your ss/ssr/ssrr/kcptun operation.${COLOR_END}"
-    echo "1: Update All Programe£¨SS-libev,SSR,SSRR,KCPTUN,Rinetd-BBR£©"
+    echo "1: Update All Programeï¼ˆSS-libev,SSR,SSRR,KCPTUN,Rinetd-BBRï¼‰"
     echo "2: Switch ShadowsocksR(python) Config"
     echo "3: Switch ShadowsocksRR(python) Config"
     read -p "Enter your choice (1, 2,3 or exit. default [${def_Select}]): " Select

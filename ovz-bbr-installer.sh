@@ -15,9 +15,9 @@ EOF
 
 export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 
-# Haproxy-lkl ��������
+# Haproxy-lkl 服务名称
 SERVICE_NAME='haproxy-lkl'
-# Haproxy-lkl Ĭ�ϰ�װ·�����޸�֮����Ҫͬʱ�޸ķ��������ļ�
+# Haproxy-lkl 默认安装路径，修改之后需要同时修改服务启动文件
 HAPROXY_LKL_DIR="/usr/local/$SERVICE_NAME"
 
 BASE_URL='https://github.com/kuoruan/shell-scripts/raw/master/ovz-bbr'
@@ -29,19 +29,19 @@ HAPROXY_LKL_SYSTEMD_FILE_URL="${BASE_URL}/startup/haproxy-lkl.systemd"
 LKL_LIB_URL="${BASE_URL}/lib64/liblkl-hijack.so-20170724"
 LKL_LIB_MD5='b50fc6a7ccfc70c76f44506814e7e18b'
 
-# ��Ҫ BBR ���ٵĶ˿�
+# 需要 BBR 加速的端口
 ACCELERATE_PORT=
 
 clear
 
 cat >&2 <<-'EOF'
 #######################################################
-# OpenVZ BBR һ����װ�ű�                             #
-# �ýű������� OpenVZ �������ϰ�װ���� Google BBR     #
-# �ű�����: Xingwang Liao <kuoruan@gmail.com>         #
-# ���߲���: https://blog.kuoruan.com/                 #
+# OpenVZ BBR 一键安装脚本                             #
+# 该脚本用于在 OpenVZ 服务器上安装配置 Google BBR     #
+# 脚本作者: Xingwang Liao <kuoruan@gmail.com>         #
+# 作者博客: https://blog.kuoruan.com/                 #
 # Github: https://github.com/kuoruan/shell-scripts    #
-# QQ����Ⱥ: 43391448, 68133628                        #
+# QQ交流群: 43391448, 68133628                        #
 #           633945405                                 #
 #######################################################
 EOF
@@ -54,7 +54,7 @@ check_root() {
 	local user="$(id -un 2>/dev/null || true)"
 	if [ "$user" != "root" ]; then
 		cat >&2 <<-'EOF'
-		Ȩ�޴���, ��ʹ�� root �û����д˽ű�!
+		权限错误, 请使用 root 用户运行此脚本!
 		EOF
 		exit 1
 	fi
@@ -63,8 +63,8 @@ check_root() {
 check_ovz() {
 	if [ ! -d /proc/vz ]; then
 		cat >&2 <<-'EOF'
-		��ǰ������������ OpenVZ �ܹ��������ֱ�Ӹ����ں������� BBR��
-		��Ȼ����Ҳ���Լ�����װ��
+		当前服务器好像不是 OpenVZ 架构，你可以直接更换内核以启用 BBR。
+		当然，你也可以继续安装。
 		EOF
 		any_key_to_continue
 	fi
@@ -76,17 +76,17 @@ check_ldd() {
 		if [ "${ldd_version%.*}" -eq "2" -a "${ldd_version#*.}" -lt "14" ] || \
 		[ "${ldd_version%.*}" -lt "2" ]; then
 			cat >&2 <<-EOF
-			��ǰ�������� glibc �汾Ϊ $ldd_version��
-			��Ͱ汾���� 2.14����������汾�޷�����ʹ�á�
-			���ȸ��� glibc ֮�������нű���
+			当前服务器的 glibc 版本为 $ldd_version。
+			最低版本需求 2.14，低于这个版本无法正常使用。
+			请先更新 glibc 之后再运行脚本。
 			EOF
 			exit 1
 	  fi
 	else
 		cat >&2 <<-EOF
-		��ȡ glibc �汾ʧ�ܣ����ֶ���飺
+		获取 glibc 版本失败，请手动检查：
 		    ldd --version
-		��Ͱ汾���� 2.14����������汾�����޷�����ʹ�á�
+		最低版本需求 2.14，低于这个版本可能无法正常使用。
 		EOF
 
 		( set -x; ldd --version 2>/dev/null )
@@ -101,8 +101,8 @@ check_arch() {
 			;;
 		*)
 			cat 1>&2 <<-EOF
-			��ǰ�ű���֧�� 64 λϵͳ�����ϵͳΪ: $architecture
-			����Գ��Դ�Դ����밲װ Linux Kernel Library
+			当前脚本仅支持 64 位系统，你的系统为: $architecture
+			你可以尝试从源码编译安装 Linux Kernel Library
 			    https://github.com/lkl/linux
 			EOF
 			exit 1
@@ -111,7 +111,7 @@ check_arch() {
 }
 
 any_key_to_continue() {
-	echo "�밴����������� Ctrl + C �˳�"
+	echo "请按任意键继续或 Ctrl + C 退出"
 	local saved="$(stty -g)"
 	stty -echo
 	stty cbreak
@@ -210,8 +210,8 @@ get_os_info() {
 
 	if [ -z "$lsb_dist" -o -z "$dist_version" ]; then
 		cat >&2 <<-EOF
-		�޷�ȷ��������ϵͳ�汾��Ϣ��
-		����ϵ�ű����ߡ�
+		无法确定服务器系统版本信息。
+		请联系脚本作者。
 		EOF
 		exit 1
 	fi
@@ -321,7 +321,7 @@ install_deps() {
 		;;
 		*)
 			cat >&2 <<-EOF
-			��ʱ��֧�ֵ�ǰϵͳ��${lsb_dist} ${dist_version}
+			暂时不支持当前系统：${lsb_dist} ${dist_version}
 			EOF
 
 			exit 1
@@ -344,18 +344,18 @@ check_nat_create() {
 		)
 	else
 		cat >&2 <<-'EOF'
-		�޷��ҵ��Ѱ�װ�� ip ����(֧�� tuntap) ���� tunctl
-		Ӧ���ǽű��Զ���װʧ���ˡ�
-		���ֶ���װ iproute �� tunctl
+		无法找到已安装的 ip 命令(支持 tuntap) 或者 tunctl
+		应该是脚本自动安装失败了。
+		请手动安装 iproute 和 tunctl
 		EOF
 		exit 1
 	fi
 
 	if [ "$?" != "0" ]; then
 		cat >&2 <<-'EOF'
-		�޷����� NAT ���硣
-		����ĳЩ�����̵� VPS �޷����� NAT ���磬
-		���Բ�֧���ô˷������� BBR����װ�ű������˳���
+		无法创建 NAT 网络。
+		由于某些服务商的 VPS 无法创建 NAT 网络，
+		所以不支持用此方法开启 BBR，安装脚本将会退出。
 		EOF
 		exit 1
 	fi
@@ -368,8 +368,8 @@ download_file() {
 	( set -x; wget -O "$file" --no-check-certificate "$url" )
 	if [ "$?" != "0" ]; then
 		cat >&2 <<-EOF
-		һЩ�ļ�����ʧ�ܣ���װ�ű���Ҫ�ܷ��ʵ� github.com��������������硣
-		ע��: һЩ���ڷ����������޷��������� github.com��
+		一些文件下载失败！安装脚本需要能访问到 github.com，请检查服务器网络。
+		注意: 一些国内服务器可能无法正常访问 github.com。
 		EOF
 
 		exit 1
@@ -397,9 +397,9 @@ install_haproxy() {
 
 	if ! ( $haproxy_bin -v 2>/dev/null | grep -q 'HA-Proxy' ); then
 		cat >&2 <<-EOF
-		HAproxy ��ִ���ļ��޷���������
-		������ glibc �汾���ͣ������ļ������������ϵͳ��
-		����ϵ�ű����ߣ�Ѱ��֧�֡�
+		HAproxy 可执行文件无法正常运行
+		可能是 glibc 版本过低，或者文件不适用于你的系统。
+		请联系脚本作者，寻求支持。
 		EOF
 		(
 			set -x
@@ -426,12 +426,12 @@ install_haproxy() {
 
 		if [ "$has_vnet" != 0 ]; then
 			cat >&2 <<-EOF
-			��ⷢ����Ĺ����ӿڲ��� venet0����Ҫ���ֶ�����һ������ӿ����ơ�
-			���ǻ��������ӿ�����ת�������������ӿ��������ò���ȷ��
-			�ⲿ���罫�޷��������ʵ��ڲ�����˿ڡ�
-			 * ����ӿ��Ǿ��й��� IP �Ľӿ����ơ�
+			检测发现你的公网接口不是 venet0，需要你手动输入一下网络接口名称。
+			我们会根据网络接口设置转发规则，如果网络接口名称设置不正确，
+			外部网络将无法正常访问到内部服务端口。
+			 * 网络接口是具有公网 IP 的接口名称。
 
-			����Դ��������Ϣ���ҵ���Ĺ����ӿ�����:
+			你可以从下面的信息中找到你的公网接口名称:
 			EOF
 
 			if command_exists ip; then
@@ -443,12 +443,12 @@ install_haproxy() {
 			local input=
 			while :
 			do
-				read -p "�������������ӿ�����(����: eth0): " input
+				read -p "请输入你的网络接口名称(例如: eth0): " input
 				echo
 				if [ -n "$input" ]; then
 					sed -i -r "s#^INTERFACE=.*#INTERFACE='"${input}"'#" "$haproxy_lkl_bin"
 				else
-					echo "������Ϣ����Ϊ�գ����������룡"
+					echo "输入信息不能为空，请重新输入！"
 					continue
 				fi
 
@@ -484,15 +484,15 @@ install_haproxy() {
 				chmod +x "$haproxy_lkl_startup_file"
 			;;
 			*)
-				echo "û���ʺϵ�ǰϵͳ�ķ��������ű��ļ���"
+				echo "没有适合当前系统的服务启动脚本文件。"
 				exit 1
 			;;
 		esac
 
 	else
 		cat >&2 <<-'EOF'
-		��ǰ������δ��װ systemctl ���� service ����޷����÷���
-		�����ֶ���װ systemd ���� service ֮�������нű���
+		当前服务器未安装 systemctl 或者 service 命令，无法配置服务。
+		请先手动安装 systemd 或者 service 之后再运行脚本。
 		EOF
 
 		exit 1
@@ -513,14 +513,14 @@ install_lkl_lib() {
 			)
 			if [ "$?" != "0" ]; then
 				if [ "$retry" -lt "3" ]; then
-					echo "�ļ�У��ʧ�ܣ�3 �����������..."
+					echo "文件校验失败！3 秒后重新下载..."
 					retry=`expr $retry + 1`
 					sleep 3
 					download_lkl_lib
 				else
 					cat >&2 <<-EOF
-					Linux �ں��ļ�У��ʧ�ܡ�
-					ͨ��������ԭ������ļ����ز�ȫ��
+					Linux 内核文件校验失败。
+					通常是网络原因造成文件下载不全。
 					EOF
 					exit 1
 				fi
@@ -556,13 +556,13 @@ set_config() {
 	if [ -z "$ACCELERATE_PORT" ] || ! is_port "$ACCELERATE_PORT"; then
 		while :
 		do
-			#read -p "��������Ҫ���ٵĶ˿� [1~65535]: " input
+			#read -p "请输入需要加速的端口 [1~65535]: " input
 			input=443
 			echo
 			if [ -n "$input" ] && is_port $input; then
 					ACCELERATE_PORT="$input"
 			else
-				echo "��������, ������ 1~65535 ֮�������!"
+				echo "输入有误, 请输入 1~65535 之间的数字!"
 				continue
 			fi
 			break
@@ -571,7 +571,7 @@ set_config() {
 
 	cat >&2 <<-EOF
 	---------------------------
-	���ٶ˿� = ${ACCELERATE_PORT}
+	加速端口 = ${ACCELERATE_PORT}
 	---------------------------
 	EOF
 	#any_key_to_continue
@@ -634,9 +634,9 @@ start_service() {
 	if [ "$?" != "0" ] || ! is_running; then
 		do_uninstall
 		cat >&2 <<-EOF
-		���ź�����������ʧ�ܡ�
-		����Բ鿴�������־����ȡԭ��
-		���ߣ�����Ե����ǵ�Ⱥ�ﷴ��һ�¡�
+		很遗憾，服务启动失败。
+		你可以查看上面的日志来获取原因，
+		或者，你可以到我们的群里反馈一下。
 		EOF
 		exit 1
 	fi
@@ -646,38 +646,38 @@ end_install() {
 	clear
 
 	cat >&2 <<-EOF
-	��ϲ��BBR ��װ��ɲ��ɹ�����
+	恭喜！BBR 安装完成并成功启动
 
-	�Ѽ��ٵĶ˿�: ${ACCELERATE_PORT}
+	已加速的端口: ${ACCELERATE_PORT}
 
-	�����ͨ���޸��ļ�:
+	你可以通过修改文件:
 	    ${HAPROXY_LKL_DIR}/etc/port-rules
 
-	��������Ҫ���ٵĶ˿ڻ�˿ڷ�Χ��
+	来配置需要加速的端口或端口范围。
 	EOF
 	if command_exists systemctl; then
 
 		cat >&2 <<-EOF
 
-		��ʹ�� systemctl {start|stop|restart} ${SERVICE_NAME}
-		�� {����|�ر�|����} ����
+		请使用 systemctl {start|stop|restart} ${SERVICE_NAME}
+		来 {开启|关闭|重启} 服务
 		EOF
 	else
 
 		cat >&2 <<-EOF
 
-		��ʹ�� service ${SERVICE_NAME} {start|stop|restart}
-		�� {����|�ر�|����} ����
+		请使用 service ${SERVICE_NAME} {start|stop|restart}
+		来 {开启|关闭|重启} 服务
 		EOF
 	fi
 	cat >&2 <<-EOF
 
-	�������Զ����뿪�������������ʹ�á�
+	服务已自动加入开机启动，请放心使用。
 
-	�������ű��ﵽ���㣬����������ߺ�ƿ����:
+	如果这个脚本帮到了你，你可以请作者喝瓶可乐:
 	  https://blog.kuoruan.com/donate
 
-	���ܼ��ٵĿ�аɣ�
+	享受加速的快感吧！
 	EOF
 }
 
@@ -746,7 +746,7 @@ case "$action" in
 	;;
 	*)
 		cat >&2 <<-EOF
-		����������ʹ�� $(basename $0) install|uninstall
+		参数有误，请使用 $(basename $0) install|uninstall
 		EOF
 		exit 255
 esac
