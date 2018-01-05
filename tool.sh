@@ -6,7 +6,6 @@ cur_dir=$(pwd)
 ssr_origin_config=/root/shadowsocksR-Origin.json
 ssrr_origin_config=/root/shadowsocksRR-Origin.json
 
-
 set_text_color(){
     COLOR_RED='\E[1;31m'
     COLOR_GREEN='\E[1;32m'
@@ -37,7 +36,7 @@ shell_update(){
 Dispaly_Selection(){
     def_Select=1
     echo -e "${COLOR_YELOW}You have 3 options for your ss/ssr/ssrr/kcptun operation.${COLOR_END}"
-    echo "1: Update All Programe（SS-libev,SSR,SSRR,KCPTUN,Rinetd-BBR）"
+    echo "1: Update All Programe(SS-libev,SSR,SSRR,KCPTUN,Rinetd-BBR)"
     echo "2: Switch ShadowsocksR(python) Config"
     echo "3: Switch ShadowsocksRR(python) Config"
     read -p "Enter your choice (1, 2,3 or exit. default [${def_Select}]): " Select
@@ -115,6 +114,7 @@ check_bbr_update(){
         exit 1
     fi
 }
+
 update_bbr(){
     /etc/init.d/bbr stop
     echo "starting update Rinetd-BBR..."

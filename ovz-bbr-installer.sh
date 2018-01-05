@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 : <<-'EOF'
 Copyright 2017 Xingwang Liao <kuoruan@gmail.com>
@@ -556,8 +556,7 @@ set_config() {
 	if [ -z "$ACCELERATE_PORT" ] || ! is_port "$ACCELERATE_PORT"; then
 		while :
 		do
-			#read -p "请输入需要加速的端口 [1~65535]: " input
-			input=443
+			read -p "请输入需要加速的端口 [1~65535]: " input
 			echo
 			if [ -n "$input" ] && is_port $input; then
 					ACCELERATE_PORT="$input"
@@ -574,7 +573,8 @@ set_config() {
 	加速端口 = ${ACCELERATE_PORT}
 	---------------------------
 	EOF
-	#any_key_to_continue
+
+	any_key_to_continue
 }
 
 is_running() {
