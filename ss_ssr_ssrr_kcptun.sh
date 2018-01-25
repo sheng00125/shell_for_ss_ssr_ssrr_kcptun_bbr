@@ -364,36 +364,10 @@ Dispaly_Selection(){
         Install_Select="${def_Install_Select}"
     esac
 }
-BBR_Selection(){
-    def_bbr_select="2"
-    echo -e "${COLOR_YELOW}You have 2 options for bbr install.${COLOR_END}"
-    echo "1: Install BBR with Rinetd"
-    echo "2: Install BBR with LML"
-    echo "3: Install BBR with LML"
-    read -p "Enter your choice (1, 2 or exit. default [${def_bbr_select}]): " bbr_select
-    case "${bbr_select}" in
-    1)
-        echo
-        echo -e "${COLOR_PINK}You will install BBR with Rinetd.${COLOR_END}"
-        ;;
-    2)
-        echo
-        echo -e "${COLOR_PINK}You will install Install BBR with LKL.${COLOR_END}"
-        ;;
-    [eE][xX][iI][tT])
-        echo -e "${COLOR_PINK}You select <Exit>, shell exit now!${COLOR_END}"
-        exit 1
-        ;;
-    *)
-        echo
-        echo -e "${COLOR_PINK}No input,You will install install BBR with LML.${COLOR_END}"
-        bbr_select="${def_bbr_select}"
-    esac
-}
 # Install cleanup
 install_cleanup(){
     cd ${cur_dir}
-    rm -rf .version.sh ${shadowsocks_libev_ver} ${shadowsocks_libev_ver}.tar.gz manyuser.zip shadowsocksr-manyuser shadowsocks-manyuser ${kcptun_latest_file} ${libsodium_laster_ver} ${libsodium_laster_ver}.tar.gz ${mbedtls_laster_ver} ${mbedtls_laster_ver}-gpl.tgz shadowsocksr-akkariiin-master ssrr.zip install.sh ovz-bbr-installer.sh get-rinetd-bbr.sh glibc-2.15-60.el6.x86_64.rpm glibc-common-2.15-60.el6.x86_64.rpm glibc-devel-2.15-60.el6.x86_64.rpm glibc-headers-2.15-60.el6.x86_64.rpm nscd-2.15-60.el6.x86_64.rpm
+    rm -rf .version.sh ${shadowsocks_libev_ver} ${shadowsocks_libev_ver}.tar.gz manyuser.zip shadowsocksr-manyuser shadowsocks-manyuser ${kcptun_latest_file} ${libsodium_laster_ver} ${libsodium_laster_ver}.tar.gz ${mbedtls_laster_ver} ${mbedtls_laster_ver}-gpl.tgz shadowsocksr-akkariiin-master ssrr.zip install.sh glibc-2.15-60.el6.x86_64.rpm glibc-common-2.15-60.el6.x86_64.rpm glibc-devel-2.15-60.el6.x86_64.rpm glibc-headers-2.15-60.el6.x86_64.rpm nscd-2.15-60.el6.x86_64.rpm
 }
 check_ss_ssr_ssrr_kcptun_installed(){
     ss_libev_installed_flag=""
@@ -863,42 +837,9 @@ install_ss_ssr_ssrr_kcptun(){
     install_cleanup
 }
 install_bbr(){
-    if [ "${bbr_select}" == "1" ] ;then
-        echo -e "${COLOR_PINK}install BBR with Rinetd...${COLOR_END}"
-	install_rinetd_bbr
-    else
-        echo -e "${COLOR_PINK}install BBR with LKL...${COLOR_END}"
-        wget --no-check-certificate https://raw.githubusercontent.com/Jenking-Zhang/shell_for_ss_ssr_ssrr_kcptun_bbr/master/ovz-bbr-installer.sh
-        chmod +x ovz-bbr-installer.sh
-        ./ovz-bbr-installer.sh
-    fi
-}
-install_rinetd_bbr(){
-#Get Rinetd-BBR version.
-    remote_bbr_version=$(wget --no-check-certificate -qO- https://api.github.com/repos/linhua55/lkl_study/releases/latest | grep 'tag_name' | cut -d\" -f4 | sed s/v//g )
-    RINET_BBR_URL="https://github.com/linhua55/lkl_study/releases/download/v${remote_bbr_version}/rinetd_bbr_powered"
-    BBR_INIT_URL="https://raw.githubusercontent.com/Jenking-Zhang/shell_for_ss_ssr_ssrr_kcptun_bbr/master/bbr.init"
-#Download Rinetd-BBR.
-    echo -e "Get the Rinetd-BBR version:${COLOR_GREEN}${remote_bbr_version}${COLOR_END}"
-    echo " Download Rinetd-BBR from $RINET_BBR_URL"
-    curl -L "${RINET_BBR_URL}" >/usr/bin/rinetd-bbr
-    chmod +x /usr/bin/rinetd-bbr
-#Config Rinetd-BBR.
-    echo "Config Rinetd-BBR..."
-    [ ! -d /etc/rinetd-bbr/ ] && mkdir /etc/rinetd-bbr/
-    [ -d /etc/rinetd-bbr/bbr.conf ] && rm -rf /etc/rinetd-bbr/bbr.conf
-    cat <<EOF > /etc/rinetd-bbr/bbr.conf
-#bbr_version="${remote_bbr_version}"
-# bindadress bindport connectaddress connectport
-0.0.0.0 443 0.0.0.0 443
-EOF
-#Config Rinetd-BBR service.
-    echo "Config service..."
-    wget --no-check-certificate "${BBR_INIT_URL}" -O /etc/init.d/bbr
-    chmod +x /etc/init.d/bbr
-    chkconfig --add bbr
-    chkconfig bbr on
-    /etc/init.d/bbr start
+    wget --no-check-certificate https://raw.githubusercontent.com/Jenking-Zhang/shell_for_ss_ssr_ssrr_kcptun_bbr/master/bbr_kvm.sh
+    chmod +x ./bbr_kvm.sh
+    ./bbr_kvm.sh
 }
 set_crontab(){
     if centosversion 6; then
@@ -911,12 +852,7 @@ set_crontab(){
         if [ "${Install_Select}" == "2" ] || [ "${Install_Select}" == "5" ]; then echo "28 3 * * * /etc/init.d/ssr restart" >> /var/spool/cron/root; fi
         if [ "${Install_Select}" == "6" ] || [ "${Install_Select}" == "7" ]; then echo "28 3 * * * /etc/init.d/ssrr restart" >> /var/spool/cron/root; fi
 	if [ "${Install_Select}" == "3" ] || [ "${Install_Select}" == "4" ] || [ "${Install_Select}" == "5" ] || [ "${Install_Select}" == "7" ]; then echo "29 3 * * * /etc/init.d/kcptun restart" >> /var/spool/cron/root; fi
-        if [ "${bbr_select}" == "1" ] ;then
-            echo "29 3 * * * /etc/init.d/bbr restart" >> /var/spool/cron/root
-        else
-            echo "29 3 * * * service haproxy-lkl restart" >> /var/spool/cron/root
-        fi
-            service crond restart
+        service crond restart
     fi
 }
 # Firewall set
@@ -1106,7 +1042,6 @@ pre_install_ss_ssr_ssrr_kcptun(){
     clear
     get_install_version
     Dispaly_Selection
-    #BBR_Selection
     Press_Install
     Print_Sys_Info
     set_timezone
@@ -2306,9 +2241,9 @@ case "${shell_action}" in
     pre_install_ss_ssr_ssrr_kcptun
     reconfig_ss_ssr_ssrr_kcptun
     set_tool
-    #install_bbr
     set_crontab
     install_cleanup
+    install_bbr
     ;;
 [Cc]|[Cc][Oo][Nn][Ff][Ii][Gg]|-[Cc]|--[Cc])
     configure_ss_ssr_ssrr_kcptun
