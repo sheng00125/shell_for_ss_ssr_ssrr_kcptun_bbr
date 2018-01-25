@@ -153,12 +153,14 @@ install_config() {
         if centosversion 6; then
             if [ ! -f "/boot/grub/grub.conf" ]; then
                 echo -e "${red}Error:${plain} /boot/grub/grub.conf not found, please check it."
+                rm -f bbr_kvm.sh
                 exit 1
             fi
             sed -i 's/^default=.*/default=0/g' /boot/grub/grub.conf
         elif centosversion 7; then
             if [ ! -f "/boot/grub2/grub.cfg" ]; then
                 echo -e "${red}Error:${plain} /boot/grub2/grub.cfg not found, please check it."
+                rm -f bbr_kvm.sh
                 exit 1
             fi
             grub2-set-default 0
@@ -174,9 +176,11 @@ reboot_os() {
     #read -p "Do you want to restart system? [y/n]" is_reboot
     is_reboot="y"
     if [[ ${is_reboot} == "y" || ${is_reboot} == "Y" ]]; then
+        rm -f bbr_kvm.sh
         reboot
     else
         echo -e "${green}Info:${plain} Reboot has been canceled..."
+        rm -f bbr_kvm.sh
         exit 0
     fi
 }
@@ -186,6 +190,7 @@ install_bbr() {
     if [ $? -eq 0 ]; then
         echo
         echo -e "${green}Info:${plain} TCP BBR has been installed. nothing to do..."
+        rm -f bbr_kvm.sh
         exit 0
     fi
     check_kernel_version
@@ -194,6 +199,7 @@ install_bbr() {
         echo -e "${green}Info:${plain} Your kernel version is greater than 4.9, directly setting TCP BBR..."
         sysctl_config
         echo -e "${green}Info:${plain} Setting TCP BBR completed..."
+        rm -f bbr_kvm.sh
         exit 0
     fi
 
@@ -202,21 +208,24 @@ install_bbr() {
         yum --enablerepo=elrepo-kernel -y install kernel-ml kernel-ml-devel
         if [ $? -ne 0 ]; then
             echo -e "${red}Error:${plain} Install latest kernel failed, please check it."
+            rm -f bbr_kvm.sh
             exit 1
         fi
     elif [[ x"${release}" == x"debian" || x"${release}" == x"ubuntu" ]]; then
         [[ ! -e "/usr/bin/wget" ]] && apt-get -y update && apt-get -y install wget
         get_latest_version
-        [ $? -ne 0 ] && echo -e "${red}Error:${plain} Get latest kernel version failed." && exit 1
+        [ $? -ne 0 ] && echo -e "${red}Error:${plain} Get latest kernel version failed." && rm -f bbr_kvm.sh && exit 1
         wget -c -t3 -T60 -O ${deb_kernel_name} ${deb_kernel_url}
         if [ $? -ne 0 ]; then
             echo -e "${red}Error:${plain} Download ${deb_kernel_name} failed, please check it."
+            rm -f bbr_kvm.sh
             exit 1
         fi
         dpkg -i ${deb_kernel_name}
         rm -fv ${deb_kernel_name}
     else
         echo -e "${red}Error:${plain} OS is not be supported, please change to CentOS/Debian/Ubuntu and try again."
+        rm -f bbr_kvm.sh
         exit 1
     fi
 
@@ -238,4 +247,5 @@ echo
 echo "Press any key to start...or Press Ctrl+C to cancel"
 char=`get_char`
 
-install_bbr 2>&1 | tee ${cur_dir}/install_bbr.log
+#install_bbr 2>&1 | tee ${cur_dir}/install_bbr.log
+install_bbr
