@@ -2003,7 +2003,7 @@ reconfig_ss_ssr_ssrr_kcptun(){
 }
 set_tool(){
     echo -e "${COLOR_YELOW}set tool...${COLOR_END}"
-    wget --no-check-certificate https://raw.githubusercontent.com/Jenking-Zhang/shell_for_ss_ssr_ssrr_kcptun_bbr/master/tool.sh
+    wget --no-check-certificate -O /root/tool.sh https://raw.githubusercontent.com/Jenking-Zhang/shell_for_ss_ssr_ssrr_kcptun_bbr/master/kvm_tool.sh
     chmod +x /root/tool.sh
 }
 update_ss_ssr_ssrr_kcptun(){
