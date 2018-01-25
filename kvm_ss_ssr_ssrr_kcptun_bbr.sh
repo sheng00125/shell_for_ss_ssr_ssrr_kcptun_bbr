@@ -270,9 +270,6 @@ pre_install_packs(){
            for depend in ${yum_depends[@]}; do
                error_detect_depends "yum -y -q install ${depend}"
            done
-	   if centosversion 6; then
-               update_glibc
-           fi
        elif check_sys packageManager apt; then
            apt_depends=(
                gettext build-essential unzip gzip python python-dev python-setuptools curl openssl libssl-dev
@@ -283,19 +280,6 @@ pre_install_packs(){
                error_detect_depends "apt-get -y install ${depend}"
            done
        fi
-}
-update_glibc(){
-    echo -e "${COLOR_YELOW}update glibc...${COLOR_END}"
-    wget -c http://ftp.redsleeve.org/pub/steam/glibc-2.15-60.el6.x86_64.rpm \
-    http://ftp.redsleeve.org/pub/steam/glibc-common-2.15-60.el6.x86_64.rpm \
-    http://ftp.redsleeve.org/pub/steam/glibc-devel-2.15-60.el6.x86_64.rpm \
-    http://ftp.redsleeve.org/pub/steam/glibc-headers-2.15-60.el6.x86_64.rpm \
-    http://ftp.redsleeve.org/pub/steam/nscd-2.15-60.el6.x86_64.rpm
-    rpm -Uvh glibc-2.15-60.el6.x86_64.rpm \
-    glibc-common-2.15-60.el6.x86_64.rpm \
-    glibc-devel-2.15-60.el6.x86_64.rpm \
-    glibc-headers-2.15-60.el6.x86_64.rpm \
-    nscd-2.15-60.el6.x86_64.rpm
 }
 # Random password
 randstr(){
@@ -367,7 +351,7 @@ Dispaly_Selection(){
 # Install cleanup
 install_cleanup(){
     cd ${cur_dir}
-    rm -rf .version.sh ${shadowsocks_libev_ver} ${shadowsocks_libev_ver}.tar.gz manyuser.zip shadowsocksr-manyuser shadowsocks-manyuser ${kcptun_latest_file} ${libsodium_laster_ver} ${libsodium_laster_ver}.tar.gz ${mbedtls_laster_ver} ${mbedtls_laster_ver}-gpl.tgz shadowsocksr-akkariiin-master ssrr.zip install.sh glibc-2.15-60.el6.x86_64.rpm glibc-common-2.15-60.el6.x86_64.rpm glibc-devel-2.15-60.el6.x86_64.rpm glibc-headers-2.15-60.el6.x86_64.rpm nscd-2.15-60.el6.x86_64.rpm
+    rm -rf .version.sh ${shadowsocks_libev_ver} ${shadowsocks_libev_ver}.tar.gz manyuser.zip shadowsocksr-manyuser shadowsocks-manyuser ${kcptun_latest_file} ${libsodium_laster_ver} ${libsodium_laster_ver}.tar.gz ${mbedtls_laster_ver} ${mbedtls_laster_ver}-gpl.tgz shadowsocksr-akkariiin-master ssrr.zip install.sh
 }
 check_ss_ssr_ssrr_kcptun_installed(){
     ss_libev_installed_flag=""
