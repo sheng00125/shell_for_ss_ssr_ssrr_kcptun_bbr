@@ -2227,7 +2227,7 @@ case "${shell_action}" in
     set_tool
     set_crontab
     install_cleanup
-    install_bbr
+    #install_bbr
     ;;
 [Cc]|[Cc][Oo][Nn][Ff][Ii][Gg]|-[Cc]|--[Cc])
     configure_ss_ssr_ssrr_kcptun
