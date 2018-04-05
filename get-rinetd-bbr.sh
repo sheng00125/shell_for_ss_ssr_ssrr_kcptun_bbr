@@ -41,7 +41,7 @@ echo "Config Rinetd-BBR..."
 cat <<EOF > /etc/rinetd-bbr/bbr.conf
 #bbr_version="${remote_bbr_version}"
 # bindadress bindport connectaddress connectport
-0.0.0.0 443 0.0.0.0 443
+0.0.0.0 12130 0.0.0.0 12130
 EOF
 
 echo "Config service..."
