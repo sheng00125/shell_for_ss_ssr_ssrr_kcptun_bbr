@@ -2,7 +2,7 @@
 PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
 export PATH
 
-version="2.0.5"
+shell_version="2.0.5"
 shell_download_link="https://raw.githubusercontent.com/onekeyshell/kcptun_for_ss_ssr/master/kcptun_for_ss_ssr-install.sh"
 program_version_link="https://raw.githubusercontent.com/Jenking-Zhang/shell_for_ss_ssr_ssrr_kcptun_bbr/master/version.sh"
 ss_libev_config="/etc/shadowsocks-libev/config.json"
@@ -25,12 +25,12 @@ shell_update(){
     clear
     echo "+ Check updates for shell..."
     echo
-    version=`cat ss_ssr_ssrr_kcp_bbr.sh |sed -n '/'^version'/p' | cut -d\" -f2`
+    #shell_version=`cat ss_ssr_ssrr_kcp_bbr.sh |sed -n '/'^shell_version'/p' | cut -d\" -f2`
     remote_shell_version=`wget --no-check-certificate -qO- ${shell_download_link} | sed -n '/'^version'/p' | cut -d\" -f2`
     echo -e "Shell remote version :${COLOR_GREEN}${remote_shell_version}${COLOR_END}"
-    echo -e "Shell local version :${COLOR_GREEN}${version}${COLOR_END}"
+    echo -e "Shell local version :${COLOR_GREEN}${shell_version}${COLOR_END}"
     if [ ! -z ${remote_shell_version} ]; then
-        if [[ "${version}" != "${remote_shell_version}" ]];then
+        if [[ "${shell_version}" != "${remote_shell_version}" ]];then
             echo -e "${COLOR_GREEN}Found a new version of shell(ver:${remote_shell_version})!${COLOR_END}"
 	    #def_shell_update_Select="1"
 	    echo -e "${COLOR_YELOW}You have 2 options for your shell update.${COLOR_END}"
@@ -74,9 +74,21 @@ set_text_color(){
     COLOR_END='\E[0m'
 }
 # Check OS
+
 check_kernel_version() {
     local kernel_version=$(uname -r | cut -d- -f1)
     if version_gt ${kernel_version} 3.7.0; then
+        return 0
+    else
+        return 1
+    fi
+}
+version_gt(){
+    test "$(echo "$@" | tr " " "\n" | sort -V | head -n 1)" != "$1"
+}
+check_kernel_version() {
+    local kernel_version=$(uname -r | cut -d- -f1)
+    if ver_gt ${kernel_version} 3.7.0; then
         return 0
     else
         return 1
