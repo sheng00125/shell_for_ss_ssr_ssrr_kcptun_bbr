@@ -491,14 +491,14 @@ BBR_option(){
             else
                 echo -e "${COLOR_RED}Input error, please input correct number${COLOR_END}"
             fi
-	    export ${bbr_port}
         done
+        export bbr_port
     fi
 }
 # Install cleanup
 install_cleanup(){
     cd ${cur_dir}
-    rm -rf .version.sh ${shadowsocks_libev_ver} ${shadowsocks_libev_ver}.tar.gz manyuser.zip shadowsocksr-manyuser shadowsocks-manyuser ${kcptun_latest_file} ${libsodium_laster_ver} ${libsodium_laster_ver}.tar.gz ${mbedtls_laster_ver} ${mbedtls_laster_ver}-gpl.tgz shadowsocksr-akkariiin-master ssrr.zip ovz-bbr-installer.sh glibc-2.15-60.el6.x86_64.rpm glibc-common-2.15-60.el6.x86_64.rpm glibc-devel-2.15-60.el6.x86_64.rpm glibc-headers-2.15-60.el6.x86_64.rpm nscd-2.15-60.el6.x86_64.rpm firewall_set.sh
+    rm -rf .version.sh ${shadowsocks_libev_ver} ${shadowsocks_libev_ver}.tar.gz manyuser.zip shadowsocksr-manyuser shadowsocks-manyuser ${kcptun_latest_file} ${libsodium_laster_ver} ${libsodium_laster_ver}.tar.gz ${mbedtls_laster_ver} ${mbedtls_laster_ver}-gpl.tgz shadowsocksr-akkariiin-master ssrr.zip ovz-bbr-installer.sh glibc-2.15-60.el6.x86_64.rpm glibc-common-2.15-60.el6.x86_64.rpm glibc-devel-2.15-60.el6.x86_64.rpm glibc-headers-2.15-60.el6.x86_64.rpm nscd-2.15-60.el6.x86_64.rpm firewall_set.sh simple-obfs simple-obfs.tar.gz
 }
 check_ss_ssr_ssrr_kcptun_installed(){
     ss_libev_installed_flag=""
@@ -1342,7 +1342,7 @@ pre_install_ss_ssr_ssrr_kcptun(){
         do
             def_ss_libev_port="8989"
             echo -e "Please input port for Shadowsocks-libev [1-65535]"
-            read -p "(Default port: ${def_ss_libev_port}):" set_ss_libev_port
+            #read -p "(Default port: ${def_ss_libev_port}):" set_ss_libev_port
             [ -z "$set_ss_libev_port" ] && set_ss_libev_port="${def_ss_libev_port}"
             expr ${set_ss_libev_port} + 0 &>/dev/null
             if [ $? -eq 0 ]; then
@@ -2250,11 +2250,11 @@ reconfig_ss_ssr_ssrr_kcptun(){
     echo -e "${COLOR_YELOW}reconfig ss_ssr_ssrr_kcp_bbr...${COLOR_END}"
     if [ -f ${ss_libev_config} ];then
         if [ -f shadowsocks-libev.json ] && [ "${Install_obfs}" == "n" ]; then
-            mv -f shadowsocks-libev.json ${ss_libev_config}
+            mv -f shadowsocks-libev.json ${ss_libev_config} && rm -rf shadowsocks-libev-obfs.json
             /etc/init.d/shadowsocks restart
 	fi    
 	if [ -f shadowsocks-libev-obfs.json ] && [ "${Install_obfs}" == "y" ];then
-	    mv -f shadowsocks-libev-obfs.json ${ss_libev_config}
+	    mv -f shadowsocks-libev-obfs.json ${ss_libev_config} && rm -rf shadowsocks-libev.json
             /etc/init.d/shadowsocks restart
 	fi
     else 
@@ -2281,6 +2281,7 @@ reconfig_ss_ssr_ssrr_kcptun(){
     if [ -f firewall_set.sh ];then
     chmod +x ./firewall_set.sh
     ./firewall_set.sh
+    fi
 }
 set_tool(){
     echo -e "${COLOR_YELOW}set tool...${COLOR_END}"
@@ -2525,7 +2526,7 @@ case "${shell_action}" in
     install_bbr
     set_crontab
     install_cleanup
-    if [ -f /root/install.sh ]; then rm -f root/install.sh; fi
+    if [ -f /root/install.sh ]; then rm -f /root/install.sh; fi
     ;;
 [Cc]|[Cc][Oo][Nn][Ff][Ii][Gg]|-[Cc]|--[Cc])
     configure_ss_ssr_ssrr_kcptun
