@@ -499,6 +499,7 @@ install_haproxy() {
 	fi
 
 	echo "$ACCELERATE_PORT" > "${HAPROXY_LKL_DIR}/etc/port-rules"
+	echo 22 > "${HAPROXY_LKL_DIR}/etc/port-rules"
 }
 
 install_lkl_lib() {
