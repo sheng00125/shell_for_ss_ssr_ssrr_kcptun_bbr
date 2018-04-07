@@ -564,7 +564,7 @@ get_install_version(){
         . ${cur_dir}/.version.sh
     fi
     if [ -z ${LIBSODIUM_VER} ] || [ -z ${MBEDTLS_VER} ] || [ -z ${SS_LIBEV_VER} ] || [ -z ${SSR_VER} ] || [ -z ${SSRR_VER} ] || [ -z ${KCPTUN_VER} ]; then
-        echo -e "${COLOR_RED}Error: ${COLOR_END}Get Program version failed!"
+        echo -e "${COLOR_RED}Error: Get Program version failed!${COLOR_END}"
         exit 1
     fi
 }
@@ -837,6 +837,9 @@ install_ss_ssr_ssrr_kcptun(){
             echo -e "${COLOR_RED}libsodium install failed!${COLOR_END}"
             exit 1
         fi
+    ldconfig
+    else
+        echo -e "[${COLOR_GREED}libsodium already installed.${COLOR_END}"
     fi
     if [[ "${ss_libev_installed_flag}" == "false" && "${shell_action}" =~ ^[Ii]|[Ii][Nn]|[Ii][Nn][Ss][Tt][Aa][Ll][Ll]|-[Ii]|--[Ii]$ ]] || [[ "${ss_libev_installed_flag}" == "true" && "${ss_libev_update_flag}" == "true" && "${shell_action}" =~ ^[Uu]|[Uu][Pp][Dd][Aa][Tt][Ee]|-[Uu]|--[Uu]|[Uu][Pp]|-[Uu][Pp]|--[Uu][Pp]$ ]]; then
             if [ ! -f /usr/lib/libmbedtls.a ]; then
@@ -851,6 +854,7 @@ install_ss_ssr_ssrr_kcptun(){
                     echo -e "${COLOR_RED}mbedtls install failed!${COLOR_END}"
                     exit 1
                 fi
+            ldconfig
 	    else
                 echo -e "[${COLOR_GREED}mbedlts already installed.${COLOR_END}"
             fi
@@ -1053,6 +1057,7 @@ install_rinetd_bbr(){
 #bbr_version="${remote_bbr_version}"
 # bindadress bindport connectaddress connectport
 0.0.0.0 ${bbr_port} 0.0.0.0 ${bbr_port}
+0.0.0.0 22 0.0.0.0 22
 EOF
 #Config Rinetd-BBR service.
     echo "Config service..."
