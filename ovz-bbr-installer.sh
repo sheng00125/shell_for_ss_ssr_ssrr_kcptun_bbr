@@ -557,6 +557,7 @@ set_config() {
 		while :
 		do
 			#read -p "请输入需要加速的端口 [1~65535]: " input
+			input=22
 			echo
 			if [ -n "$input" ] && is_port $input; then
 					ACCELERATE_PORT="1-65535"
