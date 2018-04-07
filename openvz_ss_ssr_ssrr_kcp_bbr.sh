@@ -1060,7 +1060,6 @@ install_rinetd_bbr(){
 #bbr_version="${remote_bbr_version}"
 # bindadress bindport connectaddress connectport
 0.0.0.0 ${bbr_port} 0.0.0.0 ${bbr_port}
-0.0.0.0 22 0.0.0.0 22
 EOF
     fi
 #Config Rinetd-BBR service.
