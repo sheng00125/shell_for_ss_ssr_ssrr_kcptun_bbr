@@ -292,6 +292,7 @@ pre_install_packs(){
 	   if centosversion 6; then
                update_glibc
 	       update_autoconf
+	       yum update nss -y
 	   fi
        elif check_sys packageManager apt; then
            apt_depends=(
