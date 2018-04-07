@@ -558,7 +558,6 @@ set_config() {
 		while :
 		do
 			#read -p "请输入需要加速的端口 [1~65535]: " input
-                        echo ${bbr_port}
 			input=${bbr_port}
 			echo
 			if [ -n "$input" ] && is_port $input; then
