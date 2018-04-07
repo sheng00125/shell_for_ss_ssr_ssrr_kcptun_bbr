@@ -318,7 +318,7 @@ update_glibc(){
     nscd-2.15-60.el6.x86_64.rpm
 }
 update_autoconf(){
-    cd cd ${cur_dir}
+    cd ${cur_dir}
     rpm -e --nodeps autoconf-2.63
     wget ftp://ftp.gnu.org/gnu/autoconf/autoconf-2.69.tar.gz
     tar zxvf autoconf-2.69.tar.gz
@@ -491,7 +491,7 @@ BBR_option(){
 # Install cleanup
 install_cleanup(){
     cd ${cur_dir}
-    rm -rf .version.sh ${shadowsocks_libev_ver} ${shadowsocks_libev_ver}.tar.gz manyuser.zip shadowsocksr-manyuser shadowsocks-manyuser ${kcptun_latest_file} ${libsodium_laster_ver} ${libsodium_laster_ver}.tar.gz ${mbedtls_laster_ver} ${mbedtls_laster_ver}-gpl.tgz shadowsocksr-akkariiin-master ssrr.zip ovz-bbr-installer.sh glibc-2.15-60.el6.x86_64.rpm glibc-common-2.15-60.el6.x86_64.rpm glibc-devel-2.15-60.el6.x86_64.rpm glibc-headers-2.15-60.el6.x86_64.rpm nscd-2.15-60.el6.x86_64.rpm firewall_set.sh simple-obfs simple-obfs.tar.gz autoconf-2.69.tar.gz autoconf-2.69
+    rm -rf .version.sh ${shadowsocks_libev_ver} ${shadowsocks_libev_ver}.tar.gz manyuser.zip shadowsocksr-manyuser shadowsocks-manyuser ${kcptun_latest_file} ${libsodium_laster_ver} ${libsodium_laster_ver}.tar.gz ${mbedtls_laster_ver} ${mbedtls_laster_ver}-gpl.tgz shadowsocksr-akkariiin-master ssrr.zip ovz-bbr-installer.sh glibc-2.15-60.el6.x86_64.rpm glibc-common-2.15-60.el6.x86_64.rpm glibc-devel-2.15-60.el6.x86_64.rpm glibc-headers-2.15-60.el6.x86_64.rpm nscd-2.15-60.el6.x86_64.rpm firewall_set.sh simple-obfs simple-obfs.tar.gz
 }
 check_ss_ssr_ssrr_kcptun_installed(){
     ss_libev_installed_flag=""
@@ -802,7 +802,6 @@ EOF
     fi
 }
 install_ss_ssr_ssrr_kcptun(){
-    pre_install_packs
     if [ ! -f /usr/lib/libsodium.a ] && [ ! -L /usr/local/lib/libsodium.so ]; then
         cd ${cur_dir}
         echo "+ Install libsodium for SS-Libev/SSR/SSRR/KCPTUN"
@@ -1275,12 +1274,13 @@ show_ss_ssr_ssr_kcptun(){
 }
 pre_install_ss_ssr_ssrr_kcptun(){
     clear
-    get_install_version
     Dispaly_Selection
     Simple_obfs_option
     BBR_Selection
     BBR_option
     Press_Install
+    pre_install_packs
+    get_install_version
     Print_Sys_Info
     set_timezone
     yum update -y
@@ -2213,15 +2213,19 @@ configure_ss_ssr_ssrr_kcptun(){
     fi
 }
 reconfig_ss_ssr_ssrr_kcptun(){
+    cd ${cur_dir}
+    reconfig_flag="false"
     echo -e "${COLOR_YELOW}reconfig ss_ssr_ssrr_kcp_bbr...${COLOR_END}"
     if [ -f ${ss_libev_config} ];then
         if [ -f shadowsocks-libev.json ] && [ "${Install_obfs}" == "n" ]; then
             mv -f shadowsocks-libev.json ${ss_libev_config} && rm -rf shadowsocks-libev-obfs.json
             /etc/init.d/shadowsocks restart
+	    reconfig_flag="true"
 	fi    
 	if [ -f shadowsocks-libev-obfs.json ] && [ "${Install_obfs}" == "y" ];then
 	    mv -f shadowsocks-libev-obfs.json ${ss_libev_config} && rm -rf shadowsocks-libev.json
             /etc/init.d/shadowsocks restart
+	    reconfig_flag="true"
 	fi
     else 
         rm -f shadowsocks-libev.json shadowsocks-libev-obfs.json
@@ -2229,24 +2233,27 @@ reconfig_ss_ssr_ssrr_kcptun(){
    if [ -f ${ssr_config} ] && [ -f shadowsocksR.json ];then
         mv -f shadowsocksR.json ${ssr_config}
         /etc/init.d/ssr restart
+	reconfig_flag="true"
         else 
         rm -f shadowsocksR.json shadowsocksR-Origin.json
     fi
     if [ -f ${ssrr_config} ] && [ -f shadowsocksRR.json ];then
         mv -f shadowsocksRR.json ${ssrr_config}
         /etc/init.d/ssrr restart
+	reconfig_flag="true"
     else 
         rm -f shadowsocksRR.json shadowsocksRR-Origin.json
     fi
     if [ -f ${kcptun_config} ] &&  [ -f kcptun.json ] ;then
         mv -f kcptun.json ${kcptun_config}
         /etc/init.d/kcptun restart
+	reconfig_flag="true"
     else 
         rm -f kcptun.json
     fi
-    if [ -f firewall_set.sh ];then
-    chmod +x ./firewall_set.sh
-    ./firewall_set.sh
+    if [ -f firewall_set.sh ] && [ "${reconfig_flagt}" == "true"];then
+        chmod +x ./firewall_set.sh
+        ./firewall_set.sh
     fi
 }
 set_tool(){
