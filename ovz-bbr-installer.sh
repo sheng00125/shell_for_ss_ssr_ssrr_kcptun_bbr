@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 : <<-'EOF'
 Copyright 2017 Xingwang Liao <kuoruan@gmail.com>
@@ -557,10 +557,10 @@ set_config() {
 		while :
 		do
 			#read -p "请输入需要加速的端口 [1~65535]: " input
-			input=443
+                        input=${bbr_port}
 			echo
 			if [ -n "$input" ] && is_port $input; then
-					ACCELERATE_PORT=${input}
+					ACCELERATE_PORT="$input"
 			else
 				echo "输入有误, 请输入 1~65535 之间的数字!"
 				continue
@@ -568,7 +568,7 @@ set_config() {
 			break
 		done
 	fi
-        ACCELERATE_PORT=1-65535
+
 	cat >&2 <<-EOF
 	---------------------------
 	加速端口 = ${ACCELERATE_PORT}
@@ -586,7 +586,7 @@ is_running() {
 		# ping may not work with IPv4 under OpenVZ on CentOS 7
 
 		# ping -q -c3 10.0.0.2 2>/dev/null
-		timeout 2 bash -c "</dev/tcp/10.0.0.2/443" 2>/dev/null
+		timeout 2 bash -c "</dev/tcp/10.0.0.2/${ACCELERATE_PORT}" 2>/dev/null
 	)
 	return $?
 }
