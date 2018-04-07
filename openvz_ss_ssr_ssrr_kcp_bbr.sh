@@ -486,29 +486,6 @@ BBR_option(){
                 echo -e "${COLOR_RED}Input error, please input correct number${COLOR_END}"
             fi
         done
-    elif [ ${bbr_select} == "2" ] && [ ! -f lkl_bbr.conf ];then
-        while true
-        do
-            echo
-            read -p "(Please input port for BBR [1-65535):" bbr_port
-            [ -z "$set_ss_libev_port" ]
-            expr ${bbr_port} + 0 &>/dev/null
-            if [ $? -eq 0 ]; then
-                if [ ${bbr_port} -ge 1 ] && [ ${bbr_port} -le 65535 ]; then
-                    echo
-                    echo "---------------------------------------"
-                    echo "BBR port = ${bbr_port}"
-                    echo "---------------------------------------"
-                    echo
-                    break
-                 else
-                    echo -e "${COLOR_RED}Input error, please input correct number${COLOR_END}"
-                  fi
-            else
-                echo -e "${COLOR_RED}Input error, please input correct number${COLOR_END}"
-            fi
-        done
-        export bbr_port
     fi
 }
 # Install cleanup
@@ -1030,7 +1007,6 @@ install_simple_obfs(){
     fi
 }
 install_bbr(){
-    cd ${cur_dir}
     if [ "${bbr_select}" == "1" ] ;then
         echo -e "${COLOR_PINK}install BBR with Rinetd...${COLOR_END}"
 	install_rinetd_bbr
@@ -1040,6 +1016,7 @@ install_bbr(){
     fi
 }
 install_rinetd_bbr(){
+    cd ${cur_dir}
 #Get Rinetd-BBR version.
     remote_bbr_version=$(wget --no-check-certificate -qO- https://api.github.com/repos/linhua55/lkl_study/releases/latest | grep 'tag_name' | cut -d\" -f4 | sed s/v//g )
     RINET_BBR_URL="https://github.com/linhua55/lkl_study/releases/download/v${remote_bbr_version}/rinetd_bbr_powered"
@@ -1053,12 +1030,16 @@ install_rinetd_bbr(){
     echo "Config Rinetd-BBR..."
     [ ! -d /etc/rinetd-bbr/ ] && mkdir /etc/rinetd-bbr/
     [ -d /etc/rinetd-bbr/bbr.conf ] && rm -rf /etc/rinetd-bbr/bbr.conf
+    if [ ! -f rinetd_bbr.conf ];then
+        mv rinetd_bbr.conf /etc/rinetd-bbr/bbr.conf
+    else
     cat <<EOF > /etc/rinetd-bbr/bbr.conf
 #bbr_version="${remote_bbr_version}"
 # bindadress bindport connectaddress connectport
 0.0.0.0 ${bbr_port} 0.0.0.0 ${bbr_port}
 0.0.0.0 22 0.0.0.0 22
 EOF
+    fi
 #Config Rinetd-BBR service.
     echo "Config service..."
     wget --no-check-certificate "${BBR_INIT_URL}" -O /etc/init.d/bbr
@@ -1068,6 +1049,7 @@ EOF
     /etc/init.d/bbr start
 }
 install_lkl_bbr(){
+    cd ${cur_dir}
     wget --no-check-certificate https://raw.githubusercontent.com/Jenking-Zhang/shell_for_ss_ssr_ssrr_kcptun_bbr/master/ovz-bbr-installer.sh
     chmod +x ovz-bbr-installer.sh
     ./ovz-bbr-installer.sh
