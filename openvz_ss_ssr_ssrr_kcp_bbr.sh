@@ -88,7 +88,7 @@ version_gt(){
 }
 check_kernel_version() {
     local kernel_version=$(uname -r | cut -d- -f1)
-    if ver_gt ${kernel_version} 3.7.0; then
+    if version_gt ${kernel_version} 3.7.0; then
         return 0
     else
         return 1
@@ -272,23 +272,27 @@ error_detect_depends(){
 pre_install_packs(){
     if check_sys packageManager yum; then
            echo -e "[${COLOR_GREEN}Info${COLOR_END} Checking the EPEL repository..."
-           if [ ! -f /etc/yum.repos.d/epel.repo ]; then
-           yum install -y -q epel-release
+             if [ ! -f /etc/yum.repos.d/epel.repo ]; then
+                   yum install -y -q epel-release
            fi
-           [ ! -f /etc/yum.repos.d/epel.repo ] && echo -e "[${COLOR_RED}Error${COLOR_END} Install EPEL repository failed, please check it." && exit 1
+           [ ! -f /etc/yum.repos.d/epel.repo ] && echo -e "[${COLOR_RED}Error, Install EPEL repository failed, please check it.${COLOR_END}" && exit 1
            [ ! "$(command -v yum-config-manager)" ] && yum install -y -q yum-utils
         if [ x"`yum-config-manager epel | grep -w enabled | awk '{print $3}'`" != x"True" ]; then
             yum-config-manager --enable epel
         fi
-           echo -e "[${COLOR_GREEN}Info${COLOR_END} Checking the EPEL repository complete..."
+           echo -e "[${COLOR_GREEN}Info${COLOR_END}] Checking the EPEL repository complete..."
            yum_depends=(
-            unzip gzip openssl openssl-devel gcc python python-devel python-setuptools pcre pcre-devel libtool libevent xmlto
-            autoconf automake make curl curl-devel zlib-devel perl perl-devel cpio expat-devel gettext-devel asciidoc
-            libev-devel c-ares-devel git qrencode udns-devel kernel-headers lrzsz
+                  unzip gzip openssl openssl-devel gcc python python-devel python-setuptools pcre pcre-devel libtool libevent xmlto
+                  autoconf automake make curl curl-devel zlib-devel perl perl-devel cpio expat-devel gettext-devel asciidoc
+                  libev-devel c-ares-devel git qrencode kernel-headers lrzsz
            )
            for depend in ${yum_depends[@]}; do
-               error_detect_depends "yum -y -q install ${depend}"
+               error_detect_depends "yum -y install ${depend}"
            done
+	   if centosversion 6; then
+               update_glibc
+	       update_autoconf
+	   fi
        elif check_sys packageManager apt; then
            apt_depends=(
                gettext build-essential unzip gzip python python-dev python-setuptools curl openssl libssl-dev
@@ -654,7 +658,7 @@ down_ss_ssr_ssrr_kcptun(){
     fi
     if [[ "${ss_libev_installed_flag}" == "false" && "${shell_action}" =~ ^[Ii]|[Ii][Nn]|[Ii][Nn][Ss][Tt][Aa][Ll][Ll]|-[Ii]|--[Ii]$ ]] || [[ "${ss_libev_installed_flag}" == "true" && "${ss_libev_update_flag}" == "true" && "${shell_action}" =~ ^[Uu]|[Uu][Pp][Dd][Aa][Tt][Ee]|-[Uu]|--[Uu]|[Uu][Pp]|-[Uu][Pp]|--[Uu][Pp]$ ]]; then
         if [ -f ${shadowsocks_libev_ver}.tar.gz ]; then
-            echo "${Shadowsocks_libev_ver}.tar.gz [found]"
+            echo "${shadowsocks_libev_ver}.tar.gz [found]"
         else
             if ! wget --no-check-certificate -O ${shadowsocks_libev_ver}.tar.gz ${SS_LIBEV_LINK}; then
                 echo -e "${COLOR_RED}Failed to download ${shadowsocks_libev_ver}.tar.gz${COLOR_END}"
@@ -822,72 +826,38 @@ EOF
 }
 install_ss_ssr_ssrr_kcptun(){
     pre_install_packs
-    #if [[ "${ss_libev_installed_flag}" == "false" && "${shell_action}" =~ ^[Ii]|[Ii][Nn]|[Ii][Nn][Ss][Tt][Aa][Ll][Ll]|-[Ii]|--[Ii]$ ]] || [[ "${ssr_installed_flag}" == "false" && "${shell_action}" =~ ^[Ii]|[Ii][Nn]|[Ii][Nn][Ss][Tt][Aa][Ll][Ll]|-[Ii]|--[Ii]$ ]] || [[ "${kcptun_installed_flag}" == "false" && "${shell_action}" =~ ^[Ii]|[Ii][Nn]|[Ii][Nn][Ss][Tt][Aa][Ll][Ll]|-[Ii]|--[Ii]$ ]]; then
-        if check_sys packageManager yum; then
-            yum install -y epel-release
-            yum install -y unzip openssl-devel gcc swig autoconf libtool libevent vim automake make psmisc curl curl-devel zlib-devel perl perl-devel cpio expat-devel gettext-devel xmlto asciidoc pcre pcre-devel python python-devel python-setuptools udns-devel libev-devel mbedtls-devel
-            if [ $? -gt 1 ]; then
-                echo
-                echo -e "${COLOR_RED}Install support packs failed!${COLOR_END}"
-                exit 1
-            fi
-        elif check_sys packageManager apt; then
-            if debianversion 7; then
-                grep "jessie" /etc/apt/sources.list > /dev/null 2>&1
-                if [ $? -ne 0 ] && [ -r /etc/apt/sources.list ]; then
-                    echo "deb http://http.us.debian.org/debian jessie main" >> /etc/apt/sources.list
-                fi
-            fi
-            apt-get -y update && apt-get -y install --no-install-recommends gettext curl wget vim unzip psmisc gcc swig autoconf automake make perl cpio build-essential libtool openssl libssl-dev zlib1g-dev xmlto asciidoc libpcre3 libpcre3-dev python python-dev python-pip python-m2crypto libev-dev libudns-dev
-            if [ $? -gt 1 ]; then
-                echo
-                echo -e "${COLOR_RED}Install support packs failed!${COLOR_END}"
-                exit 1
-            fi
-        fi
-    #fi
     if [ ! -f /usr/lib/libsodium.a ] && [ ! -L /usr/local/lib/libsodium.so ]; then
         cd ${cur_dir}
         echo "+ Install libsodium for SS-Libev/SSR/SSRR/KCPTUN"
         tar xzf ${libsodium_laster_ver}.tar.gz
         cd ${libsodium_laster_ver}
-        ./configure --prefix=/usr && make && make install
+         ./configure --prefix=/usr && make && make install
         if [ $? -ne 0 ]; then
             install_cleanup
             echo -e "${COLOR_RED}libsodium install failed!${COLOR_END}"
             exit 1
         fi
-        ldconfig
-        #echo "/usr/lib" > /etc/ld.so.conf.d/local.conf
     fi
     if [[ "${ss_libev_installed_flag}" == "false" && "${shell_action}" =~ ^[Ii]|[Ii][Nn]|[Ii][Nn][Ss][Tt][Aa][Ll][Ll]|-[Ii]|--[Ii]$ ]] || [[ "${ss_libev_installed_flag}" == "true" && "${ss_libev_update_flag}" == "true" && "${shell_action}" =~ ^[Uu]|[Uu][Pp][Dd][Aa][Tt][Ee]|-[Uu]|--[Uu]|[Uu][Pp]|-[Uu][Pp]|--[Uu][Pp]$ ]]; then
-        if check_sys packageManager yum; then
-            echo "+ Install mbedtls for SS-Liber..."
-            yum install -y mbedtls-devel
-            if [ $? -ne 0 ]; then
-                install_cleanup
-                echo -e "${COLOR_RED}mbedtls install failed!${COLOR_END}"
-                exit 1
-            fi
-        elif check_sys packageManager apt; then
             if [ ! -f /usr/lib/libmbedtls.a ]; then
                 cd ${cur_dir}
-                echo "+ Install mbedtls for SS-Liber..."
+                echo "install mbedtls for Shadowsocks-libev..."
                 tar xzf ${mbedtls_laster_ver}-gpl.tgz
                 cd ${mbedtls_laster_ver}
-                make SHARED=1 CFLAGS=-fPIC && make DESTDIR=/usr install
+                make SHARED=1 CFLAGS=-fPIC
+                        make DESTDIR=/usr install
                 if [ $? -ne 0 ]; then
                     install_cleanup
                     echo -e "${COLOR_RED}mbedtls install failed!${COLOR_END}"
                     exit 1
                 fi
-                ldconfig
+	    else
+                echo -e "[${COLOR_GREED}mbedlts already installed.${COLOR_END}"
             fi
-        fi
         cd ${cur_dir}
         tar zxf ${shadowsocks_libev_ver}.tar.gz
         cd ${shadowsocks_libev_ver}
-        ./configure
+        ./configure --disable-documentation
         make && make install
         if [ $? -eq 0 ]; then
             chmod +x /etc/init.d/shadowsocks
@@ -1057,9 +1027,6 @@ install_simple_obfs(){
 }
 install_bbr(){
     cd ${cur_dir}
-    if centosversion 6; then
-       update_glibc
-    fi
     if [ "${bbr_select}" == "1" ] ;then
         echo -e "${COLOR_PINK}install BBR with Rinetd...${COLOR_END}"
 	install_rinetd_bbr
