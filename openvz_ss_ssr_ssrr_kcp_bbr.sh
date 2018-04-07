@@ -292,7 +292,6 @@ pre_install_packs(){
 	   if centosversion 6; then
                update_glibc
 	       update_autoconf
-	       yum update nss -y
 	   fi
        elif check_sys packageManager apt; then
            apt_depends=(
@@ -486,6 +485,29 @@ BBR_option(){
             else
                 echo -e "${COLOR_RED}Input error, please input correct number${COLOR_END}"
             fi
+        done
+    elif [ ${bbr_select} == "2" ] && [ ! -f lkl_bbr.conf ];then
+        while true
+        do
+            echo
+            read -p "(Please input port for BBR [1-65535):" bbr_port
+            [ -z "$set_ss_libev_port" ]
+            expr ${bbr_port} + 0 &>/dev/null
+            if [ $? -eq 0 ]; then
+                if [ ${bbr_port} -ge 1 ] && [ ${bbr_port} -le 65535 ]; then
+                    echo
+                    echo "---------------------------------------"
+                    echo "BBR port = ${bbr_port}"
+                    echo "---------------------------------------"
+                    echo
+                    break
+                 else
+                    echo -e "${COLOR_RED}Input error, please input correct number${COLOR_END}"
+                  fi
+            else
+                echo -e "${COLOR_RED}Input error, please input correct number${COLOR_END}"
+            fi
+	    export ${bbr_port}
         done
     fi
 }
@@ -803,6 +825,7 @@ EOF
     fi
 }
 install_ss_ssr_ssrr_kcptun(){
+    pre_install_packs
     if [ ! -f /usr/lib/libsodium.a ] && [ ! -L /usr/local/lib/libsodium.so ]; then
         cd ${cur_dir}
         echo "+ Install libsodium for SS-Libev/SSR/SSRR/KCPTUN"
@@ -1280,7 +1303,6 @@ pre_install_ss_ssr_ssrr_kcptun(){
     BBR_Selection
     BBR_option
     Press_Install
-    pre_install_packs
     get_install_version
     Print_Sys_Info
     set_timezone
