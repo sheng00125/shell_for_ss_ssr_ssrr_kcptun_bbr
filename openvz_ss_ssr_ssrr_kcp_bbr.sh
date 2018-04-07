@@ -825,7 +825,6 @@ EOF
     fi
 }
 install_ss_ssr_ssrr_kcptun(){
-    pre_install_packs
     if [ ! -f /usr/lib/libsodium.a ] && [ ! -L /usr/local/lib/libsodium.so ]; then
         cd ${cur_dir}
         echo "+ Install libsodium for SS-Libev/SSR/SSRR/KCPTUN"
@@ -1303,6 +1302,7 @@ pre_install_ss_ssr_ssrr_kcptun(){
     BBR_Selection
     BBR_option
     Press_Install
+    pre_install_packs
     get_install_version
     Print_Sys_Info
     set_timezone
