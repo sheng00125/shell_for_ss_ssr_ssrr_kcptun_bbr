@@ -508,8 +508,8 @@ BBR_option(){
             else
                 echo -e "${COLOR_RED}Input error, please input correct number${COLOR_END}"
             fi
-	    export bbr_port
         done
+    export bbr_port
     fi
 }
 # Install cleanup
