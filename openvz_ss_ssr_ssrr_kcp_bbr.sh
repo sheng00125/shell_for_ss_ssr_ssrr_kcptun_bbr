@@ -31,12 +31,12 @@ shell_update(){
     if [ ! -z ${remote_shell_version} ]; then
         if [[ "${shell_version}" != "${remote_shell_version}" ]];then
             echo -e "${COLOR_GREEN}Found a new version of shell(ver:${remote_shell_version})!${COLOR_END}"
-	          echo -e "${COLOR_YELOW}You have 2 options for your shell update.${COLOR_END}"
+	    echo -e "${COLOR_YELOW}You have 2 options for your shell update.${COLOR_END}"
             echo "1: Continue with currently shell"
             echo "2: Exit to update shell"
             echo
-	          read -p "Enter your choice (1, 2 or exit. default [${def_shell_update_Select}]): " shell_update_Select
-	          case "${shell_update_Select}" in
+	    read -p "Enter your choice (1, 2 or exit. default [${def_shell_update_Select}]): " shell_update_Select
+	    case "${shell_update_Select}" in
                 1)
                     echo
                     echo -e "${COLOR_PINK}You will continue with currently shell ${SS_LIBEV_VER}${COLOR_END}"
@@ -230,7 +230,7 @@ Press_Start(){
 }
 Press_Exit(){
     echo ""
-    echo -e "${COLOR_GREEN}Press any key to Exit...or Press Ctrl+C${COLOR_END}"
+    echo -e "${COLOR_GREEN}Press any key to Exit...or Press Ctrl+C cancel${COLOR_END}"
     OLDCONFIG=`stty -g`
     stty -icanon -echo min 1 time 0
     dd count=1 2>/dev/null
@@ -264,7 +264,7 @@ pre_install_packs(){
         if [ ! -f /etc/yum.repos.d/epel.repo ]; then
             yum install -y -q epel-release
         fi
-        [ ! -f /etc/yum.repos.d/epel.repo ] && echo -e "[${COLOR_RED}Error, Install EPEL repository failed, please check it.${COLOR_END}" && exit 1
+        [ ! -f /etc/yum.repos.d/epel.repo ] && echo -e "[${COLOR_RED}Error:install EPEL repository failed, please check it.${COLOR_END}" && exit 1
         [ ! "$(command -v yum-config-manager)" ] && yum install -y -q yum-utils
         if [ x"`yum-config-manager epel | grep -w enabled | awk '{print $3}'`" != x"True" ]; then
             yum-config-manager --enable epel
@@ -273,16 +273,16 @@ pre_install_packs(){
         yum_depends=(
             unzip gzip openssl openssl-devel gcc python python-devel python-setuptools pcre pcre-devel libtool libevent xmlto
             autoconf automake make curl curl-devel zlib-devel perl perl-devel cpio expat-devel gettext-devel asciidoc
-            libev-devel c-ares-devel git qrencode kernel-headers lrzsz
+            libev-devel c-ares-devel git qrencode udns-devel kernel-headers lrzsz
         )
         for depend in ${yum_depends[@]}; do
             error_detect_depends "yum -y install ${depend}"
         done
         if centosversion 6; then
             update_glibc
-	          update_autoconf
-	          yum update nss -y
-	      fi
+	    update_autoconf
+	    yum update nss -y
+	fi
     elif check_sys packageManager apt; then
         apt_depends=(
             gettext build-essential unzip gzip python python-dev python-setuptools curl openssl libssl-dev
@@ -295,7 +295,7 @@ pre_install_packs(){
     fi
 }
 update_glibc(){
-    echo -e "+Update glibc"
+    echo -e "+ Update glibc...."
     wget -c http://ftp.redsleeve.org/pub/steam/glibc-2.15-60.el6.x86_64.rpm \
     http://ftp.redsleeve.org/pub/steam/glibc-common-2.15-60.el6.x86_64.rpm \
     http://ftp.redsleeve.org/pub/steam/glibc-devel-2.15-60.el6.x86_64.rpm \
@@ -308,6 +308,7 @@ update_glibc(){
     nscd-2.15-60.el6.x86_64.rpm
 }
 update_autoconf(){
+    echo -e "+ Update autoconf...."
     cd ${cur_dir}
     rpm -e --nodeps autoconf-2.63
     wget ftp://ftp.gnu.org/gnu/autoconf/autoconf-2.69.tar.gz
@@ -385,8 +386,8 @@ Dispaly_Selection(){
     if [ "${Install_Select}" == "1" ] || [ "${Install_Select}" == "4" ]; then
         def_Install_obfs="N"
         echo
-        echo -e "${COLOR_YELOW}Do you want to install simple-obfs for Shadowsocks-libev?${COLOR_END} [Y/N]"
-        read -p "Enter your choice fot simple-obf.default: ${def_Install_obfs}):" Install_obfs
+        echo -e "${COLOR_YELOW}Do you want to install simple-obfs for Shadowsocks-libev?[Y/N]${COLOR_END}"
+        read -p "Enter your choice fot simple-obf.default: ${def_Install_obfs}:" Install_obfs
 
         case "${Install_obfs}" in
             [yY])
@@ -813,12 +814,34 @@ EOF
     fi
 }
 install_ss_ssr_ssrr_kcptun(){
+    if check_sys packageManager yum; then
+        yum install -y epel-release
+        yum install -y unzip openssl-devel gcc swig autoconf libtool libevent vim automake make psmisc curl curl-devel zlib-devel perl perl-devel cpio expat-devel gettext-devel xmlto asciidoc pcre pcre-devel python python-devel python-setuptools udns-devel libev-devel mbedtls-devel
+        if [ $? -gt 1 ]; then
+            echo
+            echo -e "${COLOR_RED}Install support packs failed!${COLOR_END}"
+            exit 1
+        fi
+    elif check_sys packageManager apt; then
+        if debianversion 7; then
+            grep "jessie" /etc/apt/sources.list > /dev/null 2>&1
+            if [ $? -ne 0 ] && [ -r /etc/apt/sources.list ]; then
+                echo "deb http://http.us.debian.org/debian jessie main" >> /etc/apt/sources.list
+            fi
+        fi
+        apt-get -y update && apt-get -y install --no-install-recommends gettext curl wget vim unzip psmisc gcc swig autoconf automake make perl cpio build-essential libtool openssl libssl-dev zlib1g-dev xmlto asciidoc libpcre3 libpcre3-dev python python-dev python-pip python-m2crypto libev-dev libudns-dev
+        if [ $? -gt 1 ]; then
+            echo
+            echo -e "${COLOR_RED}Install support packs failed!${COLOR_END}"
+            exit 1
+        fi
+    fi
     if [ ! -f /usr/lib/libsodium.a ] && [ ! -L /usr/local/lib/libsodium.so ]; then
         cd ${cur_dir}
         echo "+ Install libsodium for SS-Libev/SSR/SSRR/KCPTUN"
         tar xzf ${libsodium_laster_ver}.tar.gz
         cd ${libsodium_laster_ver}
-         ./configure --prefix=/usr && make && make install
+        ./configure --prefix=/usr && make && make install
         if [ $? -ne 0 ]; then
             install_cleanup
             echo -e "${COLOR_RED}libsodium install failed!${COLOR_END}"
@@ -2234,7 +2257,7 @@ configure_ss_ssr_ssrr_kcptun(){
 reconfig_ss_ssr_ssrr_kcptun(){
     cd ${cur_dir}
     reconfig_flag="false"
-    echo -e "${COLOR_YELOW}reconfig ss_ssr_ssrr_kcp_bbr...${COLOR_END}"
+    echo -e "+ Reconfig ss_ssr_ssrr_kcp_bbr..."
     if [ -f ${ss_libev_config} ];then
         if [ -f shadowsocks-libev.json ];then
             if [ "${Install_obfs}" != "y" ] && [ ! "${Install_obfs}" != "Y" ]; then
