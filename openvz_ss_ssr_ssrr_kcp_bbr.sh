@@ -10,13 +10,13 @@ ssr_config="/usr/local/shadowsocksR/shadowsocksR.json"
 ssrr_config="/usr/local/shadowsocksRR/user-config.json"
 kcptun_config="/usr/local/kcptun/config.json"
 
+# Check if user is root
 if [ $(id -u) != "0" ]; then
     echo "Error: You must be root to run this script, please use root to install SS/SSR/SSRR/KCPTUN/BBR"
     exit 1
 fi
-
 set_timezone(){
-    echo -e "${COLOR_YELOW}set time zone...${COLOR_END}"
+    echo -e "${COLOR_YELOW}+ Set timezone...${COLOR_END}"
     rm -rf /etc/localtime
     ln -s /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
     echo "done."
@@ -25,20 +25,18 @@ shell_update(){
     clear
     echo "+ Check updates for shell..."
     echo
-    #shell_version=`cat ss_ssr_ssrr_kcp_bbr.sh |sed -n '/'^shell_version'/p' | cut -d\" -f2`
     remote_shell_version=`wget --no-check-certificate -qO- ${shell_download_link} | sed -n '/'^version'/p' | cut -d\" -f2`
     echo -e "Shell remote version :${COLOR_GREEN}${remote_shell_version}${COLOR_END}"
     echo -e "Shell local version :${COLOR_GREEN}${shell_version}${COLOR_END}"
     if [ ! -z ${remote_shell_version} ]; then
         if [[ "${shell_version}" != "${remote_shell_version}" ]];then
             echo -e "${COLOR_GREEN}Found a new version of shell(ver:${remote_shell_version})!${COLOR_END}"
-	    #def_shell_update_Select="1"
-	    echo -e "${COLOR_YELOW}You have 2 options for your shell update.${COLOR_END}"
+	          echo -e "${COLOR_YELOW}You have 2 options for your shell update.${COLOR_END}"
             echo "1: Continue with currently shell"
             echo "2: Exit to update shell"
             echo
-	    read -p "Enter your choice (1, 2 or exit. default [${def_shell_update_Select}]): " shell_update_Select
-	    case "${shell_update_Select}" in
+	          read -p "Enter your choice (1, 2 or exit. default [${def_shell_update_Select}]): " shell_update_Select
+	          case "${shell_update_Select}" in
                 1)
                     echo
                     echo -e "${COLOR_PINK}You will continue with currently shell ${SS_LIBEV_VER}${COLOR_END}"
@@ -54,15 +52,13 @@ shell_update(){
                     ;;
                 *)
                     echo
-                    echo -e "${COLOR_PINK}No input,You will continue with currently shell ${COLOR_END}"
-                    #shell_update_Select="${def_shell_update_Select}"
+                    echo -e "${COLOR_PINK}No input or input error,You will continue with currently shell ${COLOR_END}"
             esac
         else
             echo -e "${COLOR_PINK}Shell is up-to-date!${COLOR_END}"
         fi
     fi
 }
-# Check if user is root
 set_text_color(){
     COLOR_RED='\E[1;31m'
     COLOR_GREEN='\E[1;32m'
@@ -74,14 +70,8 @@ set_text_color(){
     COLOR_END='\E[0m'
 }
 # Check OS
-
-check_kernel_version() {
-    local kernel_version=$(uname -r | cut -d- -f1)
-    if version_gt ${kernel_version} 3.7.0; then
-        return 0
-    else
-        return 1
-    fi
+version_ge(){
+    test "$(echo "$@" | tr " " "\n" | sort -rV | head -n 1)" == "$1"
 }
 version_gt(){
     test "$(echo "$@" | tr " " "\n" | sort -V | head -n 1)" != "$1"
@@ -166,11 +156,11 @@ check_sys(){
 }
 # Get version
 getversion(){
-if [[ -s /etc/redhat-release ]]; then
-    grep -oE  "[0-9.]+" /etc/redhat-release
-else
-    grep -oE  "[0-9.]+" /etc/issue
-fi
+    if [[ -s /etc/redhat-release ]]; then
+        grep -oE  "[0-9.]+" /etc/redhat-release
+    else
+        grep -oE  "[0-9.]+" /etc/issue
+    fi
 }
 # CentOS version
 centosversion(){
@@ -230,7 +220,6 @@ Press_Install(){
     dd count=1 2>/dev/null
     stty ${OLDCONFIG}
 }
-
 Press_Start(){
     echo ""
     echo -e "${COLOR_GREEN}Press any key to continue...or Press Ctrl+C to cancel${COLOR_END}"
@@ -271,42 +260,42 @@ error_detect_depends(){
 }
 pre_install_packs(){
     if check_sys packageManager yum; then
-           echo -e "[${COLOR_GREEN}Info${COLOR_END} Checking the EPEL repository..."
-             if [ ! -f /etc/yum.repos.d/epel.repo ]; then
-                   yum install -y -q epel-release
-           fi
-           [ ! -f /etc/yum.repos.d/epel.repo ] && echo -e "[${COLOR_RED}Error, Install EPEL repository failed, please check it.${COLOR_END}" && exit 1
-           [ ! "$(command -v yum-config-manager)" ] && yum install -y -q yum-utils
+        echo -e "[${COLOR_GREEN}Info${COLOR_END} Checking the EPEL repository..."
+        if [ ! -f /etc/yum.repos.d/epel.repo ]; then
+            yum install -y -q epel-release
+        fi
+        [ ! -f /etc/yum.repos.d/epel.repo ] && echo -e "[${COLOR_RED}Error, Install EPEL repository failed, please check it.${COLOR_END}" && exit 1
+        [ ! "$(command -v yum-config-manager)" ] && yum install -y -q yum-utils
         if [ x"`yum-config-manager epel | grep -w enabled | awk '{print $3}'`" != x"True" ]; then
             yum-config-manager --enable epel
         fi
-           echo -e "[${COLOR_GREEN}Info${COLOR_END}] Checking the EPEL repository complete..."
-           yum_depends=(
-                  unzip gzip openssl openssl-devel gcc python python-devel python-setuptools pcre pcre-devel libtool libevent xmlto
-                  autoconf automake make curl curl-devel zlib-devel perl perl-devel cpio expat-devel gettext-devel asciidoc
-                  libev-devel c-ares-devel git qrencode kernel-headers lrzsz
-           )
-           for depend in ${yum_depends[@]}; do
-               error_detect_depends "yum -y install ${depend}"
-           done
-	   if centosversion 6; then
-               update_glibc
-	       update_autoconf
-	       yum update nss -y
-	   fi
-       elif check_sys packageManager apt; then
-           apt_depends=(
-               gettext build-essential unzip gzip python python-dev python-setuptools curl openssl libssl-dev
+        echo -e "[${COLOR_GREEN}Info${COLOR_END}] Checking the EPEL repository complete..."
+        yum_depends=(
+            unzip gzip openssl openssl-devel gcc python python-devel python-setuptools pcre pcre-devel libtool libevent xmlto
+            autoconf automake make curl curl-devel zlib-devel perl perl-devel cpio expat-devel gettext-devel asciidoc
+            libev-devel c-ares-devel git qrencode kernel-headers lrzsz
+        )
+        for depend in ${yum_depends[@]}; do
+            error_detect_depends "yum -y install ${depend}"
+        done
+        if centosversion 6; then
+            update_glibc
+	          update_autoconf
+	          yum update nss -y
+	      fi
+    elif check_sys packageManager apt; then
+        apt_depends=(
+            gettext build-essential unzip gzip python python-dev python-setuptools curl openssl libssl-dev
             autoconf automake libtool gcc make perl cpio libpcre3 libpcre3-dev zlib1g-dev libev-dev libc-ares-dev git qrencode 
-           )
-           apt-get -y update
-           for depend in ${apt_depends[@]}; do
-               error_detect_depends "apt-get -y install ${depend}"
-           done
-       fi
+        )
+        apt-get -y update
+        for depend in ${apt_depends[@]}; do
+            error_detect_depends "apt-get -y install ${depend}"
+        done
+    fi
 }
 update_glibc(){
-    echo -e "${COLOR_YELOW}update glibc...${COLOR_END}"
+    echo -e "+Update glibc"
     wget -c http://ftp.redsleeve.org/pub/steam/glibc-2.15-60.el6.x86_64.rpm \
     http://ftp.redsleeve.org/pub/steam/glibc-common-2.15-60.el6.x86_64.rpm \
     http://ftp.redsleeve.org/pub/steam/glibc-devel-2.15-60.el6.x86_64.rpm \
@@ -356,85 +345,83 @@ Dispaly_Selection(){
     read -p "Enter your choice (1, 2, 3, 4, 5, 6, 7 or exit. default [${def_Install_Select}]): " Install_Select
 
     case "${Install_Select}" in
-    1)
-        echo
-        echo -e "${COLOR_PINK}You will install Shadowsocks-libev ${SS_LIBEV_VER}${COLOR_END}"
-        ;;
-    2)
-        echo
-        echo -e "${COLOR_PINK}You will install ShadowsocksR(python) ${SSR_VER}${COLOR_END}"
-        ;;
-    3)
-        echo
-        echo -e "${COLOR_PINK}You will install KCPTUN ${KCPTUN_VER}${COLOR_END}"
-        ;;
-    4)
-        echo
-        echo -e "${COLOR_PINK}You will Install Shadowsocks-libev ${SS_LIBEV_VER} + KCPTUN ${KCPTUN_VER}${COLOR_END}"
-        ;;
-    5)
-        echo
-        echo -e "${COLOR_PINK}You will install ShadowsocksR(python) ${SSR_VER} + KCPTUN ${KCPTUN_VER}${COLOR_END}"
-        ;;
-    6)
-        echo
-        echo -e "${COLOR_PINK}You will install ShadowsocksRR(python) ${SSRR_VER}${COLOR_END}"
-        ;;
-    7)
-        echo
-        echo -e "${COLOR_PINK}You will install ShadowsocksRR(python) ${SSRR_VER} + KCPTUN ${KCPTUN_VER}${COLOR_END}"
-        ;;
-    [eE][xX][iI][tT])
-        echo -e "${COLOR_PINK}You select <Exit>, shell exit now!${COLOR_END}"
-        exit 1
-        ;;
-    *)
-        echo
-        echo -e "${COLOR_PINK}No input or input error,You will install Shadowsocks-libev${COLOR_END}"
-        Install_Select="${def_Install_Select}"
+        1)
+            echo
+            echo -e "${COLOR_PINK}You will install Shadowsocks-libev ${SS_LIBEV_VER}${COLOR_END}"
+            ;;
+        2)
+            echo
+            echo -e "${COLOR_PINK}You will install ShadowsocksR(python) ${SSR_VER}${COLOR_END}"
+            ;;
+        3)
+            echo
+            echo -e "${COLOR_PINK}You will install KCPTUN ${KCPTUN_VER}${COLOR_END}"
+            ;;
+        4)
+            echo
+            echo -e "${COLOR_PINK}You will Install Shadowsocks-libev ${SS_LIBEV_VER} + KCPTUN ${KCPTUN_VER}${COLOR_END}"
+            ;;
+        5)
+            echo
+            echo -e "${COLOR_PINK}You will install ShadowsocksR(python) ${SSR_VER} + KCPTUN ${KCPTUN_VER}${COLOR_END}"
+            ;;
+        6)
+            echo
+            echo -e "${COLOR_PINK}You will install ShadowsocksRR(python) ${SSRR_VER}${COLOR_END}"
+            ;;
+        7)
+            echo
+            echo -e "${COLOR_PINK}You will install ShadowsocksRR(python) ${SSRR_VER} + KCPTUN ${KCPTUN_VER}${COLOR_END}"
+            ;;
+        [eE][xX][iI][tT])
+            echo -e "${COLOR_PINK}You select <Exit>, shell exit now!${COLOR_END}"
+            exit 1
+            ;;
+        *)
+            echo
+            echo -e "${COLOR_PINK}No input or input error,You will install Shadowsocks-libev${COLOR_END}"
+            Install_Select="${def_Install_Select}"
     esac
     if [ "${Install_Select}" == "1" ] || [ "${Install_Select}" == "4" ]; then
-       def_Install_obfs="N"
-       echo
-       echo -e "${COLOR_YELOW}Do you want to install simple-obfs for Shadowsocks-libev?${COLOR_END} [Y/N]"
-       read -p "(please input your choice,default: ${def_Install_obfs}):" Install_obfs
+        def_Install_obfs="N"
+        echo
+        echo -e "${COLOR_YELOW}Do you want to install simple-obfs for Shadowsocks-libev?${COLOR_END} [Y/N]"
+        read -p "Enter your choice fot simple-obf.default: ${def_Install_obfs}):" Install_obfs
 
-       case "${Install_obfs}" in
-           [yY])
-               echo
-               echo -e "${COLOR_PINK}You will install Simple-obfs for Shadowsocks-libev${COLOR_END}"
-               Install_obfs="y"
-           ;;
-           [nN])
-               echo
-               echo -e "${COLOR_PINK}You will not install Simple-obfs for Shadowsocks-libev${COLOR_END}"
-               Install_obfs="n"
-           ;;
-           *)
-              echo -e "${COLOR_PINK}No input or input error,You will not install Simple-obfs for Shadowsocks-libev${COLOR_END}"
-              Install_obfs="${def_Install_obfs}"
-       esac
-     fi
+        case "${Install_obfs}" in
+            [yY])
+                echo
+                echo -e "${COLOR_PINK}You will install Simple-obfs for Shadowsocks-libev${COLOR_END}"
+                ;;
+            [nN])
+                echo
+                echo -e "${COLOR_PINK}You will not install Simple-obfs for Shadowsocks-libev${COLOR_END}"
+                ;;
+            *)
+               echo -e "${COLOR_PINK}No input or input error,You will not install Simple-obfs for Shadowsocks-libev${COLOR_END}"
+               Install_obfs="${def_Install_obfs}"
+        esac
+    fi
 }
 Simple_obfs_option(){
-    if [ "${Install_obfs}" == "y" ]; then
+    if [ "${Install_obfs}" == "y" ] || [ "${Install_obfs}" == "Y" ]; then
         echo
-	def_ofbs_option="1"
+      	def_ofbs_option="1"
         echo -e "${COLOR_YELOW}Please select your Simple-obfs setting:${COLOR_END}"
-	echo "1: http"
-	echo "2: tls"
-	#read -p "Enter your choice (1, 2. default ${def_ofbs_option}): " ofbs_option
+      	echo "1: http"
+      	echo "2: tls"
+      	#read -p "Enter your choice (1, 2. default ${def_ofbs_option}): " ofbs_option
 
-	case "${ofbs_option}" in
-        1|[hH][tT][tT][pP])
-	    ofbs_option="http"
-            ;;
-        2|[tT][lL][sS])
-            ofbs_option="tls"
-            ;;
-	 *)
-            echo -e "${COLOR_PINK}No input or input error,You Simple-obfs will be set to:http${COLOR_END}"
-            ofbs_option="http"
+	      case "${ofbs_option}" in
+            1|[hH][tT][tT][pP])
+	              ofbs_option="http"
+                ;;
+            2|[tT][lL][sS])
+                ofbs_option="tls"
+                ;;
+            *)
+                echo -e "${COLOR_PINK}No input or input error,You Simple-obfs will be set to:http${COLOR_END}"
+                ofbs_option="http"
         esac
     fi
 }
@@ -445,23 +432,24 @@ BBR_Selection(){
     echo "2: Install BBR with LML"
     echo "3: Not install any BBR"
     read -p "Enter your choice (1, 2 or exit. default [${def_bbr_select}]): " bbr_select
+
     case "${bbr_select}" in
-    1)
-        echo
-        echo -e "${COLOR_PINK}You will install BBR with Rinetd${COLOR_END}"
-        ;;
-    2)
-        echo
-        echo -e "${COLOR_PINK}You will install BBR with LKL${COLOR_END}"
-        ;;
-    3)
-        echo
-        echo -e "${COLOR_PINK}You will not install any BBR${COLOR_END}"
-        ;;
-    *)
-        echo
-        echo -e "${COLOR_PINK}No input,You will install BBR with LML${COLOR_END}"
-        bbr_select="${def_bbr_select}"
+        1)
+            echo
+            echo -e "${COLOR_PINK}You will install BBR with Rinetd${COLOR_END}"
+            ;;
+        2)
+            echo
+            echo -e "${COLOR_PINK}You will install BBR with LKL${COLOR_END}"
+            ;;
+        3)
+            echo
+            echo -e "${COLOR_PINK}You will not install any BBR${COLOR_END}"
+            ;;
+        *)
+            echo
+            echo -e "${COLOR_PINK}No input or input error,You will install BBR with LML${COLOR_END}"
+            bbr_select="${def_bbr_select}"
     esac
 }
 BBR_option(){
@@ -469,7 +457,7 @@ BBR_option(){
         while true
         do
             echo
-            read -p "(Please input port for BBR [1-65535):" bbr_port
+            read -p "Please input port for BBR [1-65535]:" bbr_port
             [ -z "$set_ss_libev_port" ]
             expr ${bbr_port} + 0 &>/dev/null
             if [ $? -eq 0 ]; then
@@ -484,14 +472,14 @@ BBR_option(){
                     echo -e "${COLOR_RED}Input error, please input correct number${COLOR_END}"
                   fi
             else
-                echo -e "${COLOR_RED}Input error, please input correct number${COLOR_END}"
+                echo -e "${COLOR_RED}No input, please input correct number${COLOR_END}"
             fi
         done
     elif [ ${bbr_select} == "2" ] && [ ! -f lkl_bbr.conf ];then
         while true
         do
             echo
-            read -p "(Please input port for BBR [1-65535):" bbr_port
+            read -p "Please input port for BBR [1-65535]:" bbr_port
             [ -z "$set_ss_libev_port" ]
             expr ${bbr_port} + 0 &>/dev/null
             if [ $? -eq 0 ]; then
@@ -506,7 +494,7 @@ BBR_option(){
                     echo -e "${COLOR_RED}Input error, please input correct number${COLOR_END}"
                   fi
             else
-                echo -e "${COLOR_RED}Input error, please input correct number${COLOR_END}"
+                echo -e "${COLOR_RED}No input, please input correct number${COLOR_END}"
             fi
         done
     export bbr_port
@@ -584,22 +572,22 @@ get_latest_version(){
         fi
     fi
     if [ ! -f /usr/lib/libsodium.a ] && [ ! -L /usr/local/lib/libsodium.so ]; then
-        #echo -e "Loading libsodium version, please wait..."
+        echo -e "Loading libsodium version, please wait..."
         libsodium_laster_ver="libsodium-${LIBSODIUM_VER}"
         if [ "${libsodium_laster_ver}" == "" ] || [ "${LIBSODIUM_LINK}" == "" ]; then
             echo -e "${COLOR_RED}Error: Get libsodium version failed${COLOR_END}"
             exit 1
         fi
-        #echo -e "Get the libsodium version:${COLOR_GREEN} ${LIBSODIUM_VER}${COLOR_END}"
+        echo -e "Get the libsodium version:${COLOR_GREEN} ${LIBSODIUM_VER}${COLOR_END}"
     fi
     if [ ! -f /usr/lib/libmbedtls.a ] && [ ! -f /usr/include/mbedtls/version.h ]; then
-        #echo -e "Loading mbedtls version, please wait..."
+        echo -e "Loading mbedtls version, please wait..."
         mbedtls_laster_ver="mbedtls-${MBEDTLS_VER}"
         if [ "${mbedtls_laster_ver}" == "" ] || [ "${MBEDTLS_LINK}" == "" ]; then
             echo -e "${COLOR_RED}Error: Get mbedtls version failed${COLOR_END}"
             exit 1
         fi
-        #echo -e "Get the mbedtls version:${COLOR_GREEN} ${MBEDTLS_VER}${COLOR_END}"
+        echo -e "Get the mbedtls version:${COLOR_GREEN} ${MBEDTLS_VER}${COLOR_END}"
     fi
     if [[ "${ssr_installed_flag}" == "false" && "${shell_action}" =~ ^[Ii]|[Ii][Nn]|[Ii][Nn][Ss][Tt][Aa][Ll][Ll]|-[Ii]|--[Ii]$ ]] || [[ "${ssr_installed_flag}" == "true" && "${shell_action}" =~ ^[Uu]|[Uu][Pp][Dd][Aa][Tt][Ee]|-[Uu]|--[Uu]|[Uu][Pp]|-[Uu][Pp]|--[Uu][Pp]$ ]]; then
         echo -e "Loading ShadowsocksR version, please wait..."
@@ -666,7 +654,6 @@ down_ss_ssr_ssrr_kcptun(){
                 exit 1
             fi
         fi
-
         # Download init script
         if ! wget --no-check-certificate -O /etc/init.d/shadowsocks ${ss_libev_init_link}; then
             echo -e "${COLOR_RED}Failed to download Shadowsocks-libev init script!${COLOR_END}"
@@ -734,22 +721,8 @@ config_ss_ssr_ssrr_kcptun(){
     fi
     if [[ "${ss_libev_installed_flag}" == "false" && "${shell_action}" =~ ^[Ii]|[Ii][Nn]|[Ii][Nn][Ss][Tt][Aa][Ll][Ll]|-[Ii]|--[Ii]$ ]]; then
         [ ! -d /etc/shadowsocks-libev ] && mkdir -p /etc/shadowsocks-libev
-        if  [ "${Install_obfs}" == "n" ]; then
-        cat > ${ss_libev_config}<<-EOF
-{
-    "server":"0.0.0.0",
-    "server_port":${set_ss_libev_port},
-    "local_address":"127.0.0.1",
-    "local_port":${ss_libev_local_port},
-    "password":"${set_ss_libev_pwd}",
-    "timeout":300,
-    "method":"${set_ss_libev_method}",
-    "fast_open":${fast_open}
-}
-EOF
-       fi
-       if  [ "${Install_obfs}" == "y" ]; then
-        cat > ${ss_libev_config}<<-EOF
+        if [ "${Install_obfs}" == "y" ] || [ "${Install_obfs}" == "Y" ]; then
+            cat > ${ss_libev_config}<<-EOF
 {
     "server":"0.0.0.0",
     "server_port":${set_ss_libev_port},
@@ -760,6 +733,19 @@ EOF
     "method":"${set_ss_libev_method}",
     "fast_open":${fast_open},
     "plugin":"obfs-server --obfs ${ofbs_option}"
+}
+EOF
+        else
+            cat > ${ss_libev_config}<<-EOF
+{
+    "server":"0.0.0.0",
+    "server_port":${set_ss_libev_port},
+    "local_address":"127.0.0.1",
+    "local_port":${ss_libev_local_port},
+    "password":"${set_ss_libev_pwd}",
+    "timeout":300,
+    "method":"${set_ss_libev_method}",
+    "fast_open":${fast_open}
 }
 EOF
        fi
@@ -842,22 +828,22 @@ install_ss_ssr_ssrr_kcptun(){
         echo -e "[${COLOR_GREED}libsodium already installed.${COLOR_END}"
     fi
     if [[ "${ss_libev_installed_flag}" == "false" && "${shell_action}" =~ ^[Ii]|[Ii][Nn]|[Ii][Nn][Ss][Tt][Aa][Ll][Ll]|-[Ii]|--[Ii]$ ]] || [[ "${ss_libev_installed_flag}" == "true" && "${ss_libev_update_flag}" == "true" && "${shell_action}" =~ ^[Uu]|[Uu][Pp][Dd][Aa][Tt][Ee]|-[Uu]|--[Uu]|[Uu][Pp]|-[Uu][Pp]|--[Uu][Pp]$ ]]; then
-            if [ ! -f /usr/lib/libmbedtls.a ]; then
-                cd ${cur_dir}
-                echo "install mbedtls for Shadowsocks-libev..."
-                tar xzf ${mbedtls_laster_ver}-gpl.tgz
-                cd ${mbedtls_laster_ver}
-                make SHARED=1 CFLAGS=-fPIC
-                        make DESTDIR=/usr install
-                if [ $? -ne 0 ]; then
-                    install_cleanup
-                    echo -e "${COLOR_RED}mbedtls install failed!${COLOR_END}"
-                    exit 1
-                fi
-            ldconfig
-	    else
-                echo -e "[${COLOR_GREED}mbedlts already installed.${COLOR_END}"
+        if [ ! -f /usr/lib/libmbedtls.a ]; then
+            cd ${cur_dir}
+            echo "+ Install mbedtls for Shadowsocks-libev..."
+            tar xzf ${mbedtls_laster_ver}-gpl.tgz
+            cd ${mbedtls_laster_ver}
+            make SHARED=1 CFLAGS=-fPIC
+            make DESTDIR=/usr install
+            if [ $? -ne 0 ]; then
+                install_cleanup
+                echo -e "${COLOR_RED}mbedtls install failed!${COLOR_END}"
+                exit 1
             fi
+            ldconfig
+	      else
+            echo -e "[${COLOR_GREED}mbedlts already installed.${COLOR_END}"
+        fi
         cd ${cur_dir}
         tar zxf ${shadowsocks_libev_ver}.tar.gz
         cd ${shadowsocks_libev_ver}
@@ -886,9 +872,9 @@ install_ss_ssr_ssrr_kcptun(){
             echo -e "${COLOR_RED}Shadowsocks-libev install failed! ${COLOR_END}"
             exit 1
         fi
-	if [ "${Install_obfs}" == "y" ]; then
-	    install_simple_obfs
-	fi
+        if [ "${Install_obfs}" == "y" ] || [ "${Install_obfs}" == "Y" ]; then
+	          install_simple_obfs
+      	fi
     fi
     if [[ "${ssr_installed_flag}" == "false" && "${shell_action}" =~ ^[Ii]|[Ii][Nn]|[Ii][Nn][Ss][Tt][Aa][Ll][Ll]|-[Ii]|--[Ii]$ ]] || [[ "${ssr_installed_flag}" == "true" && "${ssr_update_flag}" == "true" && "${shell_action}" =~ ^[Uu]|[Uu][Pp][Dd][Aa][Tt][Ee]|-[Uu]|--[Uu]|[Uu][Pp]|-[Uu][Pp]|--[Uu][Pp]$ ]]; then
         cd ${cur_dir}
@@ -983,36 +969,36 @@ install_simple_obfs(){
     cd ${cur_dir}
     if check_sys packageManager yum; then
         if centosversion 6; then
-           update_autoconf
-	   cd ${cur_dir}
-	   wget --no-check-certificate -O simple-obfs.tar.gz https://raw.githubusercontent.com/Jenking-Zhang/shell_for_ss_ssr_ssrr_kcptun_bbr/master/centos6_simple-obfs.tar.gz
+            update_autoconf
+	          cd ${cur_dir}
+	          wget --no-check-certificate -O simple-obfs.tar.gz https://raw.githubusercontent.com/Jenking-Zhang/shell_for_ss_ssr_ssrr_kcptun_bbr/master/centos6_simple-obfs.tar.gz
            tar -zxvpf simple-obfs.tar.gz
-	   cd /root/simple-obfs
-	   ./autogen.sh
+	         cd /root/simple-obfs
+	         ./autogen.sh
            ./configure --disable-documentation
-	   make
+	         make
            make install
-	   if [ ! "$(command -v obfs-server)" ]; then
-               echo -e "[${COLOR_RED}Error,simple-obfs for Shadowsocks-libev install failed${COLOR_RED}"
+	         if [ ! "$(command -v obfs-server)" ]; then
+               echo -e "[${COLOR_RED}Error:simple-obfs for Shadowsocks-libev install failed${COLOR_RED}"
                install_cleanup
                exit 1
            fi
            [ -f /usr/local/bin/obfs-server ] && ln -s /usr/local/bin/obfs-server /usr/bin
-	else
-	    git clone https://github.com/shadowsocks/simple-obfs.git
+        else
+	          git clone https://github.com/shadowsocks/simple-obfs.git
             cd simple-obfs
             git submodule update --init --recursive
             ./autogen.sh
             ./configure --disable-documentation
             make
             make install
-	   if [ ! "$(command -v obfs-server)" ]; then
-               echo -e "[${COLOR_RED}Error,simple-obfs for Shadowsocks-libev install failed${COLOR_RED}"
-               install_cleanup
-               exit 1
-           fi
-           [ -f /usr/local/bin/obfs-server ] && ln -s /usr/local/bin/obfs-server /usr/bin
-	fi
+	          if [ ! "$(command -v obfs-server)" ]; then
+                echo -e "[${COLOR_RED}Error:simple-obfs for Shadowsocks-libev install failed${COLOR_RED}"
+                install_cleanup
+                exit 1
+            fi
+            [ -f /usr/local/bin/obfs-server ] && ln -s /usr/local/bin/obfs-server /usr/bin
+       	fi
     elif check_sys packageManager apt; then
         git clone https://github.com/shadowsocks/simple-obfs.git
         cd simple-obfs
@@ -1022,7 +1008,7 @@ install_simple_obfs(){
         make
         make install
         if [ ! "$(command -v obfs-server)" ]; then
-            echo -e "[${COLOR_RED}Error,simple-obfs for Shadowsocks-libev install failed${COLOR_RED}"
+            echo -e "[${COLOR_RED}Error:simple-obfs for Shadowsocks-libev install failed${COLOR_RED}"
             install_cleanup
             exit 1
         fi
@@ -1031,25 +1017,25 @@ install_simple_obfs(){
 }
 install_bbr(){
     if [ "${bbr_select}" == "1" ] ;then
-        echo -e "${COLOR_PINK}install BBR with Rinetd...${COLOR_END}"
-	install_rinetd_bbr
+        echo -e "+ Install BBR with Rinetd..."
+        install_rinetd_bbr
     elif [ "${bbr_select}" == "2" ] ;then
-        echo -e "${COLOR_PINK}install BBR with LKL...${COLOR_END}"
-	install_lkl_bbr
+        echo -e "+ Install BBR with LKL..."
+        install_lkl_bbr
     fi
 }
 install_rinetd_bbr(){
     cd ${cur_dir}
-#Get Rinetd-BBR version.
+    #Get Rinetd-BBR version.
     remote_bbr_version=$(wget --no-check-certificate -qO- https://api.github.com/repos/linhua55/lkl_study/releases/latest | grep 'tag_name' | cut -d\" -f4 | sed s/v//g )
     RINET_BBR_URL="https://github.com/linhua55/lkl_study/releases/download/v${remote_bbr_version}/rinetd_bbr_powered"
     BBR_INIT_URL="https://raw.githubusercontent.com/Jenking-Zhang/shell_for_ss_ssr_ssrr_kcptun_bbr/master/bbr.init"
-#Download Rinetd-BBR.
+    #Download Rinetd-BBR.
     echo -e "Get the Rinetd-BBR version:${COLOR_GREEN}${remote_bbr_version}${COLOR_END}"
     echo " Download Rinetd-BBR from $RINET_BBR_URL"
     curl -L "${RINET_BBR_URL}" >/usr/bin/rinetd-bbr
     chmod +x /usr/bin/rinetd-bbr
-#Config Rinetd-BBR.
+    #Config Rinetd-BBR.
     echo "Config Rinetd-BBR..."
     [ ! -d /etc/rinetd-bbr/ ] && mkdir /etc/rinetd-bbr/
     [ -d /etc/rinetd-bbr/bbr.conf ] && rm -rf /etc/rinetd-bbr/bbr.conf
@@ -1062,13 +1048,19 @@ install_rinetd_bbr(){
 0.0.0.0 ${bbr_port} 0.0.0.0 ${bbr_port}
 EOF
     fi
-#Config Rinetd-BBR service.
-    echo "Config service..."
+    #Config Rinetd-BBR service.
+    echo "config Rinetd-BBR service..."
     wget --no-check-certificate "${BBR_INIT_URL}" -O /etc/init.d/bbr
     chmod +x /etc/init.d/bbr
     chkconfig --add bbr
     chkconfig bbr on
     /etc/init.d/bbr start
+    if [ $? -eq 0 ]; then
+        [ -x /etc/init.d/bbr ] && ln -s /etc/init.d/bbr /usr/bin/rinetd-bbr
+        echo -e "${COLOR_GREEN}Rinetd-BBR start success!${COLOR_END}"
+    else
+        echo -e "${COLOR_RED}Rinetd-BBR start failure!${COLOR_END}"
+    fi
 }
 install_lkl_bbr(){
     cd ${cur_dir}
@@ -1083,30 +1075,30 @@ set_crontab(){
             chkconfig crond on
             service crond start
             echo -e "${COLOR_YELOW}set crontab...${COLOR_END}"
-	    echo "27 3 * * 2,5 /sbin/reboot" >> /var/spool/cron/root
-	    if [ "${Install_Select}" == "1" ] || [ "${Install_Select}" == "4" ]; then echo "28 3 * * * /etc/init.d/shadowsocks restart" >> /var/spool/cron/root; fi
-	    if [ "${Install_Select}" == "2" ] || [ "${Install_Select}" == "5" ]; then echo "28 3 * * * /etc/init.d/ssr restart" >> /var/spool/cron/root; fi
-	    if [ "${Install_Select}" == "6" ] || [ "${Install_Select}" == "7" ]; then echo "28 3 * * * /etc/init.d/ssrr restart" >> /var/spool/cron/root; fi
-	    if [ "${Install_Select}" == "3" ] || [ "${Install_Select}" == "4" ] || [ "${Install_Select}" == "5" ] || [ "${Install_Select}" == "7" ]; then echo "29 3 * * * /etc/init.d/kcptun restart" >> /var/spool/cron/root; fi
-	    if [ "${bbr_select}" == "1" ] ;then
-	        echo "29 3 * * * /etc/init.d/bbr restart" >> /var/spool/cron/root
-            else
+	          echo "27 3 * * 2,5 /sbin/reboot" >> /var/spool/cron/root
+	          if [ "${Install_Select}" == "1" ] || [ "${Install_Select}" == "4" ]; then echo "28 3 * * * /etc/init.d/shadowsocks restart" >> /var/spool/cron/root; fi
+	          if [ "${Install_Select}" == "2" ] || [ "${Install_Select}" == "5" ]; then echo "28 3 * * * /etc/init.d/ssr restart" >> /var/spool/cron/root; fi
+	          if [ "${Install_Select}" == "6" ] || [ "${Install_Select}" == "7" ]; then echo "28 3 * * * /etc/init.d/ssrr restart" >> /var/spool/cron/root; fi
+	          if [ "${Install_Select}" == "3" ] || [ "${Install_Select}" == "4" ] || [ "${Install_Select}" == "5" ] || [ "${Install_Select}" == "7" ]; then echo "29 3 * * * /etc/init.d/kcptun restart" >> /var/spool/cron/root; fi
+	          if [ "${bbr_select}" == "1" ] ;then
+	              echo "29 3 * * * /etc/init.d/bbr restart" >> /var/spool/cron/root
+            elif [ "${bbr_select}" == "2" ] ;then
                 echo "29 3 * * * service haproxy-lkl restart" >> /var/spool/cron/root
             fi
             service crond restart
         fi
     elif check_sys packageManager apt; then
         apt-get install cron -y
-	/etc/init.d/cron start
+        /etc/init.d/cron start
         echo -e "${COLOR_YELOW}set crontab...${COLOR_END}"
         echo "27 3 * * 2,5 /sbin/reboot" >> /var/spool/cron/crontabs/root
         if [ "${Install_Select}" == "1" ] || [ "${Install_Select}" == "4" ]; then echo "28 3 * * * /etc/init.d/shadowsocks restart" >> /var/spool/cron/crontabs/root; fi
         if [ "${Install_Select}" == "2" ] || [ "${Install_Select}" == "5" ]; then echo "28 3 * * * /etc/init.d/ssr restart" >> /var/spool/cron/crontabs/root; fi
         if [ "${Install_Select}" == "6" ] || [ "${Install_Select}" == "7" ]; then echo "28 3 * * * /etc/init.d/ssrr restart" >> /var/spool/cron/crontabs/root; fi
-	if [ "${Install_Select}" == "3" ] || [ "${Install_Select}" == "4" ] || [ "${Install_Select}" == "5" ] || [ "${Install_Select}" == "7" ]; then echo "29 3 * * * /etc/init.d/kcptun restart" >> /var/spool/cron/crontabs/root; fi
+	      if [ "${Install_Select}" == "3" ] || [ "${Install_Select}" == "4" ] || [ "${Install_Select}" == "5" ] || [ "${Install_Select}" == "7" ]; then echo "29 3 * * * /etc/init.d/kcptun restart" >> /var/spool/cron/crontabs/root; fi
         if [ "${bbr_select}" == "1" ] ;then
             echo "29 3 * * * /etc/init.d/bbr restart" >> /var/spool/cron/crontabs/root
-        else
+        elif [ "${bbr_select}" == "2" ] ;then
             echo "29 3 * * * service haproxy-lkl restart" >> /var/spool/cron/crontabs/root
         fi
         /etc/init.d/cron restart
@@ -1242,6 +1234,9 @@ show_ss_ssr_ssr_kcptun(){
         echo -e "SS-libev Encryption Method : ${COLOR_GREEN}${set_ss_libev_method}${COLOR_END}"
         #echo -e "SS-libev Local IP          : ${COLOR_GREEN}127.0.0.1${COLOR_END}"
         #echo -e "SS-libev Local Port        : ${COLOR_GREEN}${ss_libev_local_port}${COLOR_END}"
+        if [ "${Install_obfs}" == "y" ] || [ "${Install_obfs}" == "Y" ]; then
+            echo -e "SS-libev obfs : ${COLOR_GREEN}obfs-server --obfs ${ofbs_option}${COLOR_END}"
+        fi
         echo "----------------------------------------------------------"
         echo -e "SS-libev status manage: ${COLOR_PINK}/etc/init.d/shadowsocks${COLOR_END} {${COLOR_GREEN}start|stop|restart|status|config|viewconfig|version${COLOR_END}}"
         echo "=========================================================="
@@ -1355,10 +1350,10 @@ pre_install_ss_ssr_ssrr_kcptun(){
         echo "  1: rc4-md5"
         echo "  2: aes-128-gcm"
         echo "  3: aes-192-gcm"
-        echo "  4: aes-256-gcm"
+        echo "  4: aes-256-gcm (default)"
         echo "  5: aes-128-cfb"
         echo "  6: aes-192-cfb"
-        echo "  7: aes-256-cfb (default)"
+        echo "  7: aes-256-cfb"
         echo "  8: aes-128-ctr"
         echo "  9: aes-192-ctr"
         echo " 10: aes-256-ctr"
@@ -2240,16 +2235,20 @@ reconfig_ss_ssr_ssrr_kcptun(){
     reconfig_flag="false"
     echo -e "${COLOR_YELOW}reconfig ss_ssr_ssrr_kcp_bbr...${COLOR_END}"
     if [ -f ${ss_libev_config} ];then
-        if [ -f shadowsocks-libev.json ] && [ "${Install_obfs}" == "n" ]; then
-            mv -f shadowsocks-libev.json ${ss_libev_config} && rm -rf shadowsocks-libev-obfs.json
-            /etc/init.d/shadowsocks restart
-	    reconfig_flag="true"
-	fi    
-	if [ -f shadowsocks-libev-obfs.json ] && [ "${Install_obfs}" == "y" ];then
-	    mv -f shadowsocks-libev-obfs.json ${ss_libev_config} && rm -rf shadowsocks-libev.json
-            /etc/init.d/shadowsocks restart
-	    reconfig_flag="true"
-	fi
+        if [ -f shadowsocks-libev.json ];then
+            if [ "${Install_obfs}" != "y" ] && [ ! "${Install_obfs}" != "Y" ]; then
+                mv -f shadowsocks-libev.json ${ss_libev_config} && rm -rf shadowsocks-libev-obfs.json
+                /etc/init.d/shadowsocks restart
+	              reconfig_flag="true"
+	          fi
+	      fi  
+        if [ -f shadowsocks-libev-obfs.json ];then
+	          if [ "${Install_obfs}" == "y" ] || [ "${Install_obfs}" == "Y" ];then
+	              mv -f shadowsocks-libev-obfs.json ${ss_libev_config} && rm -rf shadowsocks-libev.json
+                /etc/init.d/shadowsocks restart
+	              reconfig_flag="true"
+	          fi
+	      fi
     else 
         rm -f shadowsocks-libev.json shadowsocks-libev-obfs.json
     fi
@@ -2275,12 +2274,14 @@ reconfig_ss_ssr_ssrr_kcptun(){
         rm -f kcptun.json
     fi
     if [ -f firewall_set.sh ] && [ "${reconfig_flagt}" == "true"];then
+    	  echo "reconfig"
+    	  echo reconfig_flagt:${reconfig_flagt}
         chmod +x ./firewall_set.sh
         ./firewall_set.sh
     fi
 }
 set_tool(){
-    echo -e "${COLOR_YELOW}set tool...${COLOR_END}"
+    echo -e "+ Set tool.sh..."
     wget --no-check-certificate -O /root/tool.sh https://raw.githubusercontent.com/Jenking-Zhang/shell_for_ss_ssr_ssrr_kcptun_bbr/master/openvz_tool.sh
     chmod +x /root/tool.sh
 }
