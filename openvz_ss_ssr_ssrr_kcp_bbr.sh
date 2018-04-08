@@ -427,6 +427,7 @@ Simple_obfs_option(){
 }
 BBR_Selection(){
     def_bbr_select="2"
+    echo
     echo -e "${COLOR_YELOW}You have 3 options for BBR install${COLOR_END}"
     echo "1: Install BBR with Rinetd"
     echo "2: Install BBR with LML"
@@ -2252,30 +2253,28 @@ reconfig_ss_ssr_ssrr_kcptun(){
     else 
         rm -f shadowsocks-libev.json shadowsocks-libev-obfs.json
     fi
-   if [ -f ${ssr_config} ] && [ -f shadowsocksR.json ];then
+    if [ -f ${ssr_config} ] && [ -f shadowsocksR.json ];then
         mv -f shadowsocksR.json ${ssr_config}
         /etc/init.d/ssr restart
-	reconfig_flag="true"
-        else 
+        reconfig_flag="true"
+    else 
         rm -f shadowsocksR.json shadowsocksR-Origin.json
     fi
     if [ -f ${ssrr_config} ] && [ -f shadowsocksRR.json ];then
         mv -f shadowsocksRR.json ${ssrr_config}
         /etc/init.d/ssrr restart
-	reconfig_flag="true"
+        reconfig_flag="true"
     else 
         rm -f shadowsocksRR.json shadowsocksRR-Origin.json
     fi
     if [ -f ${kcptun_config} ] &&  [ -f kcptun.json ] ;then
         mv -f kcptun.json ${kcptun_config}
         /etc/init.d/kcptun restart
-	reconfig_flag="true"
+        reconfig_flag="true"
     else 
         rm -f kcptun.json
     fi
-    if [ -f firewall_set.sh ] && [ "${reconfig_flagt}" == "true"];then
-    	  echo "reconfig"
-    	  echo reconfig_flagt:${reconfig_flagt}
+    if [ -f firewall_set.sh ] && [ "${reconfig_flagt}" == "true" ];then
         chmod +x ./firewall_set.sh
         ./firewall_set.sh
     fi
