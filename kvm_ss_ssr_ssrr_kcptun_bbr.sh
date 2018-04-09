@@ -273,7 +273,7 @@ pre_install_packs(){
         yum_depends=(
             unzip gzip openssl openssl-devel gcc python python-devel python-setuptools pcre pcre-devel libtool libevent xmlto
             autoconf automake make curl curl-devel zlib-devel perl perl-devel cpio expat-devel gettext-devel asciidoc
-            libev-devel c-ares-devel git qrencode lrzsz
+            libev-devel c-ares-devel git udns-devel qrencode lrzsz
         )
         for depend in ${yum_depends[@]}; do
             error_detect_depends "yum -y install ${depend}"
@@ -759,28 +759,6 @@ EOF
     fi
 }
 install_ss_ssr_ssrr_kcptun(){
-    if check_sys packageManager yum; then
-        yum install -y epel-release
-        yum install -y unzip openssl-devel gcc swig autoconf libtool libevent vim automake make psmisc curl curl-devel zlib-devel perl perl-devel cpio expat-devel gettext-devel xmlto asciidoc pcre pcre-devel python python-devel python-setuptools udns-devel libev-devel mbedtls-devel
-        if [ $? -gt 1 ]; then
-            echo
-            echo -e "${COLOR_RED}Install support packs failed!${COLOR_END}"
-            exit 1
-        fi
-    elif check_sys packageManager apt; then
-        if debianversion 7; then
-            grep "jessie" /etc/apt/sources.list > /dev/null 2>&1
-            if [ $? -ne 0 ] && [ -r /etc/apt/sources.list ]; then
-                echo "deb http://http.us.debian.org/debian jessie main" >> /etc/apt/sources.list
-            fi
-        fi
-        apt-get -y update && apt-get -y install --no-install-recommends gettext curl wget vim unzip psmisc gcc swig autoconf automake make perl cpio build-essential libtool openssl libssl-dev zlib1g-dev xmlto asciidoc libpcre3 libpcre3-dev python python-dev python-pip python-m2crypto libev-dev libudns-dev
-        if [ $? -gt 1 ]; then
-            echo
-            echo -e "${COLOR_RED}Install support packs failed!${COLOR_END}"
-            exit 1
-        fi
-    fi
     if [ ! -f /usr/lib/libsodium.a ] && [ ! -L /usr/local/lib/libsodium.so ]; then
         cd ${cur_dir}
         echo "+ Install libsodium for SS-Libev/SSR/SSRR/KCPTUN"
