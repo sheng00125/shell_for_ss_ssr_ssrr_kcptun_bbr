@@ -450,7 +450,7 @@ BBR_Selection(){
 # Install cleanup
 install_cleanup(){
     cd ${cur_dir}
-    rm -rf .version.sh ${shadowsocks_libev_ver} ${shadowsocks_libev_ver}.tar.gz manyuser.zip shadowsocksr-manyuser shadowsocks-manyuser ${kcptun_latest_file} ${libsodium_laster_ver} ${libsodium_laster_ver}.tar.gz ${mbedtls_laster_ver} ${mbedtls_laster_ver}-gpl.tgz shadowsocksr-akkariiin-master ssrr.zip bbr_kvm.sh glibc-2.15-60.el6.x86_64.rpm glibc-common-2.15-60.el6.x86_64.rpm glibc-devel-2.15-60.el6.x86_64.rpm glibc-headers-2.15-60.el6.x86_64.rpm nscd-2.15-60.el6.x86_64.rpm simple-obfs simple-obfs.tar.gz autoconf-2.69.tar.gz autoconf-2.69
+    rm -rf .version.sh ${shadowsocks_libev_ver} ${shadowsocks_libev_ver}.tar.gz manyuser.zip shadowsocksr-manyuser shadowsocks-manyuser ${kcptun_latest_file} ${libsodium_laster_ver} ${libsodium_laster_ver}.tar.gz ${mbedtls_laster_ver} ${mbedtls_laster_ver}-gpl.tgz shadowsocksr-akkariiin-master ssrr.zip ovz-bbr-installer.sh glibc-2.15-60.el6.x86_64.rpm glibc-common-2.15-60.el6.x86_64.rpm glibc-devel-2.15-60.el6.x86_64.rpm glibc-headers-2.15-60.el6.x86_64.rpm nscd-2.15-60.el6.x86_64.rpm simple-obfs simple-obfs.tar.gz autoconf-2.69.tar.gz autoconf-2.69 autoconf-2.69.tar.gz.1
 }
 check_ss_ssr_ssrr_kcptun_installed(){
     ss_libev_installed_flag=""
@@ -804,6 +804,9 @@ install_ss_ssr_ssrr_kcptun(){
             elif check_sys packageManager apt; then
                 update-rc.d -f shadowsocks defaults
             fi
+            if [ "${Install_obfs}" == "y" ] || [ "${Install_obfs}" == "Y" ]; then
+	              install_simple_obfs
+            fi
             # Run shadowsocks in the background
             /etc/init.d/shadowsocks start
             if [ $? -eq 0 ]; then
@@ -819,9 +822,6 @@ install_ss_ssr_ssrr_kcptun(){
             echo -e "${COLOR_RED}Shadowsocks-libev install failed! ${COLOR_END}"
             exit 1
         fi
-        if [ "${Install_obfs}" == "y" ] || [ "${Install_obfs}" == "Y" ]; then
-	          install_simple_obfs
-      	fi
     fi
     if [[ "${ssr_installed_flag}" == "false" && "${shell_action}" =~ ^[Ii]|[Ii][Nn]|[Ii][Nn][Ss][Tt][Aa][Ll][Ll]|-[Ii]|--[Ii]$ ]] || [[ "${ssr_installed_flag}" == "true" && "${ssr_update_flag}" == "true" && "${shell_action}" =~ ^[Uu]|[Uu][Pp][Dd][Aa][Tt][Ee]|-[Uu]|--[Uu]|[Uu][Pp]|-[Uu][Pp]|--[Uu][Pp]$ ]]; then
         cd ${cur_dir}
@@ -2163,7 +2163,7 @@ reconfig_ss_ssr_ssrr_kcptun(){
     else 
         rm -f kcptun.json
     fi
-    if [ -f firewall_set.sh ] && [ "${reconfig_flagt}" == "true" ];then
+    if [ -f firewall_set.sh ] && [ "${reconfig_flag}" == "true" ];then
         chmod +x ./firewall_set.sh
         ./firewall_set.sh
     fi
