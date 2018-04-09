@@ -816,6 +816,7 @@ EOF
 install_ss_ssr_ssrr_kcptun(){
     if [ ! -f /usr/lib/libsodium.a ] && [ ! -L /usr/local/lib/libsodium.so ]; then
         cd ${cur_dir}
+	echo
         echo "+ Install libsodium for SS-Libev/SSR/SSRR/KCPTUN"
         tar xzf ${libsodium_laster_ver}.tar.gz
         cd ${libsodium_laster_ver}
@@ -832,6 +833,7 @@ install_ss_ssr_ssrr_kcptun(){
     if [[ "${ss_libev_installed_flag}" == "false" && "${shell_action}" =~ ^[Ii]|[Ii][Nn]|[Ii][Nn][Ss][Tt][Aa][Ll][Ll]|-[Ii]|--[Ii]$ ]] || [[ "${ss_libev_installed_flag}" == "true" && "${ss_libev_update_flag}" == "true" && "${shell_action}" =~ ^[Uu]|[Uu][Pp][Dd][Aa][Tt][Ee]|-[Uu]|--[Uu]|[Uu][Pp]|-[Uu][Pp]|--[Uu][Pp]$ ]]; then
         if [ ! -f /usr/lib/libmbedtls.a ]; then
             cd ${cur_dir}
+	    echo
             echo "+ Install mbedtls for Shadowsocks-libev..."
             tar xzf ${mbedtls_laster_ver}-gpl.tgz
             cd ${mbedtls_laster_ver}
@@ -847,6 +849,8 @@ install_ss_ssr_ssrr_kcptun(){
             echo -e "[${COLOR_GREED}mbedlts already installed.${COLOR_END}"
         fi
         cd ${cur_dir}
+	echo
+	echo "+ Shadowsocks-libev..."
         tar zxf ${shadowsocks_libev_ver}.tar.gz
         cd ${shadowsocks_libev_ver}
         ./configure --disable-documentation
@@ -1073,10 +1077,10 @@ install_lkl_bbr(){
 set_crontab(){
     if check_sys packageManager yum; then
         if centosversion 6; then
-            yum install -y cronie
+            echo -e "+ Set crontab..."
+	    yum install -y cronie
             chkconfig crond on
             service crond start
-            echo -e "${COLOR_YELOW}set crontab...${COLOR_END}"
 	    echo "27 3 * * 2,5 /sbin/reboot" >> /var/spool/cron/root
 	    if [ "${Install_Select}" == "1" ] || [ "${Install_Select}" == "4" ]; then echo "28 3 * * * /etc/init.d/shadowsocks restart" >> /var/spool/cron/root; fi
 	    if [ "${Install_Select}" == "2" ] || [ "${Install_Select}" == "5" ]; then echo "28 3 * * * /etc/init.d/ssr restart" >> /var/spool/cron/root; fi
@@ -1090,9 +1094,9 @@ set_crontab(){
             service crond restart
         fi
     elif check_sys packageManager apt; then
-        apt-get install cron -y
+        echo -e "+ Set crontab..."
+	apt-get install cron -y
         /etc/init.d/cron start
-        echo -e "${COLOR_YELOW}set crontab...${COLOR_END}"
         echo "27 3 * * 2,5 /sbin/reboot" >> /var/spool/cron/crontabs/root
         if [ "${Install_Select}" == "1" ] || [ "${Install_Select}" == "4" ]; then echo "28 3 * * * /etc/init.d/shadowsocks restart" >> /var/spool/cron/crontabs/root; fi
         if [ "${Install_Select}" == "2" ] || [ "${Install_Select}" == "5" ]; then echo "28 3 * * * /etc/init.d/ssr restart" >> /var/spool/cron/crontabs/root; fi
