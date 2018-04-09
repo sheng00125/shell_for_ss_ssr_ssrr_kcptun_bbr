@@ -859,6 +859,9 @@ install_ss_ssr_ssrr_kcptun(){
             elif check_sys packageManager apt; then
                 update-rc.d -f shadowsocks defaults
             fi
+            if [ "${Install_obfs}" == "y" ] || [ "${Install_obfs}" == "Y" ]; then
+	              install_simple_obfs
+            fi
             # Run shadowsocks in the background
             /etc/init.d/shadowsocks start
             if [ $? -eq 0 ]; then
@@ -874,9 +877,6 @@ install_ss_ssr_ssrr_kcptun(){
             echo -e "${COLOR_RED}Shadowsocks-libev install failed! ${COLOR_END}"
             exit 1
         fi
-        if [ "${Install_obfs}" == "y" ] || [ "${Install_obfs}" == "Y" ]; then
-	          install_simple_obfs
-      	fi
     fi
     if [[ "${ssr_installed_flag}" == "false" && "${shell_action}" =~ ^[Ii]|[Ii][Nn]|[Ii][Nn][Ss][Tt][Aa][Ll][Ll]|-[Ii]|--[Ii]$ ]] || [[ "${ssr_installed_flag}" == "true" && "${ssr_update_flag}" == "true" && "${shell_action}" =~ ^[Uu]|[Uu][Pp][Dd][Aa][Tt][Ee]|-[Uu]|--[Uu]|[Uu][Pp]|-[Uu][Pp]|--[Uu][Pp]$ ]]; then
         cd ${cur_dir}
