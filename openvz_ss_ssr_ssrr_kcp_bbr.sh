@@ -273,7 +273,7 @@ pre_install_packs(){
         yum_depends=(
             unzip gzip openssl openssl-devel gcc python python-devel python-setuptools pcre pcre-devel libtool libevent xmlto
             autoconf automake make curl curl-devel zlib-devel perl perl-devel cpio expat-devel gettext-devel asciidoc
-            libev-devel c-ares-devel git qrencode udns-devel kernel-headers lrzsz
+            libev-devel c-ares-devel git qrencode kernel-headers lrzsz
         )
         for depend in ${yum_depends[@]}; do
             error_detect_depends "yum -y install ${depend}"
