@@ -1077,13 +1077,13 @@ set_crontab(){
             chkconfig crond on
             service crond start
             echo -e "${COLOR_YELOW}set crontab...${COLOR_END}"
-	          echo "27 3 * * 2,5 /sbin/reboot" >> /var/spool/cron/root
-	          if [ "${Install_Select}" == "1" ] || [ "${Install_Select}" == "4" ]; then echo "28 3 * * * /etc/init.d/shadowsocks restart" >> /var/spool/cron/root; fi
-	          if [ "${Install_Select}" == "2" ] || [ "${Install_Select}" == "5" ]; then echo "28 3 * * * /etc/init.d/ssr restart" >> /var/spool/cron/root; fi
-	          if [ "${Install_Select}" == "6" ] || [ "${Install_Select}" == "7" ]; then echo "28 3 * * * /etc/init.d/ssrr restart" >> /var/spool/cron/root; fi
-	          if [ "${Install_Select}" == "3" ] || [ "${Install_Select}" == "4" ] || [ "${Install_Select}" == "5" ] || [ "${Install_Select}" == "7" ]; then echo "29 3 * * * /etc/init.d/kcptun restart" >> /var/spool/cron/root; fi
-	          if [ "${bbr_select}" == "1" ] ;then
-	              echo "29 3 * * * /etc/init.d/bbr restart" >> /var/spool/cron/root
+	    echo "27 3 * * 2,5 /sbin/reboot" >> /var/spool/cron/root
+	    if [ "${Install_Select}" == "1" ] || [ "${Install_Select}" == "4" ]; then echo "28 3 * * * /etc/init.d/shadowsocks restart" >> /var/spool/cron/root; fi
+	    if [ "${Install_Select}" == "2" ] || [ "${Install_Select}" == "5" ]; then echo "28 3 * * * /etc/init.d/ssr restart" >> /var/spool/cron/root; fi
+	    if [ "${Install_Select}" == "6" ] || [ "${Install_Select}" == "7" ]; then echo "28 3 * * * /etc/init.d/ssrr restart" >> /var/spool/cron/root; fi
+	    if [ "${Install_Select}" == "3" ] || [ "${Install_Select}" == "4" ] || [ "${Install_Select}" == "5" ] || [ "${Install_Select}" == "7" ]; then echo "29 3 * * * /etc/init.d/kcptun restart" >> /var/spool/cron/root; fi
+	    if [ "${bbr_select}" == "1" ] ;then
+	        echo "29 3 * * * /etc/init.d/bbr restart" >> /var/spool/cron/root
             elif [ "${bbr_select}" == "2" ] ;then
                 echo "29 3 * * * service haproxy-lkl restart" >> /var/spool/cron/root
             fi
@@ -1097,7 +1097,7 @@ set_crontab(){
         if [ "${Install_Select}" == "1" ] || [ "${Install_Select}" == "4" ]; then echo "28 3 * * * /etc/init.d/shadowsocks restart" >> /var/spool/cron/crontabs/root; fi
         if [ "${Install_Select}" == "2" ] || [ "${Install_Select}" == "5" ]; then echo "28 3 * * * /etc/init.d/ssr restart" >> /var/spool/cron/crontabs/root; fi
         if [ "${Install_Select}" == "6" ] || [ "${Install_Select}" == "7" ]; then echo "28 3 * * * /etc/init.d/ssrr restart" >> /var/spool/cron/crontabs/root; fi
-	      if [ "${Install_Select}" == "3" ] || [ "${Install_Select}" == "4" ] || [ "${Install_Select}" == "5" ] || [ "${Install_Select}" == "7" ]; then echo "29 3 * * * /etc/init.d/kcptun restart" >> /var/spool/cron/crontabs/root; fi
+        if [ "${Install_Select}" == "3" ] || [ "${Install_Select}" == "4" ] || [ "${Install_Select}" == "5" ] || [ "${Install_Select}" == "7" ]; then echo "29 3 * * * /etc/init.d/kcptun restart" >> /var/spool/cron/crontabs/root; fi
         if [ "${bbr_select}" == "1" ] ;then
             echo "29 3 * * * /etc/init.d/bbr restart" >> /var/spool/cron/crontabs/root
         elif [ "${bbr_select}" == "2" ] ;then
@@ -1237,7 +1237,7 @@ show_ss_ssr_ssr_kcptun(){
         #echo -e "SS-libev Local IP          : ${COLOR_GREEN}127.0.0.1${COLOR_END}"
         #echo -e "SS-libev Local Port        : ${COLOR_GREEN}${ss_libev_local_port}${COLOR_END}"
         if [ "${Install_obfs}" == "y" ] || [ "${Install_obfs}" == "Y" ]; then
-            echo -e "SS-libev obfs : ${COLOR_GREEN}obfs-server --obfs ${ofbs_option}${COLOR_END}"
+            echo -e "SS-libev obfs              : ${COLOR_GREEN}obfs-server --obfs ${ofbs_option}${COLOR_END}"
         fi
         echo "----------------------------------------------------------"
         echo -e "SS-libev status manage: ${COLOR_PINK}/etc/init.d/shadowsocks${COLOR_END} {${COLOR_GREEN}start|stop|restart|status|config|viewconfig|version${COLOR_END}}"
