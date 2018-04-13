@@ -282,6 +282,7 @@ pre_install_packs(){
             update_glibc
 	    update_autoconf
 	    yum update nss -y
+	    yum update -y
 	fi
     elif check_sys packageManager apt; then
         apt_depends=(
@@ -292,6 +293,7 @@ pre_install_packs(){
         for depend in ${apt_depends[@]}; do
             error_detect_depends "apt-get -y install ${depend}"
         done
+	apt-get upgrade -y
     fi
 }
 update_glibc(){
@@ -1307,7 +1309,6 @@ pre_install_ss_ssr_ssrr_kcptun(){
     get_install_version
     Print_Sys_Info
     set_timezone
-    yum update -y
     Disable_Selinux
     check_ss_ssr_ssrr_kcptun_installed
     cd ${cur_dir}
