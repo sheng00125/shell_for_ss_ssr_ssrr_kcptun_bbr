@@ -390,7 +390,7 @@ Dispaly_Selection(){
         def_Install_obfs="N"
         echo
         echo -e "${COLOR_YELOW}Do you want to install simple-obfs for Shadowsocks-libev?[Y/N]${COLOR_END}"
-        read -p "Enter your choice fot simple-obf.default: ${def_Install_obfs}:" Install_obfs
+        read -p "Enter your choice for simple-obf.default: ${def_Install_obfs}:" Install_obfs
 
         case "${Install_obfs}" in
             [yY])
@@ -464,7 +464,7 @@ BBR_option(){
         do
             echo
             echo -e "Please input port for BBR [1-65535]"
-            read -p "(Default port: ${bbr_port}):" bbr_port
+            read -p "(Default port: ${def_bbr_port}):" bbr_port
             [ -z "$bbr_port" ] && bbr_port="${def_bbr_port}"
             expr ${bbr_port} + 0 &>/dev/null
             if [ $? -eq 0 ]; then
