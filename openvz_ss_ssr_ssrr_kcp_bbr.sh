@@ -9,7 +9,7 @@ ss_libev_config="/etc/shadowsocks-libev/config.json"
 ssr_config="/usr/local/shadowsocksR/shadowsocksR.json"
 ssrr_config="/usr/local/shadowsocksRR/user-config.json"
 kcptun_config="/usr/local/kcptun/config.json"
-def_port=$(shuf -i 10000-65534 -n 1)
+export def_port=$(shuf -i 10000-65534 -n 1)
 
 # Check if user is root
 if [ $(id -u) != "0" ]; then
