@@ -14,10 +14,10 @@ export MBEDTLS_VER=$(curl -L -s https://tls.mbed.org/download | grep "/download/
 export MBEDTLS_LINK="https://tls.mbed.org/download/mbedtls-${MBEDTLS_VER}-gpl.tgz"
 
 # SS_LIBEV
-export SS_LIBEV_VER=3.1.3
+#export SS_LIBEV_VER=3.2.0
 #old export SS_LIBEV_VER=$(curl -L -s https://github.com/shadowsocks/shadowsocks-libev/releases/latest | grep "/shadowsocks/shadowsocks-libev/releases/download/" | cut -f4 -d \- | awk -F ".tar" '{print $1}' | sed s/[[:space:]]//g )
 #export SS_LIBEV_VER=$(curl -L -s https://github.com/shadowsocks/shadowsocks-libev/releases/latest | grep "/shadowsocks/shadowsocks-libev/releases/download/" |head -n 1 |cut -f6 -d "/" | awk -F "v" '{print $1,$2}' | sed s/[[:space:]]//g )
-#export SS_LIBEV_VER=$(curl -L -s https://api.github.com/repos/shadowsocks/shadowsocks-libev/releases/latest | grep 'tag_name' | cut -d\" -f4 | sed s/v//g)
+export SS_LIBEV_VER=$(curl -L -s https://api.github.com/repos/shadowsocks/shadowsocks-libev/releases/latest | grep 'tag_name' | cut -d\" -f4 | sed s/v//g)
 export SS_LIBEV_LINK="https://github.com/shadowsocks/shadowsocks-libev/releases/download/v${SS_LIBEV_VER}/shadowsocks-libev-${SS_LIBEV_VER}.tar.gz"
 export SS_LIBEV_YUM_INIT="https://raw.githubusercontent.com/Jenking-Zhang/shell_for_ss_ssr_ssrr_kcptun_bbr/master/ss_libev.init"
 export SS_LIBEV_APT_INIT="https://raw.githubusercontent.com/onekeyshell/kcptun_for_ss_ssr/master/ss_libev_apt.init"
