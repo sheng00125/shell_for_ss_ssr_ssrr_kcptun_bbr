@@ -9,6 +9,7 @@ ss_libev_config="/etc/shadowsocks-libev/config.json"
 ssr_config="/usr/local/shadowsocksR/shadowsocksR.json"
 ssrr_config="/usr/local/shadowsocksRR/user-config.json"
 kcptun_config="/usr/local/kcptun/config.json"
+def_port=$(shuf -i 10000-65534 -n 1)
 
 # Check if user is root
 if [ $(id -u) != "0" ]; then
@@ -457,12 +458,14 @@ BBR_Selection(){
     esac
 }
 BBR_option(){
-    if [ ${bbr_select} == "1" ] && [ ! -f rinetd_bbr.conf ];then
+    def_bbr_port=${def_port}
+    if [ ${bbr_select} == "1" ] || [ ${bbr_select} == "2" ];then
         while true
         do
             echo
-            read -p "Please input port for BBR [1-65535]:" bbr_port
-            [ -z "$set_ss_libev_port" ]
+            echo -e "Please input port for BBR [1-65535]"
+            read -p "(Default port: ${bbr_port}):" bbr_port
+            [ -z "$bbr_port" ] && bbr_port="${def_bbr_port}"
             expr ${bbr_port} + 0 &>/dev/null
             if [ $? -eq 0 ]; then
                 if [ ${bbr_port} -ge 1 ] && [ ${bbr_port} -le 65535 ]; then
@@ -472,36 +475,14 @@ BBR_option(){
                     echo "---------------------------------------"
                     echo
                     break
-                 else
-                    echo -e "${COLOR_RED}Input error, please input correct number${COLOR_END}"
-                  fi
+                else
+                    echo "${COLOR_RED}Input error, please input correct number"${COLOR_END}
+                fi
             else
-                echo -e "${COLOR_RED}No input, please input correct number${COLOR_END}"
+                echo "${COLOR_RED}Input error, please input correct number"${COLOR_END}
             fi
         done
-    elif [ ${bbr_select} == "2" ] && [ ! -f lkl_bbr.conf ];then
-        while true
-        do
-            echo
-            read -p "Please input port for BBR [1-65535]:" bbr_port
-            [ -z "$set_ss_libev_port" ]
-            expr ${bbr_port} + 0 &>/dev/null
-            if [ $? -eq 0 ]; then
-                if [ ${bbr_port} -ge 1 ] && [ ${bbr_port} -le 65535 ]; then
-                    echo
-                    echo "---------------------------------------"
-                    echo "BBR port = ${bbr_port}"
-                    echo "---------------------------------------"
-                    echo
-                    break
-                 else
-                    echo -e "${COLOR_RED}Input error, please input correct number${COLOR_END}"
-                  fi
-            else
-                echo -e "${COLOR_RED}No input, please input correct number${COLOR_END}"
-            fi
-        done
-    export bbr_port
+        export bbr_port
     fi
 }
 # Install cleanup
@@ -1327,7 +1308,7 @@ pre_install_ss_ssr_ssrr_kcptun(){
         # Set shadowsocks-libev port
         while true
         do
-            def_ss_libev_port="8989"
+            def_ss_libev_port=${def_port}
             echo -e "Please input port for Shadowsocks-libev [1-65535]"
             #read -p "(Default port: ${def_ss_libev_port}):" set_ss_libev_port
             [ -z "$set_ss_libev_port" ] && set_ss_libev_port="${def_ss_libev_port}"
@@ -1460,7 +1441,7 @@ pre_install_ss_ssr_ssrr_kcptun(){
         # Set shadowsocksR port
         while true
         do
-            def_ssr_port="28989"
+            def_ssr_port=${def_port}
             echo -e "Please input port for ShadowsocksR [1-65535]"
             #read -p "(Default port: ${def_ssr_port}):" set_ssr_port
             [ -z "$set_ssr_port" ] && set_ssr_port="${def_ssr_port}"
@@ -1647,7 +1628,7 @@ pre_install_ss_ssr_ssrr_kcptun(){
         # Set shadowsocksRR port
         while true
         do
-            def_ssrr_port="48989"
+            def_ssrr_port=${def_port}
             echo -e "Please input port for ShadowsocksRR [1-65535]"
             #read -p "(Default port: ${def_ssrr_port}):" set_ssrr_port
             [ -z "$set_ssrr_port" ] && set_ssrr_port="${def_ssrr_port}"
@@ -1861,7 +1842,7 @@ pre_install_ss_ssr_ssrr_kcptun(){
         # Set kcptun port
         while true
         do
-            def_kcptun_port="38989"
+            def_kcptun_port=$(shuf -i 10000-65534 -n 1)
             echo -e "Please input port for KCPTUN [1-65535]"
             #read -p "(Default port: ${def_kcptun_port}):" set_kcptun_port
             [ -z "$set_kcptun_port" ] && set_kcptun_port="${def_kcptun_port}"
