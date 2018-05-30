@@ -2,7 +2,7 @@
 PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
 export PATH
 
-shell_version="2.0.5"
+shell_version="2.0.7"
 shell_download_link="https://raw.githubusercontent.com/onekeyshell/kcptun_for_ss_ssr/master/kcptun_for_ss_ssr-install.sh"
 program_version_link="https://raw.githubusercontent.com/Jenking-Zhang/shell_for_ss_ssr_ssrr_kcptun_bbr/master/version.sh"
 ss_libev_config="/etc/shadowsocks-libev/config.json"
@@ -273,7 +273,7 @@ pre_install_packs(){
         yum_depends=(
             unzip gzip openssl openssl-devel gcc python python-devel python-setuptools pcre pcre-devel libtool libevent xmlto
             autoconf automake make curl curl-devel zlib-devel perl perl-devel cpio expat-devel gettext-devel asciidoc
-            libev-devel c-ares-devel git udns-devel qrencode lrzsz
+            libev-devel c-ares-devel git udns-devel qrencode kernel-headers lrzsz
         )
         for depend in ${yum_depends[@]}; do
             error_detect_depends "yum -y install ${depend}"
@@ -282,6 +282,7 @@ pre_install_packs(){
             update_glibc
 	    update_autoconf
 	    yum update nss -y
+	    yum update -y
 	fi
     elif check_sys packageManager apt; then
         apt_depends=(
@@ -292,6 +293,7 @@ pre_install_packs(){
         for depend in ${apt_depends[@]}; do
             error_detect_depends "apt-get -y install ${depend}"
         done
+	apt-get upgrade -y
     fi
 }
 update_glibc(){
@@ -673,13 +675,12 @@ config_ss_ssr_ssrr_kcptun(){
 {
     "server":"0.0.0.0",
     "server_port":${set_ss_libev_port},
-    "local_address":"127.0.0.1",
-    "local_port":${ss_libev_local_port},
     "password":"${set_ss_libev_pwd}",
     "timeout":300,
     "method":"${set_ss_libev_method}",
     "fast_open":${fast_open},
-    "plugin":"obfs-server --obfs ${ofbs_option}"
+    "plugin":"/usr/local/bin/obfs-server",
+    "plugin_opts":"obfs=${ofbs_option}"
 }
 EOF
         else
@@ -687,8 +688,6 @@ EOF
 {
     "server":"0.0.0.0",
     "server_port":${set_ss_libev_port},
-    "local_address":"127.0.0.1",
-    "local_port":${ss_libev_local_port},
     "password":"${set_ss_libev_pwd}",
     "timeout":300,
     "method":"${set_ss_libev_method}",
@@ -1127,10 +1126,9 @@ show_ss_ssr_ssr_kcptun(){
         echo -e "SS-libev Server Port       : ${COLOR_GREEN}${set_ss_libev_port}${COLOR_END}"
         echo -e "SS-libev Password          : ${COLOR_GREEN}${set_ss_libev_pwd}${COLOR_END}"
         echo -e "SS-libev Encryption Method : ${COLOR_GREEN}${set_ss_libev_method}${COLOR_END}"
-        #echo -e "SS-libev Local IP          : ${COLOR_GREEN}127.0.0.1${COLOR_END}"
-        #echo -e "SS-libev Local Port        : ${COLOR_GREEN}${ss_libev_local_port}${COLOR_END}"
         if [ "${Install_obfs}" == "y" ] || [ "${Install_obfs}" == "Y" ]; then
-            echo -e "SS-libev obfs              : ${COLOR_GREEN}obfs-server --obfs ${ofbs_option}${COLOR_END}"
+            echo -e "SS-libev plugin            : ${COLOR_GREEN}/usr/local/bin/obfs-server${COLOR_END}"
+            echo -e "SS-libev plugin_opts       : ${COLOR_GREEN}obfs=${ofbs_option}${COLOR_END}"
         fi
         echo "----------------------------------------------------------"
         echo -e "SS-libev status manage: ${COLOR_PINK}/etc/init.d/shadowsocks${COLOR_END} {${COLOR_GREEN}start|stop|restart|status|config|viewconfig|version${COLOR_END}}"
@@ -1195,7 +1193,6 @@ pre_install_ss_ssr_ssrr_kcptun(){
     get_install_version
     Print_Sys_Info
     set_timezone
-    yum update -y
     Disable_Selinux
     check_ss_ssr_ssrr_kcptun_installed
     cd ${cur_dir}
@@ -1238,7 +1235,6 @@ pre_install_ss_ssr_ssrr_kcptun(){
                 echo "Input error, please input correct number"
             fi
         done
-        ss_libev_local_port="1086"
         def_ss_libev_method="aes-256-gcm"
         echo -e "Please select method for Shadowsocks-libev"
         echo "  1: rc4-md5"
