@@ -322,13 +322,25 @@ update_autoconf(){
 }
 # Random password
 randstr(){
-  index=0
-  strRandomPass=""
-  for i in {a..z}; do arr[index]=$i; index=`expr ${index} + 1`; done
-  for i in {A..Z}; do arr[index]=$i; index=`expr ${index} + 1`; done
-  for i in {0..9}; do arr[index]=$i; index=`expr ${index} + 1`; done
-  for i in {1..16}; do strRandomPass="$strRandomPass${arr[$RANDOM%$index]}"; done
-  echo $strRandomPass
+    index=0
+    special[0]="#"
+    special[1]="$"
+    special[2]="&"
+    special[3]="^"
+    special[4]="!"
+    special[5]="%"
+    special[6]="@"
+    special[7]="_"
+    special[8]="*"
+    special[8]="+"
+    special[8]="-"
+    str=""
+    for i in {a..z}; do arr[index]=$i; index=`expr ${index} + 1`; done
+    for i in {A..Z}; do arr[index]=$i; index=`expr ${index} + 1`; done
+    for i in {0..9}; do arr[index]=$i; index=`expr ${index} + 1`; done
+    for i in ${special[@]}; do arr[index]=$i; index=`expr ${index} + 1`; done
+    for i in {1..8}; do str="$str${arr[$RANDOM%$index]}"; done
+    echo $str
 }
 get_ip(){
     local IP=$(ip addr | egrep -o '[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}' | egrep -v "^192\.168|^172\.1[6-9]\.|^172\.2[0-9]\.|^172\.3[0-2]\.|^10\.|^127\.|^255\.|^0\." | head -n 1)
