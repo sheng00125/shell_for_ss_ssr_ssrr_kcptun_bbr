@@ -730,13 +730,12 @@ config_ss_ssr_ssrr_kcptun(){
 {
     "server":"0.0.0.0",
     "server_port":${set_ss_libev_port},
-    "local_address":"127.0.0.1",
-    "local_port":${ss_libev_local_port},
     "password":"${set_ss_libev_pwd}",
     "timeout":300,
     "method":"${set_ss_libev_method}",
     "fast_open":${fast_open},
-    "plugin":"obfs-server --obfs ${ofbs_option}"
+    "plugin":"/usr/local/bin/obfs-server",
+    "plugin_opts":"obfs=${ofbs_option}"
 }
 EOF
         else
@@ -744,8 +743,6 @@ EOF
 {
     "server":"0.0.0.0",
     "server_port":${set_ss_libev_port},
-    "local_address":"127.0.0.1",
-    "local_port":${ss_libev_local_port},
     "password":"${set_ss_libev_pwd}",
     "timeout":300,
     "method":"${set_ss_libev_method}",
@@ -1240,10 +1237,9 @@ show_ss_ssr_ssr_kcptun(){
         echo -e "SS-libev Server Port       : ${COLOR_GREEN}${set_ss_libev_port}${COLOR_END}"
         echo -e "SS-libev Password          : ${COLOR_GREEN}${set_ss_libev_pwd}${COLOR_END}"
         echo -e "SS-libev Encryption Method : ${COLOR_GREEN}${set_ss_libev_method}${COLOR_END}"
-        #echo -e "SS-libev Local IP          : ${COLOR_GREEN}127.0.0.1${COLOR_END}"
-        #echo -e "SS-libev Local Port        : ${COLOR_GREEN}${ss_libev_local_port}${COLOR_END}"
         if [ "${Install_obfs}" == "y" ] || [ "${Install_obfs}" == "Y" ]; then
-            echo -e "SS-libev obfs              : ${COLOR_GREEN}obfs-server --obfs ${ofbs_option}${COLOR_END}"
+            echo -e "SS-libev plugin            : ${COLOR_GREEN}/usr/local/bin/obfs-server${COLOR_END}"
+            echo -e "SS-libev plugin_opts       : ${COLOR_GREEN}obfs=${ofbs_option}${COLOR_END}"
         fi
         echo "----------------------------------------------------------"
         echo -e "SS-libev status manage: ${COLOR_PINK}/etc/init.d/shadowsocks${COLOR_END} {${COLOR_GREEN}start|stop|restart|status|config|viewconfig|version${COLOR_END}}"
@@ -1351,7 +1347,6 @@ pre_install_ss_ssr_ssrr_kcptun(){
                 echo "Input error, please input correct number"
             fi
         done
-        ss_libev_local_port="1086"
         def_ss_libev_method="aes-256-gcm"
         echo -e "Please select method for Shadowsocks-libev"
         echo "  1: rc4-md5"
@@ -2339,9 +2334,9 @@ update_ss_ssr_ssrr_kcptun(){
         if [ "${ss_libev_installed_flag}" == "true" ]; then
             ss_libev_local_ver=$(ss-server --help | grep -i "shadowsocks-libev" | awk '{print $2}')
             if [ -z ${ss_libev_local_ver} ] || [ -z ${SS_LIBEV_VER} ]; then
-                echo -e "${COLOR_RED}Error: Get Shadowsocks-libev shell version failed${COLOR_END}"
+                echo -e "${COLOR_RED}Error: Get Shadowsocks-libev remote version failed${COLOR_END}"
             else
-                echo -e "Shadowsocks-libev shell version : ${COLOR_GREEN}${SS_LIBEV_VER}${COLOR_END}"
+                echo -e "Shadowsocks-libev remote version : ${COLOR_GREEN}${SS_LIBEV_VER}${COLOR_END}"
                 echo -e "Shadowsocks-libev local version : ${COLOR_GREEN}${ss_libev_local_ver}${COLOR_END}"
                 if [[ "${ss_libev_local_ver}" != "${SS_LIBEV_VER}" ]];then
                     ss_libev_update_flag="true"
@@ -2358,9 +2353,9 @@ update_ss_ssr_ssrr_kcptun(){
         if [ "${ssr_installed_flag}" == "true" ]; then
             ssr_local_ver=$(ssr version | grep -i "shadowsocksr" | awk '{print $2}')
             if [ -z ${ssr_local_ver} ] || [ -z ${SSR_VER} ]; then
-                echo -e "${COLOR_RED}Error: Get ShadowsocksR shell version failed${COLOR_END}"
+                echo -e "${COLOR_RED}Error: Get ShadowsocksR remote version failed${COLOR_END}"
             else
-                echo -e "ShadowsocksR shell version : ${COLOR_GREEN}${SSR_VER}${COLOR_END}"
+                echo -e "ShadowsocksR remote version : ${COLOR_GREEN}${SSR_VER}${COLOR_END}"
                 echo -e "ShadowsocksR local version : ${COLOR_GREEN}${ssr_local_ver}${COLOR_END}"
                 if [[ "${ssr_local_ver}" != "${SSR_VER}" ]];then
                     ssr_update_flag="true"
@@ -2377,9 +2372,9 @@ update_ss_ssr_ssrr_kcptun(){
         if [ "${kcptun_installed_flag}" == "true" ]; then
             kcptun_local_ver=$(/usr/local/kcptun/kcptun --version | awk '{print $3}')
             if [ -z ${kcptun_local_ver} ] || [ -z ${KCPTUN_VER} ]; then
-                echo -e "${COLOR_RED}Error: Get KCPTUN shell version failed${COLOR_END}"
+                echo -e "${COLOR_RED}Error: Get KCPTUN remote version failed${COLOR_END}"
             else
-                echo -e "KCPTUN shell version : ${COLOR_GREEN}${KCPTUN_VER}${COLOR_END}"
+                echo -e "KCPTUN remote version : ${COLOR_GREEN}${KCPTUN_VER}${COLOR_END}"
                 echo -e "KCPTUN local version : ${COLOR_GREEN}${kcptun_local_ver}${COLOR_END}"
                 if [[ "${kcptun_local_ver}" != "${KCPTUN_VER}" ]];then
                     kcptun_update_flag="true"
@@ -2396,9 +2391,9 @@ update_ss_ssr_ssrr_kcptun(){
         if [ "${ssrr_installed_flag}" == "true" ]; then
             ssrr_local_ver=$(ssrr version | grep -i "SSRR" | awk '{print $3}')
             if [ -z ${ssrr_local_ver} ] || [ -z ${SSRR_VER} ]; then
-                echo -e "${COLOR_RED}Error: Get ShadowsocksRR shell version failed${COLOR_END}"
+                echo -e "${COLOR_RED}Error: Get ShadowsocksRR remote version failed${COLOR_END}"
             else
-                echo -e "ShadowsocksRR shell version : ${COLOR_GREEN}${SSRR_VER}${COLOR_END}"
+                echo -e "ShadowsocksRR remote version : ${COLOR_GREEN}${SSRR_VER}${COLOR_END}"
                 echo -e "ShadowsocksRR local version : ${COLOR_GREEN}${ssrr_local_ver}${COLOR_END}"
                 if [[ "${ssrr_local_ver}" != "${SSRR_VER}" ]];then
                     ssrr_update_flag="true"
