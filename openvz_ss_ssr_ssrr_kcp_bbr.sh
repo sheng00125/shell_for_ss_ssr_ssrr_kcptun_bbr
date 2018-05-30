@@ -2073,7 +2073,6 @@ pre_install_ss_ssr_ssrr_kcptun(){
     if check_sys packageManager yum; then
         firewall_set
     fi
-    show_ss_ssr_ssr_kcptun
 }
 uninstall_ss_ssr_ssrr_kcptun(){
     Get_Dist_Name
@@ -2523,6 +2522,7 @@ case "${shell_action}" in
     set_tool
     install_bbr
     set_crontab
+    show_ss_ssr_ssr_kcptun
     install_cleanup
     if [ -f /root/install.sh ]; then rm -f /root/install.sh; fi
     if [ -f /root/firewall_set.sh ]; then rm -f /root/firewall_set.sh; fi
