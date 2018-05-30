@@ -1238,6 +1238,8 @@ show_ss_ssr_ssr_kcptun(){
 	    else
 	        ss_libev_url=ss://$(echo -n "${set_ss_libev_method}:${set_ss_libev_pwd}" | base64 -w0)@${SERVER_IP}:${set_ss_libev_port}/?plugin=obfs-local%3bobfs%3dhttp#Shadowsocks_libev
 	    fi
+	else
+	    ss_libev_url=ss://$(echo -n "${set_ss_libev_method}:${set_ss_libev_pwd}" | base64 -w0)@${SERVER_IP}:${set_ss_libev_port}#Shadowsocks_libev
         fi
         echo "----------------------------------------------------------"
         echo -e "SS-libev status manage: ${COLOR_PINK}/etc/init.d/shadowsocks${COLOR_END} {${COLOR_GREEN}start|stop|restart|status|config|viewconfig|version${COLOR_END}}"
