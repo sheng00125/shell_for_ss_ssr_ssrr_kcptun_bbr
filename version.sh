@@ -9,7 +9,7 @@ export LIBSODIUM_VER=$(curl -L -s https://api.github.com/repos/jedisct1/libsodiu
 export LIBSODIUM_LINK="https://github.com/jedisct1/libsodium/releases/download/${LIBSODIUM_VER}/libsodium-${LIBSODIUM_VER}.tar.gz"
 
 # MBEDTLS
-#export MBEDTLS_VER=2.8.0
+#export MBEDTLS_VER=2.9.0
 export MBEDTLS_VER=$(curl -L -s https://tls.mbed.org/download | grep "/download/start/" |head -n 1 | cut -f2 -d \- | sed s/[[:space:]]//g )
 export MBEDTLS_LINK="https://tls.mbed.org/download/mbedtls-${MBEDTLS_VER}-gpl.tgz"
 
@@ -29,7 +29,7 @@ export SSR_LINK="https://github.com/onekeyshell/shadowsocksr/archive/manyuser.zi
 export SSR_YUM_INIT="https://raw.githubusercontent.com/Jenking-Zhang/shell_for_ss_ssr_ssrr_kcptun_bbr/master/ssr.init"
 export SSR_APT_INIT="https://raw.githubusercontent.com/onekeyshell/kcptun_for_ss_ssr/master/ssr_apt.init"
 # SSRR
-#export SSRR_VER=3.2.1
+#export SSRR_VER=3.2.2
 export SSRR_VER=$(wget --no-check-certificate -qO- https://raw.githubusercontent.com/shadowsocksrr/shadowsocksr/akkariiin/dev/shadowsocks/version.py | grep return | cut -d\' -f2 | awk '{print $2}')
 export SSRR_LINK="https://github.com/shadowsocksrr/shadowsocksr/archive/akkariiin/master.zip"
 export SSRR_YUM_INIT="https://raw.githubusercontent.com/Jenking-Zhang/shell_for_ss_ssr_ssrr_kcptun_bbr/master/ssrr.init"
