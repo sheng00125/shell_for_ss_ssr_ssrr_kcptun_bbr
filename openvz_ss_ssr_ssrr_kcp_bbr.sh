@@ -351,13 +351,13 @@ get_ip(){
 Dispaly_Selection(){
     def_Install_Select="1"
     echo -e "${COLOR_YELOW}You have 7 options for your ss/ssr/ssrr/kcptun install.${COLOR_END}"
-    echo "1: Install Shadowsocks-libev"
+    echo "1: Install Shadowsocks-libev (default)"
     echo "2: Install ShadowsocksR(python)"
     echo "3: Install KCPTUN"
     echo "4: Install Shadowsocks-libev + KCPTUN"
     echo "5: Install ShadowsocksR(python) + KCPTUN"
     echo "6: Install ShadowsocksRR(python)"
-    echo "7: Install ShadowsocksRR(python) + KCPTUN [default]"
+    echo "7: Install ShadowsocksRR(python) + KCPTUN"
     read -p "Enter your choice (1, 2, 3, 4, 5, 6, 7 or exit. default [${def_Install_Select}]): " Install_Select
 
     case "${Install_Select}" in
@@ -424,7 +424,7 @@ Simple_obfs_option(){
         echo
       	def_ofbs_option="1"
         echo -e "${COLOR_YELOW}Please select your Simple-obfs setting:${COLOR_END}"
-      	echo "1: http"
+      	echo "1: http (default)"
       	echo "2: tls"
       	#read -p "Enter your choice (1, 2. default ${def_ofbs_option}): " ofbs_option
 
@@ -446,7 +446,7 @@ BBR_Selection(){
     echo
     echo -e "${COLOR_YELOW}You have 3 options for BBR install${COLOR_END}"
     echo "1: Install BBR with Rinetd"
-    echo "2: Install BBR with LML"
+    echo "2: Install BBR with LML (default)"
     echo "3: Not install any BBR"
     read -p "Enter your choice (1, 2 or exit. default [${def_bbr_select}]): " bbr_select
 
