@@ -1296,7 +1296,7 @@ show_ss_ssr_ssr_kcptun(){
         echo -e "KCPTUN rcvwnd             : ${COLOR_GREEN}1024${COLOR_END}"
         echo -e "KCPTUN compression        : ${COLOR_GREEN}${set_kcptun_compression}${COLOR_END}"
         echo "----------------------------------------------------------"
-        echo -e "${COLOR_PINK}Kcptun config for Client:${COLOR_END}"
+        echo -e "${COLOR_PINK}KCPTUN config for Client:${COLOR_END}"
 	cat <<-EOF
 {
     "localaddr": "127.0.0.1:1110",
@@ -1315,7 +1315,7 @@ show_ss_ssr_ssr_kcptun(){
     "conn": 1
 }
 EOF
-	echo -e "${COLOR_PINK}Kcptun config for SS/SSR/Phone:${COLOR_END}"
+	echo -e "${COLOR_PINK}KCPTUN config for SS/SSR/Phone:${COLOR_END}"
 	echo -e "KCP Port      : ${COLOR_GREEN}${set_kcptun_port}${COLOR_END}"
         if [ "${set_kcptun_nocomp}" == "true" ];then
 	    echo -e "KCP parameter : ${COLOR_GREEN}key=${set_kcptun_pwd};crypt=${set_kcptun_method};mode=${set_kcptun_mode};mtu=${set_kcptun_mtu};sndwnd=512;rcvwnd=512;datashard=10;parityshard=3;dscp=46;conn=1;nocomp${COLOR_END}"
