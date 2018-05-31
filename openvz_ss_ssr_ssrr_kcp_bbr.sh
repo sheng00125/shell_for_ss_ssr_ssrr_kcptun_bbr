@@ -757,10 +757,10 @@ EOF
     "timeout":300,
     "method":"${set_ssr_method}",
     "protocol":"${set_ssr_protocol}",
-    "protocol_param":"",
+    "protocol_param":"www.cloudflare.com",
     "obfs":"${set_ssr_obfs}",
-    "obfs_param":"",
-    "redirect":"",
+    "obfs_param":"www.cloudflare.com",
+    "redirect":"www.cloudflare.com",
     "dns_ipv6":false,
     "fast_open":${fast_open},
     "workers":1
@@ -776,11 +776,11 @@ EOF
     "local_address":"127.0.0.1",
     "local_port":${ssrr_local_port},
     "port_password":{
-        "${set_ssrr_port}":{"protocol":"${set_ssrr_protocol}", "protocol_param":"", "password":"${set_ssrr_pwd}", "obfs":"${set_ssrr_obfs}", "obfs_param":""}
+        "${set_ssrr_port}":{"protocol":"${set_ssrr_protocol}", "protocol_param":"www.cloudflare.com", "password":"${set_ssrr_pwd}", "obfs":"${set_ssrr_obfs}", "obfs_param":"www.cloudflare.com"}
     },
     "timeout":300,
     "method":"${set_ssrr_method}",
-    "redirect": "",
+    "redirect": "www.cloudflare.com",
     "dns_ipv6": false,
     "fast_open":${fast_open},
     "workers": 1
@@ -798,11 +798,34 @@ EOF
     "crypt": "${set_kcptun_method}",
     "mode": "${set_kcptun_mode}",
     "mtu": ${set_kcptun_mtu},
-    "sndwnd": 1024,
-    "rcvwnd": 1024,
+    "sndwnd": 128,
+    "rcvwnd": 256,
     "nocomp": ${set_kcptun_nocomp}
+    "datashard": 10,
+    "parityshard": 3,
+    "autoexpire": 300,
+    "dscp": 46,
+    "pprof": true,
+    "log": "/root/kcptun.log"
 }
 EOF
+        cat > /root/kcptun_client.json<<-EOF
+{
+    "localaddr": "127.0.0.1:1110",
+    "remoteaddr": "${SERVER_IP}:${set_kcptun_port}",
+    "key": "${set_kcptun_pwd}",
+    "crypt": "${set_kcptun_method}",
+    "nocomp": ${set_kcptun_nocomp},
+    "mode": "${set_kcptun_mode}",
+    "mtu": ${set_kcptun_mtu},
+    "sndwnd": 128,
+    "rcvwnd": 256,
+    "datashard": 10,
+    "parityshard": 3,
+    "autoexpire": 300,
+    "dscp": 46,
+    "conn": 1
+}
     fi
 }
 install_ss_ssr_ssrr_kcptun(){
@@ -1256,8 +1279,10 @@ show_ss_ssr_ssr_kcptun(){
         echo -e "SSR obfs                   : ${COLOR_GREEN}${set_ssr_obfs}${COLOR_END}"
         #echo -e "SSR Local IP               : ${COLOR_GREEN}127.0.0.1${COLOR_END}"
         #echo -e "SSR Local Port             : ${COLOR_GREEN}${ssr_local_port}${COLOR_END}"
+	ssr_url="ssr://$(echo -n "${SERVER_IP}:${set_ssr_port}:${set_ssr_protocol}:${set_ssr_method}:${set_ssr_obfs}:${set_ssr_pwd}/?obfsparam=$(echo -n "www.cloudflare.com" | base64 -w0)&protoparam=$(echo -n "www.cloudflare.com" | base64 -w0)&remarks=$(echo -n "ShadowsocksR" | base64 -w0)&group=$(echo -n "VPS" | base64 -w0)&udpport=${set_ssr_port}" | base64 -w0)
         echo "----------------------------------------------------------"
-        echo -e "SSR status manage: ${COLOR_PINK}/etc/init.d/ssr${COLOR_END} {${COLOR_GREEN}start|stop|restart|status|config|viewconfig|version${COLOR_END}}"
+	echo -e "SSR_URL:${COLOR_GREEN}${ssr_url}${COLOR_END}"
+	echo -e "SSR status manage: ${COLOR_PINK}/etc/init.d/ssr${COLOR_END} {${COLOR_GREEN}start|stop|restart|status|config|viewconfig|version${COLOR_END}}"
         echo "=========================================================="
     fi
     if [ "${ssrr_install_flag}" == "true" ]; then
@@ -1270,7 +1295,9 @@ show_ss_ssr_ssr_kcptun(){
         echo -e "SSRR obfs                   : ${COLOR_GREEN}${set_ssrr_obfs}${COLOR_END}"
         #echo -e "SSRR Local IP               : ${COLOR_GREEN}127.0.0.1${COLOR_END}"
         #echo -e "SSRR Local Port             : ${COLOR_GREEN}${ssrr_local_port}${COLOR_END}"
+	ssrr_url="ssr://$(echo -n "${SERVER_IP}:${set_ssrr_port}:${set_ssrr_protocol}:${set_ssrr_method}:${set_ssrr_obfs}:${set_ssrr_pwd}/?obfsparam=$(echo -n "www.cloudflare.com" | base64 -w0)&protoparam=$(echo -n "www.cloudflare.com" | base64 -w0)&remarks=$(echo -n "ShadowsocksR" | base64 -w0)&group=$(echo -n "VPS" | base64 -w0)&udpport=${set_ssrr_port}" | base64 -w0)
         echo "----------------------------------------------------------"
+	echo -e "SSR_URL:${COLOR_GREEN}${ssrr_url}${COLOR_END}"
         echo -e "SSRR status manage: ${COLOR_PINK}/etc/init.d/ssrr${COLOR_END} {${COLOR_GREEN}start|stop|restart|status|config|viewconfig|version${COLOR_END}}"
         echo "=========================================================="
     fi
@@ -1483,12 +1510,12 @@ pre_install_ss_ssr_ssrr_kcptun(){
         done
         ssr_local_port="1088"
         #mujson_mgr.py
-        def_ssr_method="aes-256-cfb"
+        def_ssr_method="aes-256-ctr"
         echo -e "Please select encryption method for ShadowsocksR"
         echo "  0: none"
         echo "  1: aes-128-cfb"
         echo "  2: aes-192-cfb"
-        echo "  3: aes-256-cfb (default)"
+        echo "  3: aes-256-cfb"
         echo "  4: rc4-md5"
         echo "  5: rc4-md5-6"
         echo "  6: chacha20"
@@ -1496,7 +1523,7 @@ pre_install_ss_ssr_ssrr_kcptun(){
         echo "  8: salsa20"
         echo "  9: aes-128-ctr"
         echo " 10: aes-192-ctr"
-        echo " 11: aes-256-ctr"
+        echo " 11: aes-256-ctr (default)"
         #read -p "Enter your choice (0, 1, 2, 3, ... or exit. default [${def_ssr_method}]): " set_ssr_method
         case "${set_ssr_method}" in
             0|[Nn][Oo][Nn][Ee])
@@ -1547,14 +1574,14 @@ pre_install_ss_ssr_ssrr_kcptun(){
         echo "SSR method: ${set_ssr_method}"
         echo "---------------------------------------"
         echo
-        def_ssr_protocol="origin"
+        def_ssr_protocol="auth_chain_a"
         echo -e "Please select Protocol plugin for ShadowsocksR"
-        echo "  1: origin (default)"
+        echo "  1: origin"
         echo "  2: auth_sha1_v4"
         echo "  3: auth_sha1_v4_compatible"
         echo "  4: auth_aes128_md5"
         echo "  5: auth_aes128_sha1"
-        echo "  6: auth_chain_a"
+        echo "  6: auth_chain_a (default)"
         #read -p "Enter your choice (1, 2, 3, ... or exit. default [${def_ssr_protocol}]): " set_ssr_protocol
         case "${set_ssr_protocol}" in
             1|[Oo][Rr][Ii][Gg][Ii][Nn])
@@ -1587,11 +1614,11 @@ pre_install_ss_ssr_ssrr_kcptun(){
         echo "SSR Protocol: ${set_ssr_protocol}"
         echo "---------------------------------------"
         echo
-        def_ssr_obfs="plain"
+        def_ssr_obfs="http_simple"
         echo -e "Please select Obfs plugin for ShadowsocksR"
-        echo "  1: plain (default)"
+        echo "  1: plain"
         echo "  2: http_simple_compatible"
-        echo "  3: http_simple"
+        echo "  3: http_simple (default)"
         echo "  4: tls1.2_ticket_auth_compatible"
         echo "  5: tls1.2_ticket_auth"
         #read -p "Enter your choice (1, 2, 3, ... or exit. default [${def_ssr_obfs}]): " set_ssr_obfs
@@ -1670,12 +1697,12 @@ pre_install_ss_ssr_ssrr_kcptun(){
         done
         ssrr_local_port="1089"
         #mujson_mgr.py
-        def_ssrr_method="aes-256-cfb"
+        def_ssrr_method="aes-256-ctr"
         echo -e "Please select encryption method for ShadowsocksRR"
         echo "  0: none"
         echo "  1: aes-128-cfb"
         echo "  2: aes-192-cfb"
-        echo "  3: aes-256-cfb (default)"
+        echo "  3: aes-256-cfb"
         echo "  4: rc4-md5"
         echo "  5: rc4-md5-6"
         echo "  6: chacha20"
@@ -1683,7 +1710,7 @@ pre_install_ss_ssr_ssrr_kcptun(){
         echo "  8: salsa20"
         echo "  9: aes-128-ctr"
         echo " 10: aes-192-ctr"
-        echo " 11: aes-256-ctr"
+        echo " 11: aes-256-ctr (default)"
         echo " 12: xsalsa20"
         echo " 13: xchacha20"
         #read -p "Enter your choice (0, 1, 2, 3, ... or exit. default [${def_ssrr_method}]): " set_ssrr_method
@@ -1742,9 +1769,9 @@ pre_install_ss_ssr_ssrr_kcptun(){
         echo "SSRR method: ${set_ssrr_method}"
         echo "---------------------------------------"
         echo
-        def_ssrr_protocol="origin"
+        def_ssrr_protocol="auth_chain_f"
         echo -e "Please select Protocol plugin for ShadowsocksRR"
-        echo "  1: origin (default)"
+        echo "  1: origin"
         echo "  2: auth_sha1_v4"
         echo "  3: auth_sha1_v4_compatible"
         echo "  4: auth_aes128_md5"
@@ -1754,7 +1781,7 @@ pre_install_ss_ssr_ssrr_kcptun(){
         echo "  8: auth_chain_c"
         echo "  9: auth_chain_d"
         echo "  10: auth_chain_e"
-        echo "  11: auth_chain_f"
+        echo "  11: auth_chain_f (default)"
         #read -p "Enter your choice (1, 2, 3, ... or exit. default [${def_ssrr_protocol}]): " set_ssrr_protocol
         case "${set_ssrr_protocol}" in
             1|[Oo][Rr][Ii][Gg][Ii][Nn])
@@ -1802,11 +1829,11 @@ pre_install_ss_ssr_ssrr_kcptun(){
         echo "SSRR Protocol: ${set_ssrr_protocol}"
         echo "---------------------------------------"
         echo
-        def_ssrr_obfs="plain"
+        def_ssrr_obfs="http_simple"
         echo -e "Please select Obfs plugin for ShadowsocksRR"
-        echo "  1: plain (default)"
+        echo "  1: plain"
         echo "  2: http_simple_compatible"
-        echo "  3: http_simple"
+        echo "  3: http_simple (default)"
         echo "  4: tls1.2_ticket_auth_compatible"
         echo "  5: tls1.2_ticket_auth"
         #read -p "Enter your choice (1, 2, 3, ... or exit. default [${def_ssrr_obfs}]): " set_ssrr_obfs
@@ -1891,7 +1918,7 @@ pre_install_ss_ssr_ssrr_kcptun(){
         else
             while true
             do
-                def_kcptun_target_port=""
+                def_kcptun_target_port="${def_port}"
                 #read -p "Please input kcptun Target Port for SS/SSR/SSRR/Socks5 [1-65535]:" set_kcptun_target_port
                 [ -z "$set_kcptun_target_port" ] && set_kcptun_target_port="${def_kcptun_target_port}"
                 expr ${set_kcptun_target_port} + 0 &>/dev/null
@@ -1912,12 +1939,12 @@ pre_install_ss_ssr_ssrr_kcptun(){
             done
             kcptun_target_port="${set_kcptun_target_port}"
         fi
-        def_kcptun_method="aes"
+        def_kcptun_method="salsa20"
         echo -e "Please select method for KCPTUN"
-        echo "  1: aes (default)"
+        echo "  1: aes"
         echo "  2: aes-128"
         echo "  3: aes-192"
-        echo "  4: salsa20"
+        echo "  4: salsa20 (default)"
         echo "  5: blowfish"
         echo "  6: twofish"
         echo "  7: cast5"
@@ -2010,13 +2037,13 @@ pre_install_ss_ssr_ssrr_kcptun(){
         echo
         while true
         do
-            def_kcptun_mtu="1350"
-            echo -e "Please input MTU for KCPTUN [900-1400]"
+            def_kcptun_mtu="1472"
+            echo -e "Please input MTU for KCPTUN [900-1472]"
             #read -p "(Default mtu: ${def_kcptun_mtu}):" set_kcptun_mtu
             [ -z "$set_kcptun_mtu" ] && set_kcptun_mtu="${def_kcptun_mtu}"
             expr ${set_kcptun_mtu} + 0 &>/dev/null
             if [ $? -eq 0 ]; then
-                if [ ${set_kcptun_mtu} -ge 900 ] && [ ${set_kcptun_mtu} -le 1400 ]; then
+                if [ ${set_kcptun_mtu} -ge 900 ] && [ ${set_kcptun_mtu} -le 1472 ]; then
                     echo
                     echo "---------------------------------------"
                     echo "kcptun mtu = ${set_kcptun_mtu}"
@@ -2275,10 +2302,10 @@ reconfig_ss_ssr_ssrr_kcptun(){
     else 
         rm -f kcptun.json
     fi
-    if [ -f firewall_set.sh ] && [ "${reconfig_flag}" == "true" ];then
-        chmod +x ./firewall_set.sh
-        ./firewall_set.sh
-    fi
+#    if [ -f firewall_set.sh ] && [ "${reconfig_flag}" == "true" ];then
+#        chmod +x ./firewall_set.sh
+#        ./firewall_set.sh
+#    fi
 }
 set_tool(){
     echo -e "+ Set tool.sh..."
@@ -2295,8 +2322,8 @@ update_ss_ssr_ssrr_kcptun(){
     echo "2: Update ShadowsocksR(python)"
     echo "3: Update KCPTUN"
     echo "4: Update ShadowsocksRR(python)"
-    echo "5: Update All"
-    echo "6: Exit (default)"
+    echo "5: Update All (default)"
+    echo "6: Exit"
     #read -p "Enter your choice (1, 2, 3, 4, 5 or exit. default [exit]): " Update_Select
     Update_Select=5
 
