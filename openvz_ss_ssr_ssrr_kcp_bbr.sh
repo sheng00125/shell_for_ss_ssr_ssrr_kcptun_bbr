@@ -1260,7 +1260,7 @@ show_ss_ssr_ssr_kcptun(){
         echo -e "SSR obfs                   : ${COLOR_GREEN}${set_ssr_obfs}${COLOR_END}"
         #echo -e "SSR Local IP               : ${COLOR_GREEN}127.0.0.1${COLOR_END}"
         #echo -e "SSR Local Port             : ${COLOR_GREEN}${ssr_local_port}${COLOR_END}"
-	ssr_url="ssr://$(echo -n "${SERVER_IP}:${set_ssr_port}:${set_ssr_protocol}:${set_ssr_method}:${set_ssr_obfs}:"$(echo -n "${set_ssr_pwd}" | base64 -w0 | sed 's/=//g;s/\//_/g;s/+/-/g' )"/?obfsparam="$(echo -n "www.cloudflare.com" | base64 -w0 | sed 's/=//g;s/\//_/g;s/+/-/g' )"&protoparam="$(echo -n "www.cloudflare.com" | base64 -w0 | sed 's/=//g;s/\//_/g;s/+/-/g' )"&remarks="$(echo -n "ShadowsocksRR" | base64 -w0 | sed 's/=//g;s/\//_/g;s/+/-/g' )"&group="$(echo -n "VPS" | base64 -w0 | sed 's/=//g;s/\//_/g;s/+/-/g' )"&udpport=${set_ssr_port}" | base64 -w0 )"
+	ssr_url="ssr://$(echo -n "${SERVER_IP}:${set_ssr_port}:${set_ssr_protocol}:${set_ssr_method}:${set_ssr_obfs}:"$(echo -n "${set_ssr_pwd}" | base64 -w0 | sed 's/=//g;s/\//_/g;s/+/-/g' )"/?obfsparam="$(echo -n "www.cloudflare.com" | base64 -w0 | sed 's/=//g;s/\//_/g;s/+/-/g' )"&protoparam="$(echo -n "www.cloudflare.com" | base64 -w0 | sed 's/=//g;s/\//_/g;s/+/-/g' )"&remarks="$(echo -n "ShadowsocksR" | base64 -w0 | sed 's/=//g;s/\//_/g;s/+/-/g' )"&group="$(echo -n "VPS" | base64 -w0 | sed 's/=//g;s/\//_/g;s/+/-/g' )"&udpport=${set_ssr_port}" | base64 -w0 )"
         echo "----------------------------------------------------------"
 	echo -e "SSR_URL:${COLOR_GREEN}${ssr_url}${COLOR_END}"
 	echo -e "SSR status manage: ${COLOR_PINK}/etc/init.d/ssr${COLOR_END} {${COLOR_GREEN}start|stop|restart|status|config|viewconfig|version${COLOR_END}}"
