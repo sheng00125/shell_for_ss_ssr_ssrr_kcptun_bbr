@@ -1304,8 +1304,8 @@ show_ss_ssr_ssr_kcptun(){
 [1;32m    "nocomp": ${set_kcptun_nocomp},[0m
 [1;32m    "mode": "${set_kcptun_mode}",[0m
 [1;32m    "mtu": ${set_kcptun_mtu},[0m
-[1;32m    "sndwnd": 128,[0m[0m
-[1;32m    "rcvwnd": 256,[0m[0m
+[1;32m    "sndwnd": 256,[0m[0m
+[1;32m    "rcvwnd": 1024,[0m[0m
 [1;32m    "datashard": 10,[0m
 [1;32m    "parityshard": 3,[0m
 [1;32m    "autoexpire": 300,[0m
