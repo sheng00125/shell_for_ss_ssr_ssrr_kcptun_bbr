@@ -1313,7 +1313,7 @@ show_ss_ssr_ssr_kcptun(){
     "conn": 1
 }
 EOF
-	echo -e "${COLOR_PINK}KCPTUN config for SS/SSR/Phone:${COLOR_END}"
+	echo -e "${COLOR_PINK}KCPTUN config for Shadowsocks-libev_Phone:${COLOR_END}"
 	echo -e "KCP Port      : ${COLOR_GREEN}${set_kcptun_port}${COLOR_END}"
         if [ "${set_kcptun_nocomp}" == "true" ];then
 	    echo -e "KCP parameter : ${COLOR_GREEN}key=${set_kcptun_pwd};crypt=${set_kcptun_method};mode=${set_kcptun_mode};mtu=${set_kcptun_mtu};sndwnd=128;rcvwnd=256;datashard=10;parityshard=3;dscp=46;nocomp${COLOR_END}"
