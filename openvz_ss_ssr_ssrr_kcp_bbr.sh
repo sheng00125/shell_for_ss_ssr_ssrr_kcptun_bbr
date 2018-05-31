@@ -1296,22 +1296,22 @@ show_ss_ssr_ssr_kcptun(){
         echo "----------------------------------------------------------"
         echo -e "${COLOR_PINK}KCPTUN config for Client:${COLOR_END}"
 	cat <<-EOF
-{
-    "localaddr": "127.0.0.1:1110",
-    "remoteaddr": "${SERVER_IP}:${set_kcptun_port}",
-    "key": "${set_kcptun_pwd}",
-    "crypt": "${set_kcptun_method}",
-    "nocomp": ${set_kcptun_nocomp},
-    "mode": "${set_kcptun_mode}",
-    "mtu": ${set_kcptun_mtu},
-    "sndwnd": 128,
-    "rcvwnd": 256,
-    "datashard": 10,
-    "parityshard": 3,
-    "autoexpire": 300,
-    "dscp": 46,
-    "conn": 1
-}
+[1;32m{[0m
+[1;32m    "localaddr": "127.0.0.1:1110",[0m
+[1;32m    "remoteaddr": "${SERVER_IP}:${set_kcptun_port}",[0m
+[1;32m    "key": "${set_kcptun_pwd}",[0m
+[1;32m    "crypt": "${set_kcptun_method}",[0m
+[1;32m    "nocomp": ${set_kcptun_nocomp},[0m
+[1;32m    "mode": "${set_kcptun_mode}",[0m
+[1;32m    "mtu": ${set_kcptun_mtu},[0m
+[1;32m    "sndwnd": 128,[0m[0m
+[1;32m    "rcvwnd": 256,[0m[0m
+[1;32m    "datashard": 10,[0m
+[1;32m    "parityshard": 3,[0m
+[1;32m    "autoexpire": 300,[0m
+[1;32m    "dscp": 46,[0m
+[1;32m    "conn": 1[0m
+[1;32m}[0m
 EOF
 	echo -e "${COLOR_PINK}KCPTUN config for Shadowsocks-libev_Phone:${COLOR_END}"
 	echo -e "KCP Port      : ${COLOR_GREEN}${set_kcptun_port}${COLOR_END}"
