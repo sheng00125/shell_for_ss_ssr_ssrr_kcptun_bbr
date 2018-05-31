@@ -330,10 +330,9 @@ randstr(){
     special[4]="!"
     special[5]="%"
     special[6]="@"
-    special[7]="_"
-    special[8]="*"
+    special[7]="*"
     special[8]="+"
-    special[8]="-"
+    special[9]="-"
     str=""
     for i in {a..z}; do arr[index]=$i; index=`expr ${index} + 1`; done
     for i in {A..Z}; do arr[index]=$i; index=`expr ${index} + 1`; done
