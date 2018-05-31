@@ -1669,6 +1669,8 @@ pre_install_ss_ssr_ssrr_kcptun(){
         echo
         # Set shadowsocksRR password
         def_ssrr_pwd=`randstr`
+	echo ${def_ssrr_pwd}
+	exit
         echo "Please input password for ShadowsocksRR"
         #read -p "(Default password: ${def_ssrr_pwd}):" set_ssrr_pwd
         [ -z "${set_ssrr_pwd}" ] && set_ssrr_pwd="${def_ssrr_pwd}"
