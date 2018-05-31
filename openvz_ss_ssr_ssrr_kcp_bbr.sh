@@ -1318,9 +1318,9 @@ EOF
 	echo -e "${COLOR_PINK}KCPTUN config for SS/SSR/Phone:${COLOR_END}"
 	echo -e "KCP Port      : ${COLOR_GREEN}${set_kcptun_port}${COLOR_END}"
         if [ "${set_kcptun_nocomp}" == "true" ];then
-	    echo -e "KCP parameter : ${COLOR_GREEN}key=${set_kcptun_pwd};crypt=${set_kcptun_method};mode=${set_kcptun_mode};mtu=${set_kcptun_mtu};sndwnd=512;rcvwnd=512;datashard=10;parityshard=3;dscp=46;conn=1;nocomp${COLOR_END}"
+	    echo -e "KCP parameter : ${COLOR_GREEN}key=${set_kcptun_pwd};crypt=${set_kcptun_method};mode=${set_kcptun_mode};mtu=${set_kcptun_mtu};sndwnd=128;rcvwnd=256;datashard=10;parityshard=3;dscp=46;nocomp${COLOR_END}"
         else
-	    echo -e "KCP parameter : ${COLOR_GREEN}key=${set_kcptun_pwd};crypt=${set_kcptun_method};mode=${set_kcptun_mode};mtu=${set_kcptun_mtu};sndwnd=512;rcvwnd=512;datashard=10;parityshard=3;dscp=46;conn=1${COLOR_END}"
+	    echo -e "KCP parameter : ${COLOR_GREEN}key=${set_kcptun_pwd};crypt=${set_kcptun_method};mode=${set_kcptun_mode};mtu=${set_kcptun_mtu};sndwnd=128;rcvwnd=256;datashard=10;parityshard=3;dscp=46${COLOR_END}"
 	fi
 	echo "----------------------------------------------------------"
         echo -e "KCPTUN status manage: ${COLOR_PINK}/etc/init.d/kcptun${COLOR_END} {${COLOR_GREEN}start|stop|restart|status|config|viewconfig|version${COLOR_END}}"
