@@ -800,7 +800,7 @@ EOF
     "mtu": ${set_kcptun_mtu},
     "sndwnd": 128,
     "rcvwnd": 256,
-    "nocomp": ${set_kcptun_nocomp}
+    "nocomp": ${set_kcptun_nocomp},
     "datashard": 10,
     "parityshard": 3,
     "autoexpire": 300,
@@ -1296,7 +1296,7 @@ show_ss_ssr_ssr_kcptun(){
         echo -e "KCPTUN rcvwnd             : ${COLOR_GREEN}1024${COLOR_END}"
         echo -e "KCPTUN compression        : ${COLOR_GREEN}${set_kcptun_compression}${COLOR_END}"
         echo "----------------------------------------------------------"
-        echo -e "${COLOR_PINK}Kcptun config for client:${COLOR_END}"
+        echo -e "${COLOR_PINK}Kcptun config for Client:${COLOR_END}"
 	cat <<-EOF
 {
     "localaddr": "127.0.0.1:1110",
@@ -1315,7 +1315,6 @@ show_ss_ssr_ssr_kcptun(){
     "conn": 1
 }
 EOF
-        echo
 	echo -e "${COLOR_PINK}Kcptun config for SS/SSR/Phone:${COLOR_END}"
 	echo -e "KCP Port      : ${COLOR_GREEN}${set_kcptun_port}${COLOR_END}"
         if [ "${set_kcptun_nocomp}" == "true" ];then
