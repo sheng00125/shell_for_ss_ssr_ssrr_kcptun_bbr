@@ -796,8 +796,8 @@ EOF
     "crypt": "${set_kcptun_method}",
     "mode": "${set_kcptun_mode}",
     "mtu": ${set_kcptun_mtu},
-    "sndwnd": 128,
-    "rcvwnd": 256,
+    "sndwnd": 256,
+    "rcvwnd": 1024,
     "nocomp": ${set_kcptun_nocomp},
     "datashard": 10,
     "parityshard": 3,
@@ -1290,7 +1290,7 @@ show_ss_ssr_ssr_kcptun(){
         echo -e "KCPTUN Crypt mode         : ${COLOR_GREEN}${set_kcptun_method}${COLOR_END}"
         echo -e "KCPTUN Fast mode          : ${COLOR_GREEN}${set_kcptun_mode}${COLOR_END}"
         echo -e "KCPTUN MTU                : ${COLOR_GREEN}${set_kcptun_mtu}${COLOR_END}"
-        echo -e "KCPTUN sndwnd             : ${COLOR_GREEN}1024${COLOR_END}"
+        echo -e "KCPTUN sndwnd             : ${COLOR_GREEN}256${COLOR_END}"
         echo -e "KCPTUN rcvwnd             : ${COLOR_GREEN}1024${COLOR_END}"
         echo -e "KCPTUN compression        : ${COLOR_GREEN}${set_kcptun_compression}${COLOR_END}"
         echo "----------------------------------------------------------"
