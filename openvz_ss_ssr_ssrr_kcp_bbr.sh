@@ -809,23 +809,6 @@ EOF
     "log": "/root/kcptun.log"
 }
 EOF
-        cat > /root/kcptun_client.json<<-EOF
-{
-    "localaddr": "127.0.0.1:1110",
-    "remoteaddr": "${SERVER_IP}:${set_kcptun_port}",
-    "key": "${set_kcptun_pwd}",
-    "crypt": "${set_kcptun_method}",
-    "nocomp": ${set_kcptun_nocomp},
-    "mode": "${set_kcptun_mode}",
-    "mtu": ${set_kcptun_mtu},
-    "sndwnd": 128,
-    "rcvwnd": 256,
-    "datashard": 10,
-    "parityshard": 3,
-    "autoexpire": 300,
-    "dscp": 46,
-    "conn": 1
-}
     fi
 }
 install_ss_ssr_ssrr_kcptun(){
@@ -1313,10 +1296,34 @@ show_ss_ssr_ssr_kcptun(){
         echo -e "KCPTUN rcvwnd             : ${COLOR_GREEN}1024${COLOR_END}"
         echo -e "KCPTUN compression        : ${COLOR_GREEN}${set_kcptun_compression}${COLOR_END}"
         echo "----------------------------------------------------------"
-        echo -e "${COLOR_PINK}Kcptun config for SS/SSR/Phone:${COLOR_END}"
-        echo -e "KCP Port      : ${COLOR_GREEN}${set_kcptun_port}${COLOR_END}"
-        echo -e "KCP parameter : ${COLOR_GREEN}--crypt ${set_kcptun_method} --key ${set_kcptun_pwd} --mtu ${set_kcptun_mtu} --sndwnd 128 --rcvwnd 1024 --mode ${set_kcptun_mode}${show_kcptun_nocomp}${COLOR_END}"
-        echo "----------------------------------------------------------"
+        echo -e "${COLOR_PINK}Kcptun config for client:${COLOR_END}"
+	cat <<-EOF
+{
+    "localaddr": "127.0.0.1:1110",
+    "remoteaddr": "${SERVER_IP}:${set_kcptun_port}",
+    "key": "${set_kcptun_pwd}",
+    "crypt": "${set_kcptun_method}",
+    "nocomp": ${set_kcptun_nocomp},
+    "mode": "${set_kcptun_mode}",
+    "mtu": ${set_kcptun_mtu},
+    "sndwnd": 128,
+    "rcvwnd": 256,
+    "datashard": 10,
+    "parityshard": 3,
+    "autoexpire": 300,
+    "dscp": 46,
+    "conn": 1
+}
+EOF
+        echo
+	echo -e "${COLOR_PINK}Kcptun config for SS/SSR/Phone:${COLOR_END}"
+	echo -e "KCP Port      : ${COLOR_GREEN}${set_kcptun_port}${COLOR_END}"
+        if [ "${set_kcptun_nocomp}" == "true" ];then
+	    echo -e "KCP parameter : ${COLOR_GREEN}key=${set_kcptun_pwd};crypt=${set_kcptun_method};mode=${set_kcptun_mode};mtu=${set_kcptun_mtu};sndwnd=512;rcvwnd=512;datashard=10;parityshard=3;dscp=46;conn=1;nocomp${COLOR_END}"
+        else
+	    echo -e "KCP parameter : ${COLOR_GREEN}key=${set_kcptun_pwd};crypt=${set_kcptun_method};mode=${set_kcptun_mode};mtu=${set_kcptun_mtu};sndwnd=512;rcvwnd=512;datashard=10;parityshard=3;dscp=46;conn=1${COLOR_END}"
+	fi
+	echo "----------------------------------------------------------"
         echo -e "KCPTUN status manage: ${COLOR_PINK}/etc/init.d/kcptun${COLOR_END} {${COLOR_GREEN}start|stop|restart|status|config|viewconfig|version${COLOR_END}}"
         echo "=========================================================="
     fi
