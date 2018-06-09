@@ -440,6 +440,39 @@ Simple_obfs_option(){
     fi
 }
 BBR_Selection(){
+    if [ -d "/proc/vz" ] ;then
+        echo -e "Your VPS is based on OpenVZ."
+        BBR_Selection_OpenVZ
+        BBR_option
+    else
+        echo -e "Your VPS is based on KVM or Others type."
+	BBR_Selection_NotOpenVZ
+    fi
+}
+
+BBR_Selection_NotOpenVZ(){
+    def_bbr_install="Y"
+    echo
+    echo -e "${COLOR_YELOW}Do you want to install BBR?[Y/N]${COLOR_END} "
+    read -p "Enter your choice for BBR installation. default [${def_bbr_install}]: " bbr_install
+
+    case "${bbr_install}" in
+        [yY])
+            echo
+            echo -e "${COLOR_PINK}You will install BBR${COLOR_END}"
+            ;;
+        [nN])
+            echo
+            echo -e "${COLOR_PINK}You will not install BBR${COLOR_END}"
+             ;;
+        *)
+            echo
+            echo -e "${COLOR_PINK}No input or input error,You will not install BBR${COLOR_END}"
+            bbr_install="${def_bbr_install}"
+    esac
+}
+
+BBR_Selection_OpenVZ(){
     def_bbr_select="2"
     echo
     echo -e "${COLOR_YELOW}You have 3 options for BBR install${COLOR_END}"
@@ -1018,12 +1051,23 @@ install_simple_obfs(){
     fi
 }
 install_bbr(){
-    if [ "${bbr_select}" == "1" ] ;then
-        echo -e "+ Install BBR with Rinetd..."
-        install_rinetd_bbr
-    elif [ "${bbr_select}" == "2" ] ;then
-        echo -e "+ Install BBR with LKL..."
-        install_lkl_bbr
+    if [ -d "/proc/vz" ] ;then
+        if [ "${bbr_select}" == "1" ] ;then
+            echo -e "+ Install BBR with Rinetd..."
+            install_rinetd_bbr
+        elif [ "${bbr_select}" == "2" ] ;then
+            echo -e "+ Install BBR with LKL..."
+            install_lkl_bbr
+        fi
+    else
+        install_bbr_sys
+    fi
+}
+install_bbr_sys(){
+    if [ "${bbr_install}" == "y" ] || [ "${bbr_install}" == "Y" ]; then
+        wget --no-check-certificate https://raw.githubusercontent.com/Jenking-Zhang/shell_for_ss_ssr_ssrr_kcptun_bbr/master/bbr_kvm.sh
+        chmod +x ./bbr_kvm.sh
+        ./bbr_kvm.sh
     fi
 }
 install_rinetd_bbr(){
@@ -1331,7 +1375,6 @@ pre_install_ss_ssr_ssrr_kcptun(){
     Dispaly_Selection
     Simple_obfs_option
     BBR_Selection
-    BBR_option
     Press_Install
     pre_install_packs
     get_install_version
