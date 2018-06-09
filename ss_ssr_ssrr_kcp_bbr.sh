@@ -280,11 +280,10 @@ pre_install_packs(){
             error_detect_depends "yum -y install ${depend}"
         done
         if centosversion 6; then
-            update_glibc
 	    update_autoconf
-	    yum update nss -y
-	    yum update -y
+	    yum update nss -y	    
 	fi
+	yum update -y
     elif check_sys packageManager apt; then
         apt_depends=(
             gettext build-essential unzip gzip python python-dev python-setuptools curl openssl libssl-dev
@@ -1050,7 +1049,8 @@ install_simple_obfs(){
 }
 install_bbr(){
     if [ -d "/proc/vz" ] ;then
-        if [ "${bbr_select}" == "1" ] ;then
+        update_glibc
+	if [ "${bbr_select}" == "1" ] ;then
             echo -e "+ Install BBR with Rinetd..."
             install_rinetd_bbr
         elif [ "${bbr_select}" == "2" ] ;then
