@@ -1279,12 +1279,12 @@ show_ss_ssr_ssr_kcptun(){
             echo -e "SS-libev plugin            : ${COLOR_GREEN}/usr/local/bin/obfs-server${COLOR_END}"
             echo -e "SS-libev plugin_opts       : ${COLOR_GREEN}obfs=${ofbs_option}${COLOR_END}"
 	    if  [ "${ofbs_option}" == "tls" ] ;then
-                ss_libev_url="ss://$(echo -n "${set_ss_libev_method}:${set_ss_libev_pwd}" | base64 -w0)@${SERVER_IP}:${set_ss_libev_port}?plugin=obfs-local%3Bobfs-host%3Dwww.cloudflare.com%3Bobfs%3Dtls#Shadowsocks"
+                ss_libev_url="ss://$(echo -n "${set_ss_libev_method}:${set_ss_libev_pwd}" | base64 -w0)@${SERVER_IP}:${set_ss_libev_port}?plugin=obfs-local%3Bobfs-host%3Dwww.cloudflare.com%3Bobfs%3Dtls#${SERVER_IP}"
 	    else
-	        ss_libev_url="ss://$(echo -n "${set_ss_libev_method}:${set_ss_libev_pwd}" | base64 -w0)@${SERVER_IP}:${set_ss_libev_port}?plugin=obfs-local%3Bobbfs-host%3Dwww.cloudflare.com%3Bobfs%3Dhttp#Shadowsocks"
+	        ss_libev_url="ss://$(echo -n "${set_ss_libev_method}:${set_ss_libev_pwd}" | base64 -w0)@${SERVER_IP}:${set_ss_libev_port}?plugin=obfs-local%3Bobbfs-host%3Dwww.cloudflare.com%3Bobfs%3Dhttp#${SERVER_IP}"
 	    fi
 	else
-	    ss_libev_url="ss://$(echo -n "${set_ss_libev_method}:${set_ss_libev_pwd}" | base64 -w0)@${SERVER_IP}:${set_ss_libev_port}#Shadowsocks"
+	    ss_libev_url="ss://$(echo -n "${set_ss_libev_method}:${set_ss_libev_pwd}" | base64 -w0)@${SERVER_IP}:${set_ss_libev_port}#${SERVER_IP}"
         fi
         echo "----------------------------------------------------------"
         echo -e "SS-libev_URL:${COLOR_GREEN}${ss_libev_url}${COLOR_END}"
@@ -1301,7 +1301,7 @@ show_ss_ssr_ssr_kcptun(){
         echo -e "SSR obfs                   : ${COLOR_GREEN}${set_ssr_obfs}${COLOR_END}"
         #echo -e "SSR Local IP               : ${COLOR_GREEN}127.0.0.1${COLOR_END}"
         #echo -e "SSR Local Port             : ${COLOR_GREEN}${ssr_local_port}${COLOR_END}"
-	ssr_url="ssr://$(echo -n "${SERVER_IP}:${set_ssr_port}:${set_ssr_protocol}:${set_ssr_method}:${set_ssr_obfs}:"$(echo -n "${set_ssr_pwd}" | base64 -w0 | sed 's/=//g;s/\//_/g;s/+/-/g' )"/?obfsparam="$(echo -n "www.cloudflare.com" | base64 -w0 | sed 's/=//g;s/\//_/g;s/+/-/g' )"&protoparam="$(echo -n "www.cloudflare.com" | base64 -w0 | sed 's/=//g;s/\//_/g;s/+/-/g' )"&remarks="$(echo -n "ShadowsocksR" | base64 -w0 | sed 's/=//g;s/\//_/g;s/+/-/g' )"&group="$(echo -n "VPS" | base64 -w0 | sed 's/=//g;s/\//_/g;s/+/-/g' )"&udpport=${set_ssr_port}" | base64 -w0 )"
+	ssr_url="ssr://$(echo -n "${SERVER_IP}:${set_ssr_port}:${set_ssr_protocol}:${set_ssr_method}:${set_ssr_obfs}:"$(echo -n "${set_ssr_pwd}" | base64 -w0 | sed 's/=//g;s/\//_/g;s/+/-/g' )"/?obfsparam="$(echo -n "www.cloudflare.com" | base64 -w0 | sed 's/=//g;s/\//_/g;s/+/-/g' )"&protoparam="$(echo -n "www.cloudflare.com" | base64 -w0 | sed 's/=//g;s/\//_/g;s/+/-/g' )"&remarks="$(echo -n "ShadowsocksR" | base64 -w0 | sed 's/=//g;s/\//_/g;s/+/-/g' )"&group="$(echo -n "${SERVER_IP}" | base64 -w0 | sed 's/=//g;s/\//_/g;s/+/-/g' )"&udpport=${set_ssr_port}" | base64 -w0 )"
         echo "----------------------------------------------------------"
 	echo -e "SSR_URL:${COLOR_GREEN}${ssr_url}${COLOR_END}"
 	echo -e "SSR status manage: ${COLOR_PINK}/etc/init.d/ssr${COLOR_END} {${COLOR_GREEN}start|stop|restart|status|config|viewconfig|version${COLOR_END}}"
@@ -1317,7 +1317,7 @@ show_ss_ssr_ssr_kcptun(){
         echo -e "SSRR obfs                   : ${COLOR_GREEN}${set_ssrr_obfs}${COLOR_END}"
         #echo -e "SSRR Local IP               : ${COLOR_GREEN}127.0.0.1${COLOR_END}"
         #echo -e "SSRR Local Port             : ${COLOR_GREEN}${ssrr_local_port}${COLOR_END}"
-	ssrr_url="ssr://$(echo -n "${SERVER_IP}:${set_ssrr_port}:${set_ssrr_protocol}:${set_ssrr_method}:${set_ssrr_obfs}:"$(echo -n "${set_ssrr_pwd}" | base64 -w0 | sed 's/=//g;s/\//_/g;s/+/-/g' )"/?obfsparam="$(echo -n "www.cloudflare.com" | base64 -w0 | sed 's/=//g;s/\//_/g;s/+/-/g' )"&protoparam="$(echo -n "www.cloudflare.com" | base64 -w0 | sed 's/=//g;s/\//_/g;s/+/-/g' )"&remarks="$(echo -n "ShadowsocksRR" | base64 -w0 | sed 's/=//g;s/\//_/g;s/+/-/g' )"&group="$(echo -n "VPS" | base64 -w0 | sed 's/=//g;s/\//_/g;s/+/-/g' )"&udpport=${set_ssrr_port}" | base64 -w0 )"
+	ssrr_url="ssr://$(echo -n "${SERVER_IP}:${set_ssrr_port}:${set_ssrr_protocol}:${set_ssrr_method}:${set_ssrr_obfs}:"$(echo -n "${set_ssrr_pwd}" | base64 -w0 | sed 's/=//g;s/\//_/g;s/+/-/g' )"/?obfsparam="$(echo -n "www.cloudflare.com" | base64 -w0 | sed 's/=//g;s/\//_/g;s/+/-/g' )"&protoparam="$(echo -n "www.cloudflare.com" | base64 -w0 | sed 's/=//g;s/\//_/g;s/+/-/g' )"&remarks="$(echo -n "ShadowsocksRR" | base64 -w0 | sed 's/=//g;s/\//_/g;s/+/-/g' )"&group="$(echo -n "${SERVER_IP}" | base64 -w0 | sed 's/=//g;s/\//_/g;s/+/-/g' )"&udpport=${set_ssrr_port}" | base64 -w0 )"
         echo "----------------------------------------------------------"
 	echo -e "SSRR_URL:${COLOR_GREEN}${ssrr_url}${COLOR_END}"
         echo -e "SSRR status manage: ${COLOR_PINK}/etc/init.d/ssrr${COLOR_END} {${COLOR_GREEN}start|stop|restart|status|config|viewconfig|version${COLOR_END}}"
