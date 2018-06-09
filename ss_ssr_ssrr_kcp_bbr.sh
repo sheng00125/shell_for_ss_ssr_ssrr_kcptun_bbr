@@ -449,7 +449,6 @@ BBR_Selection(){
 	BBR_Selection_NotOpenVZ
     fi
 }
-
 BBR_Selection_NotOpenVZ(){
     def_bbr_install="Y"
     echo
@@ -467,11 +466,10 @@ BBR_Selection_NotOpenVZ(){
              ;;
         *)
             echo
-            echo -e "${COLOR_PINK}No input or input error,You will not install BBR${COLOR_END}"
+            echo -e "${COLOR_PINK}No input or input error,You will install BBR${COLOR_END}"
             bbr_install="${def_bbr_install}"
     esac
 }
-
 BBR_Selection_OpenVZ(){
     def_bbr_select="2"
     echo
