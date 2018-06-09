@@ -439,6 +439,7 @@ Simple_obfs_option(){
     fi
 }
 BBR_Selection(){
+    echo
     if [ -d "/proc/vz" ] ;then
         echo -e "Your VPS is based on OpenVZ."
         BBR_Selection_OpenVZ
@@ -450,7 +451,6 @@ BBR_Selection(){
 }
 BBR_Selection_NotOpenVZ(){
     def_bbr_install="Y"
-    echo
     echo -e "${COLOR_YELOW}Do you want to install BBR?[Y/N]${COLOR_END} "
     read -p "Enter your choice for BBR installation. default [${def_bbr_install}]: " bbr_install
 
@@ -471,7 +471,6 @@ BBR_Selection_NotOpenVZ(){
 }
 BBR_Selection_OpenVZ(){
     def_bbr_select="2"
-    echo
     echo -e "${COLOR_YELOW}You have 3 options for BBR install${COLOR_END}"
     echo "1: Install BBR with Rinetd"
     echo "2: Install BBR with LML (default)"
@@ -2598,6 +2597,7 @@ case "${shell_action}" in
     install_cleanup
     if [ -f /root/install.sh ]; then rm -f /root/install.sh; fi
     if [ -f /root/firewall_set.sh ]; then rm -f /root/firewall_set.sh; fi
+    reboot
     ;;
 [Cc]|[Cc][Oo][Nn][Ff][Ii][Gg]|-[Cc]|--[Cc])
     configure_ss_ssr_ssrr_kcptun
