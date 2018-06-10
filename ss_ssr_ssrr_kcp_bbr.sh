@@ -1378,6 +1378,7 @@ pre_install_ss_ssr_ssrr_kcptun(){
     Print_Sys_Info
     set_timezone
     Disable_Selinux
+    install_bbr
     check_ss_ssr_ssrr_kcptun_installed
     cd ${cur_dir}
     ###############################   Shadowsocks-libev   ###############################
@@ -2591,7 +2592,6 @@ case "${shell_action}" in
     pre_install_ss_ssr_ssrr_kcptun
     reconfig_ss_ssr_ssrr_kcptun
     set_tool
-    install_bbr
     set_crontab
     show_ss_ssr_ssr_kcptun
     install_cleanup
