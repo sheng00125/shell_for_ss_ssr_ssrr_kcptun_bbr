@@ -738,7 +738,7 @@ down_ss_ssr_ssrr_kcptun(){
     fi
 }
 config_ss_ssr_ssrr_kcptun(){
-    if check_kernel_version; then
+    if [ check_kernel_version ] || [ "${bbr_install}" == "y" ] || [ "${bbr_install}" == "Y" ]; then
         fast_open="true"
     else
         fast_open="false"
