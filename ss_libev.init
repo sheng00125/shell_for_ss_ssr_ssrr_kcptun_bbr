@@ -77,7 +77,7 @@ do_start(){
         exit 0
     else
 	echo -e -n "Starting ${ProgramName}:"
-    if [ -f /root/${ProgramName}.log ]; then rm -f /root/${ProgramName}.log; fi
+	if [ -f /root/${ProgramName}.log ]; then rm -f /root/${ProgramName}.log; fi
 	if [[ "${log_flag}" =~ ^[Ll][Oo][Gg]$ ]]; then
             ${BIN} -v -c ${CONFIGFILE} > /root/${ProgramName}.log 2>&1 &
 	    echo $! >  $PID_FILE
