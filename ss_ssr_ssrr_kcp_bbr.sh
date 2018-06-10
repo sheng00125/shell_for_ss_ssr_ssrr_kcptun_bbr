@@ -63,7 +63,7 @@ shell_update(){
 set_text_color(){
     COLOR_RED='\E[1;31m'
     COLOR_GREEN='\E[1;32m'
-    COLOR_YELOW='\E[1;33m'
+    COLOR_YELLOW='\E[1;33m'
     COLOR_BLUE='\E[1;34m'
     COLOR_PINK='\E[1;35m'
     COLOR_PINKBACK_WHITEFONT='\033[45;37m'
@@ -347,7 +347,7 @@ get_ip(){
 }
 Dispaly_Selection(){
     def_Install_Select="1"
-    echo -e "${COLOR_YELOW}You have 7 options for your ss/ssr/ssrr/kcptun install.${COLOR_END}"
+    echo -e "${COLOR_YELLOW}You have 7 options for your ss/ssr/ssrr/kcptun install.${COLOR_END}"
     echo "1: Install Shadowsocks-libev (default)"
     echo "2: Install ShadowsocksR(python)"
     echo "3: Install KCPTUN"
@@ -398,7 +398,7 @@ Dispaly_Selection(){
     if [ "${Install_Select}" == "1" ] || [ "${Install_Select}" == "4" ]; then
         def_Install_obfs="Y"
         echo
-        echo -e "${COLOR_YELOW}Do you want to install simple-obfs for Shadowsocks-libev?[Y/N]${COLOR_END}"
+        echo -e "${COLOR_YELLOW}Do you want to install simple-obfs for Shadowsocks-libev?[Y/N]${COLOR_END}"
         read -p "Enter your choice for simple-obf.default: ${def_Install_obfs}:" Install_obfs
 
         case "${Install_obfs}" in
@@ -420,7 +420,7 @@ Simple_obfs_option(){
     if [ "${Install_obfs}" == "y" ] || [ "${Install_obfs}" == "Y" ]; then
         echo
       	def_ofbs_option="1"
-        echo -e "${COLOR_YELOW}Please select your Simple-obfs setting:${COLOR_END}"
+        echo -e "${COLOR_YELLOW}Please select your Simple-obfs setting:${COLOR_END}"
       	echo "1: http (default)"
       	echo "2: tls"
       	#read -p "Enter your choice (1, 2. default ${def_ofbs_option}): " ofbs_option
@@ -451,7 +451,7 @@ BBR_Selection(){
 }
 BBR_Selection_NotOpenVZ(){
     def_bbr_install="Y"
-    echo -e "${COLOR_YELOW}Do you want to install BBR?[Y/N]${COLOR_END} "
+    echo -e "${COLOR_YELLOW}Do you want to install BBR?[Y/N]${COLOR_END} "
     read -p "Enter your choice for BBR installation. default [${def_bbr_install}]: " bbr_install
 
     case "${bbr_install}" in
@@ -471,7 +471,7 @@ BBR_Selection_NotOpenVZ(){
 }
 BBR_Selection_OpenVZ(){
     def_bbr_select="2"
-    echo -e "${COLOR_YELOW}You have 3 options for BBR install${COLOR_END}"
+    echo -e "${COLOR_YELLOW}You have 3 options for BBR install${COLOR_END}"
     echo "1: Install BBR with Rinetd"
     echo "2: Install BBR with LML (default)"
     echo "3: Not install any BBR"
@@ -2160,7 +2160,7 @@ uninstall_ss_ssr_ssrr_kcptun(){
     Get_Dist_Name
     clear
     def_Uninstall_Select="6"
-    echo -e "${COLOR_YELOW}You have 5 options for your ss/ssr/ssrr/kcptun Uninstall${COLOR_END}"
+    echo -e "${COLOR_YELLOW}You have 5 options for your ss/ssr/ssrr/kcptun Uninstall${COLOR_END}"
     echo "1: Uninstall Shadowsocks-libev"
     echo "2: Uninstall ShadowsocksR(python)"
     echo "3: Uninstall KCPTUN"
@@ -2372,7 +2372,7 @@ update_ss_ssr_ssrr_kcptun(){
     ssr_update_flag="false"
     kcptun_update_flag="false"
     clear
-    echo -e "${COLOR_YELOW}You have 5 options for your kcptun/ss/ssr/ssrr update.${COLOR_END}"
+    echo -e "${COLOR_YELLOW}You have 5 options for your kcptun/ss/ssr/ssrr update.${COLOR_END}"
     echo "1: Update Shadowsocks-libev"
     echo "2: Update ShadowsocksR(python)"
     echo "3: Update KCPTUN"
