@@ -87,9 +87,9 @@ do_start(){
     fi
     RETVAL=$?
     if check_running; then
-        echo -e "${COLOR_GREEN_DEEP}                                 [OK]${COLOR_END}"
+        echo -e "${COLOR_GREEN_DEEP}                                   [OK]${COLOR_END}"
     else
-        echo -e "${COLOR_RED}                               [FAILED]${COLOR_END}"
+        echo -e "${COLOR_RED}                                 [FAILED]${COLOR_END}"
         RETVAL=1
     fi
 }
@@ -98,9 +98,9 @@ do_stop(){
     echo -e -n "Stopping ${ProgramName}:"
         if check_running; then
             kill -9 $PID
-            echo -e "${COLOR_GREEN_DEEP}                                 [OK]${COLOR_END}"
+            echo -e "${COLOR_GREEN_DEEP}                                   [OK]${COLOR_END}"
         else
-	    echo -e "${COLOR_RED}                               [FAILED]${COLOR_END}"
+	    echo -e "${COLOR_RED}                                 [FAILED]${COLOR_END}"
             echo -e "${COLOR_RED}${ProgramName} not running.${COLOR_END}"
             RETVAL=1
         fi
