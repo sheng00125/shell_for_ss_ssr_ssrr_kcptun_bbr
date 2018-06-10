@@ -755,10 +755,12 @@ config_ss_ssr_ssrr_kcptun(){
     "server":"0.0.0.0",
     "server_port":${set_ss_libev_port},
     "password":"${set_ss_libev_pwd}",
+    "user":"nobody",
     "timeout":300,
     "method":"${set_ss_libev_method}",
+    "mode":"tcp_and_udp",
     "fast_open":${fast_open},
-    "plugin":"/usr/local/bin/obfs-server",
+    "plugin":"obfs-server",
     "plugin_opts":"obfs=${ofbs_option}"
 }
 EOF
@@ -768,8 +770,10 @@ EOF
     "server":"0.0.0.0",
     "server_port":${set_ss_libev_port},
     "password":"${set_ss_libev_pwd}",
+    "user":"nobody",
     "timeout":300,
     "method":"${set_ss_libev_method}",
+    "mode":"tcp_and_udp",
     "fast_open":${fast_open}
 }
 EOF
