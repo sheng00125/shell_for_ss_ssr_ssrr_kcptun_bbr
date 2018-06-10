@@ -1278,6 +1278,7 @@ show_ss_ssr_ssr_kcptun(){
         echo -e "SS-libev Server Port       : ${COLOR_GREEN}${set_ss_libev_port}${COLOR_END}"
         echo -e "SS-libev Password          : ${COLOR_GREEN}${set_ss_libev_pwd}${COLOR_END}"
         echo -e "SS-libev Encryption Method : ${COLOR_GREEN}${set_ss_libev_method}${COLOR_END}"
+        echo -e "SS-libev Fast Open         : ${COLOR_GREEN}${fast_open}${COLOR_END}"
         if [ "${Install_obfs}" == "y" ] || [ "${Install_obfs}" == "Y" ]; then
             echo -e "SS-libev plugin            : ${COLOR_GREEN}/usr/local/bin/obfs-server${COLOR_END}"
             echo -e "SS-libev plugin_opts       : ${COLOR_GREEN}obfs=${ofbs_option}${COLOR_END}"
@@ -1302,6 +1303,7 @@ show_ss_ssr_ssr_kcptun(){
         echo -e "SSR Encryption Method      : ${COLOR_GREEN}${set_ssr_method}${COLOR_END}"
         echo -e "SSR protocol               : ${COLOR_GREEN}${set_ssr_protocol}${COLOR_END}"
         echo -e "SSR obfs                   : ${COLOR_GREEN}${set_ssr_obfs}${COLOR_END}"
+        echo -e "SSR Fast Open              : ${COLOR_GREEN}${fast_open}${COLOR_END}"
         #echo -e "SSR Local IP               : ${COLOR_GREEN}127.0.0.1${COLOR_END}"
         #echo -e "SSR Local Port             : ${COLOR_GREEN}${ssr_local_port}${COLOR_END}"
 	ssr_url="ssr://$(echo -n "${SERVER_IP}:${set_ssr_port}:${set_ssr_protocol}:${set_ssr_method}:${set_ssr_obfs}:"$(echo -n "${set_ssr_pwd}" | base64 -w0 | sed 's/=//g;s/\//_/g;s/+/-/g' )"/?obfsparam="$(echo -n "www.cloudflare.com" | base64 -w0 | sed 's/=//g;s/\//_/g;s/+/-/g' )"&protoparam="$(echo -n "www.cloudflare.com" | base64 -w0 | sed 's/=//g;s/\//_/g;s/+/-/g' )"&remarks="$(echo -n "ShadowsocksR" | base64 -w0 | sed 's/=//g;s/\//_/g;s/+/-/g' )"&group="$(echo -n "${SERVER_IP}" | base64 -w0 | sed 's/=//g;s/\//_/g;s/+/-/g' )"&udpport=${set_ssr_port}" | base64 -w0 )"
@@ -1318,6 +1320,7 @@ show_ss_ssr_ssr_kcptun(){
         echo -e "SSRR Encryption Method      : ${COLOR_GREEN}${set_ssrr_method}${COLOR_END}"
         echo -e "SSRR protocol               : ${COLOR_GREEN}${set_ssrr_protocol}${COLOR_END}"
         echo -e "SSRR obfs                   : ${COLOR_GREEN}${set_ssrr_obfs}${COLOR_END}"
+        echo -e "SSRR Fast Open              : ${COLOR_GREEN}${fast_open}${COLOR_END}"
         #echo -e "SSRR Local IP               : ${COLOR_GREEN}127.0.0.1${COLOR_END}"
         #echo -e "SSRR Local Port             : ${COLOR_GREEN}${ssrr_local_port}${COLOR_END}"
 	ssrr_url="ssr://$(echo -n "${SERVER_IP}:${set_ssrr_port}:${set_ssrr_protocol}:${set_ssrr_method}:${set_ssrr_obfs}:"$(echo -n "${set_ssrr_pwd}" | base64 -w0 | sed 's/=//g;s/\//_/g;s/+/-/g' )"/?obfsparam="$(echo -n "www.cloudflare.com" | base64 -w0 | sed 's/=//g;s/\//_/g;s/+/-/g' )"&protoparam="$(echo -n "www.cloudflare.com" | base64 -w0 | sed 's/=//g;s/\//_/g;s/+/-/g' )"&remarks="$(echo -n "ShadowsocksRR" | base64 -w0 | sed 's/=//g;s/\//_/g;s/+/-/g' )"&group="$(echo -n "${SERVER_IP}" | base64 -w0 | sed 's/=//g;s/\//_/g;s/+/-/g' )"&udpport=${set_ssrr_port}" | base64 -w0 )"
