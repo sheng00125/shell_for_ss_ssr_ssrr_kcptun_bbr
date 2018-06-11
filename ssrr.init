@@ -14,6 +14,7 @@
 
 PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
 COLOR_RED='\E[1;31m'
+COLOR_RED_DEEP='\033[0;31m'
 COLOR_GREEN='\E[1;32m'
 COLOR_GREEN_DEEP='\033[0;32m'
 COLOR_YELLOW='\E[1;33m'
@@ -78,7 +79,7 @@ do_start(){
     if [ $RETVAL -eq 0 ]; then
         echo -e "                                    [${COLOR_GREEN_DEEP}  OK  ${COLOR_END}]"
     else
-        echo -e "                                    [${COLOR_RED}FAILED${COLOR_END}]"
+        echo -e "                                    [${COLOR_RED_DEEP}FAILED${COLOR_END}]"
 	RETVAL=1
     fi
 }
@@ -91,11 +92,11 @@ do_stop(){
         if [ $RETVAL -eq 0 ]; then
 	        echo -e "                                    [${COLOR_GREEN_DEEP}  OK  ${COLOR_END}]"
         else
-	        echo -e "                                    [${COLOR_RED}FAILED${COLOR_END}]"
+	        echo -e "                                    [${COLOR_RED_DEEP}FAILED${COLOR_END}]"
 	        RETVAL=1
         fi
     else
-	    echo -e "                                    [${COLOR_RED}FAILED${COLOR_END}]"
+	    echo -e "                                    [${COLOR_RED_DEEP}FAILED${COLOR_END}]"
         echo -e "${COLOR_RED}${ProgramName} not running.${COLOR_END}"
         RETVAL=1
     fi
