@@ -28,12 +28,13 @@ COLOR_PINK='\E[1;35m'
 COLOR_PINKBACK_WHITEFONT='\033[45;37m'
 COLOR_GREEN_LIGHTNING='\033[32m \033[05m'
 COLOR_END='\E[0m'
+
 ProgramName="kcptun"
 BIN=/usr/local/kcptun/kcptun
 CONFIGFILE=/usr/local/kcptun/config.json
-LOGFILE=/root/$ProgramName.log
+LOGFILE=/root/kcptun.log
 PID_DIR=/var/run
-PID_FILE=${PID_DIR}/$ProgramName.pid
+PID_FILE=${PID_DIR}/kcptun.pid
 version="2.0"
 RETVAL=0
 
@@ -77,7 +78,7 @@ do_start(){
     else
         echo -e -n "Starting ${ProgramName}:"
         if [[ "${log_flag}" =~ ^[Ll][Oo][Gg]$ ]]; then
-            if [ -f "$LOGFILE" ]; then rm -rf ${LOGFILE}; fi
+            if [ -f "$LOGFILE" ]; then rm -rf $LOGFILE; fi
             ${BIN} -c ${CONFIGFILE} --log $LOGFILE > /dev/null 2>&1 &
 	        echo $! >  $PID_FILE
         else
