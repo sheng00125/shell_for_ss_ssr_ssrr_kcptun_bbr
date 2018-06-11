@@ -367,15 +367,15 @@ Dispaly_Selection(){
             ;;
         3)
             echo
-            echo -e "${COLOR_PINK}You will install kcptun ${kcptun_VER}${COLOR_END}"
+            echo -e "${COLOR_PINK}You will install KCPTUN ${KCPTUN_VER}${COLOR_END}"
             ;;
         4)
             echo
-            echo -e "${COLOR_PINK}You will Install Shadowsocks-libev ${SS_LIBEV_VER} + kcptun ${kcptun_VER}${COLOR_END}"
+            echo -e "${COLOR_PINK}You will Install Shadowsocks-libev ${SS_LIBEV_VER} + kcptun ${KCPTUN_VER}${COLOR_END}"
             ;;
         5)
             echo
-            echo -e "${COLOR_PINK}You will install ShadowsocksR(python) ${SSR_VER} + kcptun ${kcptun_VER}${COLOR_END}"
+            echo -e "${COLOR_PINK}You will install ShadowsocksR(python) ${SSR_VER} + kcptun ${KCPTUN_VER}${COLOR_END}"
             ;;
         6)
             echo
@@ -383,7 +383,7 @@ Dispaly_Selection(){
             ;;
         7)
             echo
-            echo -e "${COLOR_PINK}You will install ShadowsocksRR(python) ${SSRR_VER} + kcptun ${kcptun_VER}${COLOR_END}"
+            echo -e "${COLOR_PINK}You will install ShadowsocksRR(python) ${SSRR_VER} + kcptun ${KCPTUN_VER}${COLOR_END}"
             ;;
         [eE][xX][iI][tT])
             echo -e "${COLOR_PINK}You select <Exit>, shell exit now!${COLOR_END}"
@@ -575,7 +575,7 @@ get_install_version(){
         [ -x ${cur_dir}/.version.sh ] && chmod +x ${cur_dir}/.version.sh 
         . ${cur_dir}/.version.sh
     fi
-    if [ -z ${LIBSODIUM_VER} ] || [ -z ${MBEDTLS_VER} ] || [ -z ${SS_LIBEV_VER} ] || [ -z ${SSR_VER} ] || [ -z ${SSRR_VER} ] || [ -z ${kcptun_VER} ]; then
+    if [ -z ${LIBSODIUM_VER} ] || [ -z ${MBEDTLS_VER} ] || [ -z ${SS_LIBEV_VER} ] || [ -z ${SSR_VER} ] || [ -z ${SSRR_VER} ] || [ -z ${KCPTUN_VER} ]; then
         echo -e "${COLOR_RED}Error: Get Program version failed!${COLOR_END}"
         exit 1
     fi
@@ -640,12 +640,12 @@ get_latest_version(){
     fi
     if [[ "${kcptun_installed_flag}" == "false" && "${shell_action}" =~ ^[Ii]|[Ii][Nn]|[Ii][Nn][Ss][Tt][Aa][Ll][Ll]|-[Ii]|--[Ii]$ ]] || [[ "${kcptun_installed_flag}" == "true" && "${shell_action}" =~ ^[Uu]|[Uu][Pp][Dd][Aa][Tt][Ee]|-[Uu]|--[Uu]|[Uu][Pp]|-[Uu][Pp]|--[Uu][Pp]$ ]]; then
         echo -e "Loading kcptun version, please wait..."
-        kcptun_init_link="${kcptun_INIT}"
-        kcptun_latest_file="kcptun-linux-${ARCHS}-${kcptun_VER}.tar.gz"
+        kcptun_init_link="${KCPTUN_INIT}"
+        kcptun_latest_file="kcptun-linux-${ARCHS}-${KCPTUN_VER}.tar.gz"
         if [[ `getconf WORD_BIT` = '32' && `getconf LONG_BIT` = '64' ]] ; then
-            kcptun_download_link="${kcptun_AMD64_LINK}"
+            kcptun_download_link="${KCPTUN_AMD64_LINK}"
         else
-            kcptun_download_link="${kcptun_386_LINK}"
+            kcptun_download_link="${KCPTUN_386_LINK}"
         fi
         if [[ "${kcptun_init_link}" == "" || "${kcptun_download_link}" == "" ]]; then
             echo -e "${COLOR_RED}Error: Get kcptun version failed${COLOR_END}"
@@ -2452,12 +2452,12 @@ update_ss_ssr_ssrr_kcptun(){
         echo "+-------------------------------------------------------------+"
         if [ "${kcptun_installed_flag}" == "true" ]; then
             kcptun_local_ver=$(/usr/local/kcptun/kcptun --version | awk '{print $3}')
-            if [ -z ${kcptun_local_ver} ] || [ -z ${kcptun_VER} ]; then
+            if [ -z ${kcptun_local_ver} ] || [ -z ${KCPTUN_VER} ]; then
                 echo -e "${COLOR_RED}Error: Get kcptun remote version failed${COLOR_END}"
             else
-                echo -e "kcptun remote version : ${COLOR_GREEN}${kcptun_VER}${COLOR_END}"
+                echo -e "kcptun remote version : ${COLOR_GREEN}${KCPTUN_VER}${COLOR_END}"
                 echo -e "kcptun local version : ${COLOR_GREEN}${kcptun_local_ver}${COLOR_END}"
-                if [[ "${kcptun_local_ver}" != "${kcptun_VER}" ]];then
+                if [[ "${kcptun_local_ver}" != "${KCPTUN_VER}" ]];then
                     kcptun_update_flag="true"
                 else
                     echo "kcptun local version is up-to-date."
