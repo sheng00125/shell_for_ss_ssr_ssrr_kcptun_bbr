@@ -14,6 +14,7 @@
 
 PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
 COLOR_RED='\E[1;31m'
+COLOR_RED_DEEP='\033[0;31m'
 COLOR_GREEN='\E[1;32m'
 COLOR_GREEN_DEEP='\033[0;32m'
 COLOR_YELLOW='\E[1;33m'
@@ -40,7 +41,7 @@ CONFIGFILE=/etc/shadowsocks-libev/config.json
 PID_DIR=/var/run
 PID_FILE=${PID_DIR}/shadowsocks-libev.pid
 version="2.0"
-RET_VAL=0
+RETVAL=0
 
 [ -x ${BIN} ] || exit 0
 if [ ! -f ${CONFIGFILE} ]; then
@@ -66,44 +67,55 @@ check_running() {
             return 1
         fi
     else
-        return 2
-    fi
+        PID=`ps -ef | grep -v grep | grep -i "${BIN}" | awk '{print $2}'`
+	if [ ! -z $PID ]; then
+	    return 0
+        else
+            return 1
+        fi
+    fi    
 }
 
 do_start(){
-    if [ -f $PID_FILE ]; then
-        read PID < $PID_FILE
+    check_running
+    if [ $? -eq 0 ]; then
         echo "${ProgramName} (pid $PID) is already running."
         exit 0
     else
 	echo -e -n "Starting ${ProgramName}:"
 	if [ -f /root/${ProgramName}.log ]; then rm -f /root/${ProgramName}.log; fi
 	if [[ "${log_flag}" =~ ^[Ll][Oo][Gg]$ ]]; then
-            ${BIN} -v -c ${CONFIGFILE} > /root/${ProgramName}.log 2>&1 &
+            $BIN -v -c $CONFIGFILE > /root/$ProgramName.log 2>&1 &
 	    echo $! >  $PID_FILE
 	else
-	    ${BIN} -v -c ${CONFIGFILE} -f $PID_FILE
+	    $BIN -v -c $CONFIGFILE -f $PID_FILE
 	fi
     fi
     RETVAL=$?
     if check_running; then
-        echo -e "${COLOR_GREEN_DEEP}                                   [OK]${COLOR_END}"
+        echo -e "                                [${COLOR_GREEN_DEEP}  OK  ${COLOR_END}]"
     else
-        echo -e "${COLOR_RED}                                 [FAILED]${COLOR_END}"
+        echo -e "                                [${COLOR_RED_DEEP}FAILED${COLOR_END}]"
         RETVAL=1
     fi
 }
 
 do_stop(){
     echo -e -n "Stopping ${ProgramName}:"
-        if check_running; then
-            kill -9 $PID
-            echo -e "${COLOR_GREEN_DEEP}                                   [OK]${COLOR_END}"
+    if check_running; then
+        kill -9 $PID
+        RETVAL=$?
+        if [ $RETVAL -eq 0 ]; then
+            echo -e "                                [${COLOR_GREEN_DEEP}  OK  ${COLOR_END}]"
         else
-	    echo -e "${COLOR_RED}                                 [FAILED]${COLOR_END}"
-            echo -e "${COLOR_RED}${ProgramName} not running.${COLOR_END}"
-            RETVAL=1
+	    echo -e "                                [${COLOR_RED_DEEP}FAILED${COLOR_END}]"
+	    RETVAL=1
         fi
+    else
+        echo -e "                                [${COLOR_RED_DEEP}FAILED${COLOR_END}]"
+        echo -e "${COLOR_RED}${ProgramName} not running.${COLOR_END}"
+        RETVAL=1
+    fi
     RETVAL=$?
     [ $RETVAL -eq 0 ]
     rm -f $PID_FILE
@@ -115,7 +127,7 @@ do_status() {
         0)
         echo "${ProgramName} (pid $PID) is running..."
         ;;
-        1|2)
+        1)
         echo "${ProgramName} is stopped"
         RETVAL=1
         ;;
