@@ -28,7 +28,6 @@ COLOR_PINK='\E[1;35m'
 COLOR_PINKBACK_WHITEFONT='\033[45;37m'
 COLOR_GREEN_LIGHTNING='\033[32m \033[05m'
 COLOR_END='\E[0m'
-
 ProgramName="kcptun"
 BIN=/usr/local/kcptun/kcptun
 CONFIGFILE=/usr/local/kcptun/config.json
@@ -80,7 +79,7 @@ do_start(){
         if [[ "${log_flag}" =~ ^[Ll][Oo][Gg]$ ]]; then
             if [ -f "$LOGFILE" ]; then rm -rf $LOGFILE; fi
             ${BIN} -c ${CONFIGFILE} --log $LOGFILE > /dev/null 2>&1 &
-	        echo $! >  $PID_FILE
+	    echo $! >  $PID_FILE
         else
             ${BIN} -c ${CONFIGFILE} > /dev/null 2>&1 &
             echo $! >  $PID_FILE
@@ -91,7 +90,7 @@ do_start(){
         echo -e "                                           [${COLOR_GREEN_DEEP}  OK  ${COLOR_END}]"
     else
         echo -e "                                           [${COLOR_RED_DEEP}FAILED${COLOR_END}]"
-   	    RETVAL=1
+   	RETVAL=1
     fi
 }
 
@@ -103,8 +102,8 @@ do_stop(){
         if [ $RETVAL -eq 0 ]; then
             echo -e "                                           [${COLOR_GREEN_DEEP}  OK  ${COLOR_END}]"
         else
-	        echo -e "                                           [${COLOR_RED_DEEP}FAILED${COLOR_END}]"
-	        RETVAL=1
+	    echo -e "                                           [${COLOR_RED_DEEP}FAILED${COLOR_END}]"
+	    RETVAL=1
         fi
     else
         echo -e "                                           [${COLOR_RED_DEEP}FAILED${COLOR_END}]"
