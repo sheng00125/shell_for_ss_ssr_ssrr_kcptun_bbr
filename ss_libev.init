@@ -24,13 +24,6 @@ COLOR_PINKBACK_WHITEFONT='\033[45;37m'
 COLOR_GREEN_LIGHTNING='\033[32m \033[05m'
 COLOR_END='\E[0m'
 
-# Source function library
-if [ -f /etc/rc.d/init.d/functions ]; then
-    . /etc/rc.d/init.d/functions
-# Check that networking is up.
-    [ ${NETWORKING} ="yes" ] || exit 0
-fi
-
 if [ -f /usr/local/bin/ss-server ]; then
     BIN=/usr/local/bin/ss-server
 elif [ -f /usr/bin/ss-server ]; then
@@ -38,6 +31,7 @@ elif [ -f /usr/bin/ss-server ]; then
 fi
 ProgramName="Shadowsocks-libev"
 CONFIGFILE=/etc/shadowsocks-libev/config.json
+LOGFILE=/root/shadowsocks-libev.log
 PID_DIR=/var/run
 PID_FILE=${PID_DIR}/shadowsocks-libev.pid
 version="2.0"
@@ -83,9 +77,9 @@ do_start(){
         exit 0
     else
 	echo -e -n "Starting ${ProgramName}:"
-	if [ -f /root/${ProgramName}.log ]; then rm -f /root/${ProgramName}.log; fi
 	if [[ "${log_flag}" =~ ^[Ll][Oo][Gg]$ ]]; then
-            $BIN -v -c $CONFIGFILE > /root/$ProgramName.log 2>&1 &
+            if [ -f "$LOGFILE" ]; then rm -rf $LOGFILE; fi
+            $BIN -v -c $CONFIGFILE > $LOGFILE 2>&1 &
 	    echo $! >  $PID_FILE
 	else
 	    $BIN -v -c $CONFIGFILE -f $PID_FILE
