@@ -76,7 +76,7 @@ do_start(){
 	    fi
     fi
     RETVAL=$?
-    if [ $RETVAL -eq 0 ]; then
+    if check_running; then
         echo -e "                                    [${COLOR_GREEN_DEEP}  OK  ${COLOR_END}]"
     else
         echo -e "                                    [${COLOR_RED_DEEP}FAILED${COLOR_END}]"
@@ -111,7 +111,7 @@ do_status(){
         0)
         echo "${ProgramName} (pid $PID) is running..."
         ;;
-        1|2)
+        1)
         echo "${ProgramName} is stopped"
         RETVAL=1
         ;;
@@ -132,7 +132,7 @@ do_viewconfig(){
 }
 
 do_version(){
-    ${BIN} --version
+    ${BIN} --version | grep "ShadowsocksR"
 }
 
 log_flag=$2
