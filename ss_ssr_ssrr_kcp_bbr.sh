@@ -32,7 +32,7 @@ shell_update(){
     if [ ! -z ${remote_shell_version} ]; then
         if [[ "${shell_version}" != "${remote_shell_version}" ]];then
             echo -e "${COLOR_GREEN}Found a new version of shell(ver:${remote_shell_version})!${COLOR_END}"
-	    echo -e "${COLOR_YELOW}You have 2 options for your shell update.${COLOR_END}"
+	    echo -e "${COLOR_YELLOW}You have 2 options for your shell update.${COLOR_END}"
             echo "1: Continue with currently shell"
             echo "2: Exit to update shell"
             echo
