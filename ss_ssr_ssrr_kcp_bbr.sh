@@ -2091,7 +2091,7 @@ pre_install_ss_ssr_ssrr_kcptun(){
         echo
         while true
         do
-            def_kcptun_mtu="1472"
+            def_kcptun_mtu="1464"
             echo -e "Please input MTU for KCPTUN [900-1472]"
             #read -p "(Default mtu: ${def_kcptun_mtu}):" set_kcptun_mtu
             [ -z "$set_kcptun_mtu" ] && set_kcptun_mtu="${def_kcptun_mtu}"
