@@ -26,10 +26,12 @@ COLOR_END='\E[0m'
 ProgramName=ShadowsocksR
 BIN=/usr/local/shadowsocksR/shadowsocks/server.py
 CONFIGFILE=/usr/local/shadowsocksR/shadowsocksR.json
+LOGFILE=/root/shadowsocksr.log
 PID_DIR=/var/run
 PID_FILE=${PID_DIR}/shadowsocksr.pid
 version="2.0"
 RETVAL=0
+
 [ -x ${BIN} ] || exit 0
 if [ ! -f ${CONFIGFILE} ]; then
     echo "${ProgramName}config file ${CONFIGFILE} not found"
@@ -68,12 +70,12 @@ do_start(){
         exit 0
     else
    	    echo -e -n "Starting ${ProgramName}:"
-        if [ -f /root/${ProgramName}.log ]; then rm -f /root/${ProgramName}.log; fi
         if [[ "${log_flag}" =~ ^[Ll][Oo][Gg]$ ]]; then
-            $BIN -v -c $CONFIGFILE -d start --pid-file $PID_FILE --log-file /root/$ProgramName.log>/dev/null 2>&1  
-	    else
+	    if [ -f "$LOGFILE" ]; then rm -rf $LOGFILE; fi
+            $BIN -v -c $CONFIGFILE -d start --pid-file $PID_FILE --log-file $LOGFILE>/dev/null 2>&1  
+	else
             $BIN -v -c $CONFIGFILE -d start --pid-file $PID_FILE>/dev/null 2>&1  
-	    fi
+	fi
     fi
     RETVAL=$?
     if check_running; then
@@ -90,13 +92,13 @@ do_stop(){
         $BIN -v -c $CONFIGFILE -d stop --pid-file $PID_FILE>/dev/null 2>&1  
         RETVAL=$?
         if [ $RETVAL -eq 0 ]; then
-	        echo -e "                                    [${COLOR_GREEN_DEEP}  OK  ${COLOR_END}]"
+	    echo -e "                                    [${COLOR_GREEN_DEEP}  OK  ${COLOR_END}]"
         else
-	        echo -e "                                    [${COLOR_RED_DEEP}FAILED${COLOR_END}]"
-	        RETVAL=1
+	    echo -e "                                    [${COLOR_RED_DEEP}FAILED${COLOR_END}]"
+	    RETVAL=1
         fi
     else
-	    echo -e "                                    [${COLOR_RED_DEEP}FAILED${COLOR_END}]"
+	echo -e "                                    [${COLOR_RED_DEEP}FAILED${COLOR_END}]"
         echo -e "${COLOR_RED}${ProgramName} not running.${COLOR_END}"
         RETVAL=1
     fi
