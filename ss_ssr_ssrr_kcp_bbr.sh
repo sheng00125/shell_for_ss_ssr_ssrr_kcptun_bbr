@@ -263,18 +263,16 @@ pre_install_packs(){
     if check_sys packageManager yum; then
         echo -e "[${COLOR_GREEN}Info${COLOR_END} Checking the EPEL repository..."
         if [ ! -f /etc/yum.repos.d/epel.repo ]; then
-            yum install -y -q epel-release
+            yum install -y epel-release > /dev/null 2>&1
         fi
         [ ! -f /etc/yum.repos.d/epel.repo ] && echo -e "[${COLOR_RED}Error:install EPEL repository failed, please check it.${COLOR_END}" && exit 1
-        [ ! "$(command -v yum-config-manager)" ] && yum install -y -q yum-utils
-        if [ x"`yum-config-manager epel | grep -w enabled | awk '{print $3}'`" != x"True" ]; then
-            yum-config-manager --enable epel
-        fi
+        [ ! "$(command -v yum-config-manager)" ] && yum install -y yum-utils > /dev/null 2>&1
+        [ x"$(yum-config-manager epel | grep -w enabled | awk '{print $3}')" != x"True" ] && yum-config-manager --enable epel > /dev/null 2>&1
         echo -e "[${COLOR_GREEN}Info${COLOR_END}] Checking the EPEL repository complete..."
         yum_depends=(
-            unzip gzip openssl openssl-devel gcc python python-devel python-setuptools pcre pcre-devel libtool libevent xmlto
-            autoconf automake make curl curl-devel zlib-devel perl perl-devel cpio expat-devel gettext-devel asciidoc
-            libev-devel c-ares-devel git udns-devel qrencode kernel-headers lrzsz
+            unzip gzip openssl openssl-devel gcc python python-devel python-setuptools pcre pcre-devel libtool libevent
+            autoconf automake make curl curl-devel zlib-devel perl perl-devel cpio expat-devel gettext-devel
+            libev-devel c-ares-devel git qrencode
         )
         for depend in ${yum_depends[@]}; do
             error_detect_depends "yum -y install ${depend}"
@@ -298,6 +296,7 @@ pre_install_packs(){
 }
 update_glibc(){
     echo -e "+ Update glibc...."
+    yum install kernel-headers -y
     wget -c http://ftp.redsleeve.org/pub/steam/glibc-2.15-60.el6.x86_64.rpm \
     http://ftp.redsleeve.org/pub/steam/glibc-common-2.15-60.el6.x86_64.rpm \
     http://ftp.redsleeve.org/pub/steam/glibc-devel-2.15-60.el6.x86_64.rpm \
