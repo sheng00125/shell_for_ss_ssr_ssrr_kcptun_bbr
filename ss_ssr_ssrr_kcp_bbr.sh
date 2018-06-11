@@ -13,7 +13,7 @@ export def_port=$(shuf -i 10000-65534 -n 1)
 
 # Check if user is root
 if [ $(id -u) != "0" ]; then
-    echo "Error: You must be root to run this script, please use root to install SS/SSR/SSRR/KCPTUN/BBR"
+    echo "Error: You must be root to run this script, please use root to install SS/SSR/SSRR/kcptun/BBR"
     exit 1
 fi
 set_timezone(){
@@ -349,11 +349,11 @@ Dispaly_Selection(){
     echo -e "${COLOR_YELLOW}You have 7 options for your ss/ssr/ssrr/kcptun install.${COLOR_END}"
     echo "1: Install Shadowsocks-libev (default)"
     echo "2: Install ShadowsocksR(python)"
-    echo "3: Install KCPTUN"
-    echo "4: Install Shadowsocks-libev + KCPTUN"
-    echo "5: Install ShadowsocksR(python) + KCPTUN"
+    echo "3: Install kcptun"
+    echo "4: Install Shadowsocks-libev + kcptun"
+    echo "5: Install ShadowsocksR(python) + kcptun"
     echo "6: Install ShadowsocksRR(python)"
-    echo "7: Install ShadowsocksRR(python) + KCPTUN"
+    echo "7: Install ShadowsocksRR(python) + kcptun"
     read -p "Enter your choice (1, 2, 3, 4, 5, 6, 7 or exit. default [${def_Install_Select}]): " Install_Select
 
     case "${Install_Select}" in
@@ -367,15 +367,15 @@ Dispaly_Selection(){
             ;;
         3)
             echo
-            echo -e "${COLOR_PINK}You will install KCPTUN ${KCPTUN_VER}${COLOR_END}"
+            echo -e "${COLOR_PINK}You will install kcptun ${kcptun_VER}${COLOR_END}"
             ;;
         4)
             echo
-            echo -e "${COLOR_PINK}You will Install Shadowsocks-libev ${SS_LIBEV_VER} + KCPTUN ${KCPTUN_VER}${COLOR_END}"
+            echo -e "${COLOR_PINK}You will Install Shadowsocks-libev ${SS_LIBEV_VER} + kcptun ${kcptun_VER}${COLOR_END}"
             ;;
         5)
             echo
-            echo -e "${COLOR_PINK}You will install ShadowsocksR(python) ${SSR_VER} + KCPTUN ${KCPTUN_VER}${COLOR_END}"
+            echo -e "${COLOR_PINK}You will install ShadowsocksR(python) ${SSR_VER} + kcptun ${kcptun_VER}${COLOR_END}"
             ;;
         6)
             echo
@@ -383,7 +383,7 @@ Dispaly_Selection(){
             ;;
         7)
             echo
-            echo -e "${COLOR_PINK}You will install ShadowsocksRR(python) ${SSRR_VER} + KCPTUN ${KCPTUN_VER}${COLOR_END}"
+            echo -e "${COLOR_PINK}You will install ShadowsocksRR(python) ${SSRR_VER} + kcptun ${kcptun_VER}${COLOR_END}"
             ;;
         [eE][xX][iI][tT])
             echo -e "${COLOR_PINK}You select <Exit>, shell exit now!${COLOR_END}"
@@ -575,7 +575,7 @@ get_install_version(){
         [ -x ${cur_dir}/.version.sh ] && chmod +x ${cur_dir}/.version.sh 
         . ${cur_dir}/.version.sh
     fi
-    if [ -z ${LIBSODIUM_VER} ] || [ -z ${MBEDTLS_VER} ] || [ -z ${SS_LIBEV_VER} ] || [ -z ${SSR_VER} ] || [ -z ${SSRR_VER} ] || [ -z ${KCPTUN_VER} ]; then
+    if [ -z ${LIBSODIUM_VER} ] || [ -z ${MBEDTLS_VER} ] || [ -z ${SS_LIBEV_VER} ] || [ -z ${SSR_VER} ] || [ -z ${SSRR_VER} ] || [ -z ${kcptun_VER} ]; then
         echo -e "${COLOR_RED}Error: Get Program version failed!${COLOR_END}"
         exit 1
     fi
@@ -639,20 +639,20 @@ get_latest_version(){
         fi
     fi
     if [[ "${kcptun_installed_flag}" == "false" && "${shell_action}" =~ ^[Ii]|[Ii][Nn]|[Ii][Nn][Ss][Tt][Aa][Ll][Ll]|-[Ii]|--[Ii]$ ]] || [[ "${kcptun_installed_flag}" == "true" && "${shell_action}" =~ ^[Uu]|[Uu][Pp][Dd][Aa][Tt][Ee]|-[Uu]|--[Uu]|[Uu][Pp]|-[Uu][Pp]|--[Uu][Pp]$ ]]; then
-        echo -e "Loading KCPTUN version, please wait..."
-        kcptun_init_link="${KCPTUN_INIT}"
-        kcptun_latest_file="kcptun-linux-${ARCHS}-${KCPTUN_VER}.tar.gz"
+        echo -e "Loading kcptun version, please wait..."
+        kcptun_init_link="${kcptun_INIT}"
+        kcptun_latest_file="kcptun-linux-${ARCHS}-${kcptun_VER}.tar.gz"
         if [[ `getconf WORD_BIT` = '32' && `getconf LONG_BIT` = '64' ]] ; then
-            kcptun_download_link="${KCPTUN_AMD64_LINK}"
+            kcptun_download_link="${kcptun_AMD64_LINK}"
         else
-            kcptun_download_link="${KCPTUN_386_LINK}"
+            kcptun_download_link="${kcptun_386_LINK}"
         fi
         if [[ "${kcptun_init_link}" == "" || "${kcptun_download_link}" == "" ]]; then
-            echo -e "${COLOR_RED}Error: Get KCPTUN version failed${COLOR_END}"
+            echo -e "${COLOR_RED}Error: Get kcptun version failed${COLOR_END}"
             exit 1
         fi
         if [[ "${kcptun_installed_flag}" == "false" && "${shell_action}" =~ ^[Ii]|[Ii][Nn]|[Ii][Nn][Ss][Tt][Aa][Ll][Ll]|-[Ii]|--[Ii]$ ]]; then
-            echo -e "Get the KCPTUN version:${COLOR_GREEN} ${kcptun_latest_file}${COLOR_END}"
+            echo -e "Get the kcptun version:${COLOR_GREEN} ${kcptun_latest_file}${COLOR_END}"
         fi
     fi
 }
@@ -731,7 +731,7 @@ down_ss_ssr_ssrr_kcptun(){
             fi
         fi
         if ! wget --no-check-certificate -O /etc/init.d/kcptun ${kcptun_init_link}; then
-            echo -e "${COLOR_RED}Failed to download KCPTUN init script!${COLOR_END}"
+            echo -e "${COLOR_RED}Failed to download kcptun init script!${COLOR_END}"
             exit 1
         fi
     fi
@@ -849,7 +849,7 @@ install_ss_ssr_ssrr_kcptun(){
     if [ ! -f /usr/lib/libsodium.a ] && [ ! -L /usr/local/lib/libsodium.so ]; then
         cd ${cur_dir}
 	echo
-        echo "+ Install libsodium for SS-Libev/SSR/SSRR/KCPTUN"
+        echo "+ Install libsodium for SS-Libev/SSR/SSRR/kcptun"
         tar xzf ${libsodium_laster_ver}.tar.gz
         cd ${libsodium_laster_ver}
         ./configure --prefix=/usr && make && make install
@@ -1334,18 +1334,18 @@ show_ss_ssr_ssr_kcptun(){
         echo "=========================================================="
     fi
     if [ "${kcptun_install_flag}" == "true" ]; then
-        echo "-------------------- KCPTUN Setting --------------------"
-        echo -e "KCPTUN configure file     : ${COLOR_GREEN}${kcptun_config}${COLOR_END}"
-        echo -e "KCPTUN Server Port        : ${COLOR_GREEN}${set_kcptun_port}${COLOR_END}"
-        echo -e "KCPTUN Key                : ${COLOR_GREEN}${set_kcptun_pwd}${COLOR_END}"
-        echo -e "KCPTUN Crypt mode         : ${COLOR_GREEN}${set_kcptun_method}${COLOR_END}"
-        echo -e "KCPTUN Fast mode          : ${COLOR_GREEN}${set_kcptun_mode}${COLOR_END}"
-        echo -e "KCPTUN MTU                : ${COLOR_GREEN}${set_kcptun_mtu}${COLOR_END}"
-        echo -e "KCPTUN sndwnd             : ${COLOR_GREEN}256${COLOR_END}"
-        echo -e "KCPTUN rcvwnd             : ${COLOR_GREEN}1024${COLOR_END}"
-        echo -e "KCPTUN compression        : ${COLOR_GREEN}${set_kcptun_compression}${COLOR_END}"
+        echo "-------------------- kcptun Setting --------------------"
+        echo -e "kcptun configure file     : ${COLOR_GREEN}${kcptun_config}${COLOR_END}"
+        echo -e "kcptun Server Port        : ${COLOR_GREEN}${set_kcptun_port}${COLOR_END}"
+        echo -e "kcptun Key                : ${COLOR_GREEN}${set_kcptun_pwd}${COLOR_END}"
+        echo -e "kcptun Crypt mode         : ${COLOR_GREEN}${set_kcptun_method}${COLOR_END}"
+        echo -e "kcptun Fast mode          : ${COLOR_GREEN}${set_kcptun_mode}${COLOR_END}"
+        echo -e "kcptun MTU                : ${COLOR_GREEN}${set_kcptun_mtu}${COLOR_END}"
+        echo -e "kcptun sndwnd             : ${COLOR_GREEN}256${COLOR_END}"
+        echo -e "kcptun rcvwnd             : ${COLOR_GREEN}1024${COLOR_END}"
+        echo -e "kcptun compression        : ${COLOR_GREEN}${set_kcptun_compression}${COLOR_END}"
         echo "----------------------------------------------------------"
-        echo -e "${COLOR_PINK}KCPTUN config for Client:${COLOR_END}"
+        echo -e "${COLOR_PINK}kcptun config for Client:${COLOR_END}"
 	cat <<-EOF
 [1;32m{[0m
 [1;32m    "localaddr": "127.0.0.1:1110",[0m
@@ -1364,7 +1364,7 @@ show_ss_ssr_ssr_kcptun(){
 [1;32m    "conn": 1[0m
 [1;32m}[0m
 EOF
-	echo -e "${COLOR_PINK}KCPTUN config for Shadowsocks-libev_Phone:${COLOR_END}"
+	echo -e "${COLOR_PINK}kcptun config for Shadowsocks-libev_Phone:${COLOR_END}"
 	echo -e "KCP Port      : ${COLOR_GREEN}${set_kcptun_port}${COLOR_END}"
         if [ "${set_kcptun_nocomp}" == "true" ];then
 	    echo -e "KCP parameter : ${COLOR_GREEN}key=${set_kcptun_pwd};crypt=${set_kcptun_method};mode=${set_kcptun_mode};mtu=${set_kcptun_mtu};sndwnd=128;rcvwnd=256;datashard=10;parityshard=3;dscp=46;nocomp${COLOR_END}"
@@ -1372,7 +1372,7 @@ EOF
 	    echo -e "KCP parameter : ${COLOR_GREEN}key=${set_kcptun_pwd};crypt=${set_kcptun_method};mode=${set_kcptun_mode};mtu=${set_kcptun_mtu};sndwnd=128;rcvwnd=256;datashard=10;parityshard=3;dscp=46${COLOR_END}"
 	fi
 	echo "----------------------------------------------------------"
-        echo -e "KCPTUN status manage: ${COLOR_PINK}/etc/init.d/kcptun${COLOR_END} {${COLOR_GREEN}start|stop|restart|status|config|viewconfig|version${COLOR_END}}"
+        echo -e "kcptun status manage: ${COLOR_PINK}/etc/init.d/kcptun${COLOR_END} {${COLOR_GREEN}start|stop|restart|status|config|viewconfig|version${COLOR_END}}"
         echo "=========================================================="
     fi
     echo
@@ -1925,14 +1925,14 @@ pre_install_ss_ssr_ssrr_kcptun(){
         echo -e "${COLOR_PINK}ShadowsocksRR has been installed, nothing to do...${COLOR_END}"
         [ "${Install_Select}" == "6" ] && exit 0
     fi
-    ###############################   KCPTUN   ###############################
+    ###############################   kcptun   ###############################
     if [ "${kcptun_installed_flag}" == "false" ]; then
         echo
         echo "=========================================================="
-        echo -e "${COLOR_PINK}Please input your KCPTUN setting:${COLOR_END}"
+        echo -e "${COLOR_PINK}Please input your kcptun setting:${COLOR_END}"
         echo
         def_kcptun_pwd=`randstr`
-        echo "Please input password for KCPTUN"
+        echo "Please input password for kcptun"
         #read -p "(Default password: ${def_kcptun_pwd}):" set_kcptun_pwd
         [ -z "${set_kcptun_pwd}" ] && set_kcptun_pwd="${def_kcptun_pwd}"
         echo
@@ -1944,7 +1944,7 @@ pre_install_ss_ssr_ssrr_kcptun(){
         while true
         do
             def_kcptun_port=$(shuf -i 10000-65534 -n 1)
-            echo -e "Please input port for KCPTUN [1-65535]"
+            echo -e "Please input port for kcptun [1-65535]"
             #read -p "(Default port: ${def_kcptun_port}):" set_kcptun_port
             [ -z "$set_kcptun_port" ] && set_kcptun_port="${def_kcptun_port}"
             expr ${set_kcptun_port} + 0 &>/dev/null
@@ -1994,7 +1994,7 @@ pre_install_ss_ssr_ssrr_kcptun(){
             kcptun_target_port="${set_kcptun_target_port}"
         fi
         def_kcptun_method="salsa20"
-        echo -e "Please select method for KCPTUN"
+        echo -e "Please select method for kcptun"
         echo "  1: aes"
         echo "  2: aes-128"
         echo "  3: aes-192"
@@ -2058,7 +2058,7 @@ pre_install_ss_ssr_ssrr_kcptun(){
         echo "---------------------------------------"
         echo
         def_kcptun_mode="fast2"
-        echo -e "Please select fast mode for KCPTUN"
+        echo -e "Please select fast mode for kcptun"
         echo "1: fast"
         echo "2: fast2 (default)"
         echo "3: fast3"
@@ -2092,7 +2092,7 @@ pre_install_ss_ssr_ssrr_kcptun(){
         while true
         do
             def_kcptun_mtu="1464"
-            echo -e "Please input MTU for KCPTUN [900-1472]"
+            echo -e "Please input MTU for kcptun [900-1472]"
             #read -p "(Default mtu: ${def_kcptun_mtu}):" set_kcptun_mtu
             [ -z "$set_kcptun_mtu" ] && set_kcptun_mtu="${def_kcptun_mtu}"
             expr ${set_kcptun_mtu} + 0 &>/dev/null
@@ -2112,7 +2112,7 @@ pre_install_ss_ssr_ssrr_kcptun(){
             fi
         done
         def_kcptun_compression="enable"
-        echo -e "Please select Compression for KCPTUN"
+        echo -e "Please select Compression for kcptun"
         echo "1: enable (default)"
         echo "2: disable"
         #read -p "Enter your choice (1, 2 or exit. default [${def_kcptun_compression}]): " set_kcptun_compression
@@ -2140,7 +2140,7 @@ pre_install_ss_ssr_ssrr_kcptun(){
         echo "=========================================================="
     elif [ "${kcptun_installed_flag}" == "true" ]; then
         echo
-        echo -e "${COLOR_PINK}KCPTUN has been installed, nothing to do...${COLOR_END}"
+        echo -e "${COLOR_PINK}kcptun has been installed, nothing to do...${COLOR_END}"
         [ "${Install_Select}" == "3" ] && exit 0
         [ "${Install_Select}" == "4" ] && [ "${ss_libev_installed_flag}" == "true" ] && exit 0
         [ "${Install_Select}" == "5" ] && [ "${ssr_installed_flag}" == "true" ] && exit 0
@@ -2162,7 +2162,7 @@ uninstall_ss_ssr_ssrr_kcptun(){
     echo -e "${COLOR_YELLOW}You have 5 options for your ss/ssr/ssrr/kcptun Uninstall${COLOR_END}"
     echo "1: Uninstall Shadowsocks-libev"
     echo "2: Uninstall ShadowsocksR(python)"
-    echo "3: Uninstall KCPTUN"
+    echo "3: Uninstall kcptun"
     echo "4: Uninstall ShadowsocksRR(python)"
     echo "5: Uninstall All"
     echo "6: Exit,cancell uninstall [default]"
@@ -2178,7 +2178,7 @@ uninstall_ss_ssr_ssrr_kcptun(){
         ;;
     3)
         echo
-        echo -e "${COLOR_PINK}You will Uninstall KCPTUN${COLOR_END}"
+        echo -e "${COLOR_PINK}You will Uninstall kcptun${COLOR_END}"
         ;;
     4)
         echo
@@ -2272,9 +2272,9 @@ uninstall_ss_ssr_ssrr_kcptun(){
             rm -f /etc/init.d/kcptun
             rm -f /var/log/kcptun.log
             rm -rf /usr/local/kcptun
-            echo -e "${COLOR_GREEN}KCPTUN uninstall success!${COLOR_END}"
+            echo -e "${COLOR_GREEN}kcptun uninstall success!${COLOR_END}"
         else
-            echo -e "${COLOR_GREEN}KCPTUN not install!${COLOR_END}"
+            echo -e "${COLOR_GREEN}kcptun not install!${COLOR_END}"
         fi
     fi
     if [ "${Uninstall_Select}" == "4" ] || [ "${Uninstall_Select}" == "5" ]; then
@@ -2310,7 +2310,7 @@ configure_ss_ssr_ssrr_kcptun(){
         echo -e "ShadowsocksRR config file:  ${COLOR_GREEN}${ssrr_config}${COLOR_END}"
     fi
     if [ -f ${kcptun_config} ]; then
-        echo -e "KCPTUN config file: ${COLOR_GREEN}${kcptun_config}${COLOR_END}"
+        echo -e "kcptun config file: ${COLOR_GREEN}${kcptun_config}${COLOR_END}"
     fi
 }
 reconfig_ss_ssr_ssrr_kcptun(){
@@ -2374,7 +2374,7 @@ update_ss_ssr_ssrr_kcptun(){
     echo -e "${COLOR_YELLOW}You have 5 options for your kcptun/ss/ssr/ssrr update.${COLOR_END}"
     echo "1: Update Shadowsocks-libev"
     echo "2: Update ShadowsocksR(python)"
-    echo "3: Update KCPTUN"
+    echo "3: Update kcptun"
     echo "4: Update ShadowsocksRR(python)"
     echo "5: Update All (default)"
     echo "6: Exit"
@@ -2392,7 +2392,7 @@ update_ss_ssr_ssrr_kcptun(){
         ;;
     3)
         echo
-        echo -e "${COLOR_PINK}You will update KCPTUN${COLOR_END}"
+        echo -e "${COLOR_PINK}You will update kcptun${COLOR_END}"
         ;;
     4)
         echo
@@ -2452,19 +2452,19 @@ update_ss_ssr_ssrr_kcptun(){
         echo "+-------------------------------------------------------------+"
         if [ "${kcptun_installed_flag}" == "true" ]; then
             kcptun_local_ver=$(/usr/local/kcptun/kcptun --version | awk '{print $3}')
-            if [ -z ${kcptun_local_ver} ] || [ -z ${KCPTUN_VER} ]; then
-                echo -e "${COLOR_RED}Error: Get KCPTUN remote version failed${COLOR_END}"
+            if [ -z ${kcptun_local_ver} ] || [ -z ${kcptun_VER} ]; then
+                echo -e "${COLOR_RED}Error: Get kcptun remote version failed${COLOR_END}"
             else
-                echo -e "KCPTUN remote version : ${COLOR_GREEN}${KCPTUN_VER}${COLOR_END}"
-                echo -e "KCPTUN local version : ${COLOR_GREEN}${kcptun_local_ver}${COLOR_END}"
-                if [[ "${kcptun_local_ver}" != "${KCPTUN_VER}" ]];then
+                echo -e "kcptun remote version : ${COLOR_GREEN}${kcptun_VER}${COLOR_END}"
+                echo -e "kcptun local version : ${COLOR_GREEN}${kcptun_local_ver}${COLOR_END}"
+                if [[ "${kcptun_local_ver}" != "${kcptun_VER}" ]];then
                     kcptun_update_flag="true"
                 else
-                    echo "KCPTUN local version is up-to-date."
+                    echo "kcptun local version is up-to-date."
                 fi
             fi
         else
-            echo -e "${COLOR_RED}KCPTUN not install!${COLOR_END}"
+            echo -e "${COLOR_RED}kcptun not install!${COLOR_END}"
         fi
     fi
     if [[ "${Update_Select}" == "4" || "${Update_Select}" == "5" ]]; then
