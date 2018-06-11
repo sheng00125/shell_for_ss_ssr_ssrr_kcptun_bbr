@@ -839,8 +839,7 @@ EOF
     "parityshard": 3,
     "autoexpire": 300,
     "dscp": 46,
-    "pprof": true,
-    "log": "/root/kcptun.log"
+    "pprof": true
 }
 EOF
     fi
@@ -1348,7 +1347,7 @@ show_ss_ssr_ssr_kcptun(){
         echo -e "${COLOR_PINK}kcptun config for Client:${COLOR_END}"
 	cat <<-EOF
 [1;32m{[0m
-[1;32m    "localaddr": "127.0.0.1:1110",[0m
+[1;32m    "localaddr": "127.0.0.1:8383",[0m
 [1;32m    "remoteaddr": "${SERVER_IP}:${set_kcptun_port}",[0m
 [1;32m    "key": "${set_kcptun_pwd}",[0m
 [1;32m    "crypt": "${set_kcptun_method}",[0m
