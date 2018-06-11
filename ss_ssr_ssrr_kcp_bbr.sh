@@ -17,7 +17,7 @@ if [ $(id -u) != "0" ]; then
     exit 1
 fi
 set_timezone(){
-    echo -e "${COLOR_YELOW}+ Set timezone...${COLOR_END}"
+    echo -e "${COLOR_YELLOW}Set timezone...${COLOR_END}"
     rm -rf /etc/localtime
     ln -s /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
     echo "done."
