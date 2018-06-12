@@ -449,7 +449,7 @@ BBR_Selection(){
     fi
 }
 BBR_Selection_NotOpenVZ(){
-    def_bbr_install="Y"
+    def_bbr_install="N"
     echo -e "${COLOR_YELLOW}Do you want to install BBR?[Y/N]${COLOR_END} "
     read -p "Enter your choice for BBR installation. default [${def_bbr_install}]: " bbr_install
 
