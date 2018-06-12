@@ -737,14 +737,12 @@ down_ss_ssr_ssrr_kcptun(){
     fi
 }
 config_ss_ssr_ssrr_kcptun(){
+    fast_open="false"
     if check_kernel_version; then
         fast_open="true"
-    else
-        if [ "${bbr_install}" == "y" ] || [ "${bbr_install}" == "Y" ]; then
-            fast_open="true"
-	else
-	    fast_open="false"
-	fi
+    fi
+    if [ "${bbr_install}" == "y" ] || [ "${bbr_install}" == "Y" ]; then
+        fast_open="true"
     fi
     if [[ "${ss_libev_installed_flag}" == "false" && "${shell_action}" =~ ^[Ii]|[Ii][Nn]|[Ii][Nn][Ss][Tt][Aa][Ll][Ll]|-[Ii]|--[Ii]$ ]]; then
         [ ! -d /etc/shadowsocks-libev ] && mkdir -p /etc/shadowsocks-libev
