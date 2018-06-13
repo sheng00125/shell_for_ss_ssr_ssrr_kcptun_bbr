@@ -290,7 +290,6 @@ install_bbr() {
         rm -f bbr_kvm.sh
         exit 0
     fi
-
     if [[ x"${release}" == x"centos" ]]; then
         install_elrepo
         [ ! "$(command -v yum-config-manager)" ] && yum install -y yum-utils > /dev/null 2>&1
@@ -302,7 +301,7 @@ install_bbr() {
             exit 1
         fi
         yum remove -y kernel-headers
-        yum -y install kernel-ml-headers kernel-ml-devel
+        yum -y install kernel-ml-devel kernel-ml-headers
     elif [[ x"${release}" == x"debian" || x"${release}" == x"ubuntu" ]]; then
         [[ ! -e "/usr/bin/wget" ]] && apt-get -y update && apt-get -y install wget
         echo -e "${green}Info:${plain} Getting latest kernel version..."
@@ -328,12 +327,10 @@ install_bbr() {
         rm -f bbr_kvm.sh
         exit 1
     fi
-
     install_config
     sysctl_config
     reboot_os
 }
-
 
 clear
 echo "---------- System Information ----------"
