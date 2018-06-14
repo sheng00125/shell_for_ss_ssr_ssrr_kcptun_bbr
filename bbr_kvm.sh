@@ -303,7 +303,7 @@ install_bbr() {
         exit 0
     fi
     if [[ x"${release}" == x"centos" ]]; then
-        remote_kernel_version=4.12.10
+        remote_kernel_version=4.11.18
         #install_elrepo
        # [ ! "$(command -v yum-config-manager)" ] && yum install -y yum-utils > /dev/null 2>&1
         #[ x"$(yum-config-manager elrepo-kernel | grep -w enabled | awk '{print $3}')" != x"True" ] && yum-config-manager --enable elrepo-kernel > /dev/null 2>&1
