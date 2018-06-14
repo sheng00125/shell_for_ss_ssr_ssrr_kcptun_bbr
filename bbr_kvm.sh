@@ -303,21 +303,21 @@ install_bbr() {
         exit 0
     fi
     if [[ x"${release}" == x"centos" ]]; then
-        remote_kernel_version=4.11.8
-        #install_elrepo
-       # [ ! "$(command -v yum-config-manager)" ] && yum install -y yum-utils > /dev/null 2>&1
-        #[ x"$(yum-config-manager elrepo-kernel | grep -w enabled | awk '{print $3}')" != x"True" ] && yum-config-manager --enable elrepo-kernel > /dev/null 2>&1
-        #yum -y install kernel-ml
-        yum -y install http://mirror.rc.usf.edu/compute_lock/elrepo/kernel/el6/x86_64/RPMS/kernel-ml-${remote_kernel_version}-1.el6.elrepo.x86_64.rpm
+        #remote_kernel_version=4.11.8
+        install_elrepo
+        [ ! "$(command -v yum-config-manager)" ] && yum install -y yum-utils > /dev/null 2>&1
+        [ x"$(yum-config-manager elrepo-kernel | grep -w enabled | awk '{print $3}')" != x"True" ] && yum-config-manager --enable elrepo-kernel > /dev/null 2>&1
+        yum -y install kernel-ml
+        # yum -y install http://mirror.rc.usf.edu/compute_lock/elrepo/kernel/el6/x86_64/RPMS/kernel-ml-${remote_kernel_version}-1.el6.elrepo.x86_64.rpm
         if [ $? -ne 0 ]; then
             echo -e "${red}Error:${plain} Install latest kernel failed, please check it."
             rm -f bbr_kvm.sh
             exit 1
         fi
         yum remove -y kernel-headers
-        #yum -y install kernel-ml-devel kernel-ml-headers
-        yum install -y http://mirror.rc.usf.edu/compute_lock/elrepo/kernel/el6/x86_64/RPMS/kernel-ml-devel-${remote_kernel_version}-1.el6.elrepo.x86_64.rpm
-        yum install -y http://mirror.rc.usf.edu/compute_lock/elrepo/kernel/el6/x86_64/RPMS/kernel-ml-headers-${remote_kernel_version}-1.el6.elrepo.x86_64.rpm
+        yum -y install kernel-ml-devel kernel-ml-headers
+        #yum install -y http://mirror.rc.usf.edu/compute_lock/elrepo/kernel/el6/x86_64/RPMS/kernel-ml-devel-${remote_kernel_version}-1.el6.elrepo.x86_64.rpm
+        #yum install -y http://mirror.rc.usf.edu/compute_lock/elrepo/kernel/el6/x86_64/RPMS/kernel-ml-headers-${remote_kernel_version}-1.el6.elrepo.x86_64.rpm
     elif [[ x"${release}" == x"debian" || x"${release}" == x"ubuntu" ]]; then
         [[ ! -e "/usr/bin/wget" ]] && apt-get -y update && apt-get -y install wget
         echo -e "${green}Info:${plain} Getting latest kernel version..."
