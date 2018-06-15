@@ -119,7 +119,7 @@ get_latest_version() {
 
     kernel_arr=()
     for i in ${latest_version[@]}; do
-        if version_ge $i 4.14; then
+        if version_ge $i 4.12.10; then
             kernel_arr+=($i);
         fi
     done
@@ -204,7 +204,7 @@ check_bbr_status() {
 
 check_kernel_version() {
     local kernel_version=$(uname -r | cut -d- -f1)
-    if version_ge ${kernel_version} 4.9; then
+    if [ ${kernel_version} = "4.12.10"]; then
         return 0
     else
         return 1
@@ -233,11 +233,81 @@ install_elrepo() {
 }
 
 sysctl_config() {
-    sed -i '/net.core.default_qdisc/d' /etc/sysctl.conf
-    sed -i '/net.ipv4.tcp_congestion_control/d' /etc/sysctl.conf
-    echo "net.core.default_qdisc = fq" >> /etc/sysctl.conf
-    echo "net.ipv4.tcp_congestion_control = bbr" >> /etc/sysctl.conf
+    sed -i '/fs.file-max/d' /etc/sysctl.conf
+    sed -i '/net.core.rmem_max/d' /etc/sysctl.conf
+    sed -i '/net.core.wmem_max/d' /etc/sysctl.conf
+    sed -i '/net.core.rmem_default/d' /etc/sysctl.conf
+    sed -i '/net.core.wmem_default/d' /etc/sysctl.conf
+    sed -i '/net.core.netdev_max_backlog/d' /etc/sysctl.conf
+    sed -i '/net.core.somaxconn/d' /etc/sysctl.conf
+    sed -i '/net.ipv4.tcp_syncookies/d' /etc/sysctl.conf
+    sed -i '/net.ipv4.tcp_tw_reuse/d' /etc/sysctl.conf
+    sed -i '/net.ipv4.tcp_tw_recycle/d' /etc/sysctl.conf
+    sed -i '/net.ipv4.tcp_fin_timeout/d' /etc/sysctl.conf
+    sed -i '/net.ipv4.tcp_keepalive_time/d' /etc/sysctl.conf
+    sed -i '/net.ipv4.ip_local_port_range/d' /etc/sysctl.conf
+    sed -i '/net.ipv4.tcp_max_syn_backlog/d' /etc/sysctl.conf
+    sed -i '/net.ipv4.tcp_max_tw_buckets/d' /etc/sysctl.conf
+    sed -i '/net.ipv4.tcp_rmem/d' /etc/sysctl.conf
+    sed -i '/net.ipv4.tcp_wmem/d' /etc/sysctl.conf
+    sed -i '/net.ipv4.tcp_mtu_probing/d' /etc/sysctl.conf
+    sed -i '/net.ipv4.ip_forward/d' /etc/sysctl.conf
+    sed -i '/net.ipv4.tcp_fastopen/d' /etc/sysctl.conf
+    sed -i '/net.core.default_qdisc=/d' /etc/sysctl.conf
+    sed -i '/net.ipv4.tcp_congestion_control=/d' /etc/sysctl.conf
+    echo "# max open files
+fs.file-max = 1024000
+# max read buffer
+net.core.rmem_max = 67108864
+# max write buffer
+net.core.wmem_max = 67108864
+# default read buffer
+net.core.rmem_default = 65536
+# default write buffer
+net.core.wmem_default = 65536
+# max processor input queue
+net.core.netdev_max_backlog = 4096
+# max backlog
+net.core.somaxconn = 4096
+# resist SYN flood attacks
+net.ipv4.tcp_syncookies = 1
+# reuse timewait sockets when safe
+net.ipv4.tcp_tw_reuse = 1
+# turn off fast timewait sockets recycling
+net.ipv4.tcp_tw_recycle = 0
+# short FIN timeout
+net.ipv4.tcp_fin_timeout = 30
+# short keepalive time
+net.ipv4.tcp_keepalive_time = 1200
+# outbound port range
+net.ipv4.ip_local_port_range = 10000 65000
+# max SYN backlog
+net.ipv4.tcp_max_syn_backlog = 4096
+# max timewait sockets held by system simultaneously
+net.ipv4.tcp_max_tw_buckets = 5000
+# TCP receive buffer
+net.ipv4.tcp_rmem = 4096 87380 67108864
+# TCP write buffer
+net.ipv4.tcp_wmem = 4096 65536 67108864
+# turn on path MTU discovery
+net.ipv4.tcp_mtu_probing = 1
+# TCP fast open
+net.ipv4.tcp_fastopen = 3
+# forward ipv4
+net.ipv4.ip_forward = 1
+net.core.default_qdisc=fq
+net.ipv4.tcp_congestion_control=nanqinlang">>/etc/sysctl.conf
     sysctl -p >/dev/null 2>&1
+    sed -i '/* soft nofile /d' /etc/security/limits.conf
+    sed -i '/* hard nofile /d' /etc/security/limits.conf
+    sed -i '/# End of file/d' /etc/security/limits.conf
+    echo "* soft nofile 51200
+* hard nofile 1024000
+# End of file">> /etc/security/limits.conf
+    ulimit -n 1024000
+    echo "ulimit -SHn 1024000">>/etc/profile
+    source /etc/profile
+    echo 3 > /proc/sys/net/ipv4/tcp_fastopen
 }
 
 install_config() {
@@ -277,47 +347,30 @@ reboot_os() {
     fi
 }
 
-install_bbr() {
-    check_bbr_status
-    if [ ! $? -eq 0 ]; then
-        if [ $? -eq 1 ]; then
-            echo
-            echo -e "${green}Info:${plain} TCP BBR has already been installed. nothing to do..."
-        elif [ $? -eq 2 ]; then
-            echo
-            echo -e "${green}Info:${plain} TCP BBR-Powered has already been installed. nothing to do..."
-        elif [ $? -eq 3 ]; then
-            echo
-            echo -e "${green}Info:${plain} TCP BBR has already been installed. nothing to do..."
-        fi
-        rm -f bbr_kvm.sh
-        exit 0
-    fi
-    check_kernel_version
-    if [ $? -eq 0 ]; then
-        echo
-        echo -e "${green}Info:${plain} Your kernel version is greater than 4.9, directly setting TCP BBR..."
-        sysctl_config
-        echo -e "${green}Info:${plain} Setting TCP BBR completed..."
-        rm -f bbr_kvm.sh
-        exit 0
-    fi
+install_tcp_nanqinlang(){
+    yum install -y make gcc
+    mkdir /root/bbrmod && cd /root/bbrmod
+    wget -N --no-check-certificate https://github.com/Jenking-Zhang/shell_for_ss_ssr_ssrr_kcptun_bbr/raw/master/tcp_nanqinlang.c
+    echo "obj-m := tcp_nanqinlang.o" > Makefile
+    make -C /lib/modules/$(uname -r)/build M=`pwd` modules CC=/usr/bin/gcc
+    chmod +x ./tcp_nanqinlang.ko
+    cp -rf ./tcp_nanqinlang.ko /lib/modules/$(uname -r)/kernel/net/ipv4
+    insmod tcp_nanqinlang.ko
+    depmod -a
+}
+
+install_kernel(){
     if [[ x"${release}" == x"centos" ]]; then
-        #remote_kernel_version=4.11.8
-        install_elrepo
-        [ ! "$(command -v yum-config-manager)" ] && yum install -y yum-utils > /dev/null 2>&1
-        [ x"$(yum-config-manager elrepo-kernel | grep -w enabled | awk '{print $3}')" != x"True" ] && yum-config-manager --enable elrepo-kernel > /dev/null 2>&1
-        yum -y install kernel-ml
-        # yum -y install http://mirror.rc.usf.edu/compute_lock/elrepo/kernel/el6/x86_64/RPMS/kernel-ml-${remote_kernel_version}-1.el6.elrepo.x86_64.rpm
+        remote_kernel_version=4.12.10
+        yum -y install http://mirror.rc.usf.edu/compute_lock/elrepo/kernel/el6/x86_64/RPMS/kernel-ml-${remote_kernel_version}-1.el6.elrepo.x86_64.rpm
         if [ $? -ne 0 ]; then
             echo -e "${red}Error:${plain} Install latest kernel failed, please check it."
             rm -f bbr_kvm.sh
             exit 1
         fi
         yum remove -y kernel-headers
-        yum -y install kernel-ml-devel kernel-ml-headers
-        #yum install -y http://mirror.rc.usf.edu/compute_lock/elrepo/kernel/el6/x86_64/RPMS/kernel-ml-devel-${remote_kernel_version}-1.el6.elrepo.x86_64.rpm
-        #yum install -y http://mirror.rc.usf.edu/compute_lock/elrepo/kernel/el6/x86_64/RPMS/kernel-ml-headers-${remote_kernel_version}-1.el6.elrepo.x86_64.rpm
+        yum install -y http://mirror.rc.usf.edu/compute_lock/elrepo/kernel/el6/x86_64/RPMS/kernel-ml-devel-${remote_kernel_version}-1.el6.elrepo.x86_64.rpm
+        yum install -y http://mirror.rc.usf.edu/compute_lock/elrepo/kernel/el6/x86_64/RPMS/kernel-ml-headers-${remote_kernel_version}-1.el6.elrepo.x86_64.rpm
     elif [[ x"${release}" == x"debian" || x"${release}" == x"ubuntu" ]]; then
         [[ ! -e "/usr/bin/wget" ]] && apt-get -y update && apt-get -y install wget
         echo -e "${green}Info:${plain} Getting latest kernel version..."
@@ -343,9 +396,60 @@ install_bbr() {
         rm -f bbr_kvm.sh
         exit 1
     fi
-    install_config
-    sysctl_config
-    reboot_os
+}
+
+detele_kernel(){
+    if [[ "${release}" == "centos" ]]; then
+        rpm_total=`rpm -qa | grep kernel | grep -v "${kernel_version}" | grep -v "noarch" | wc -l`
+	    if [ "${rpm_total}" > "1" ]; then
+	        echo -e "found ${rpm_total} surplus kernel，starting remove..."
+		    for((integer = 1; integer <= ${rpm_total}; integer++)); do
+		        rpm_del=`rpm -qa | grep kernel | grep -v "${kernel_version}" | grep -v "noarch" | head -${integer}`
+			yum remove -y ${rpm_del}
+		    done
+		    echo -e "all surplus kernel removed"
+	    else
+	        echo -e "Erorr to scan surplus kernel" && exit 1
+	    fi
+    elif [[ "${release}" == "debian" || "${release}" == "ubuntu" ]]; then
+        deb_total=`dpkg -l | grep linux-image | awk '{print $2}' | grep -v "${kernel_version}" | wc -l`
+	if [ "${deb_total}" > "1" ]; then
+	    echo -e "found ${rpm_total} surplus kernel，starting remove..."
+	        for((integer = 1; integer <= ${deb_total}; integer++)); do
+		    deb_del=`dpkg -l|grep linux-image | awk '{print $2}' | grep -v "${kernel_version}" | head -${integer}`
+		    apt-get purge -y ${deb_del}
+		done
+		    echo -e "all surplus kernel removed"
+	else
+	    echo -e "Erorr to scan surplus kernel" && exit 1
+	fi
+    fi
+}
+
+
+install_bbr() {
+    check_bbr_status
+    if [ $? -eq 0 ]; then
+        echo
+        echo -e "${green}Info:${plain} TCP BBR_ has already been installed. nothing to do..."
+        exit 0
+    fi
+    check_kernel_version
+    if [ $? -eq 0 ]; then
+        echo
+        echo -e "${green}Info:${plain} Your kernel version is equal to 4.12.10, directly setting TCP BBR..."
+	install_tcp_nanqinlang
+        sysctl_config
+        echo -e "${green}Info:${plain} Setting TCP BBR completed..."
+        rm -f bbr_kvm.sh
+	delete_kernel
+	reboot
+        exit 0
+    else
+        install_kernel
+        update_grub
+        reboot
+    fi
 }
 
 clear
