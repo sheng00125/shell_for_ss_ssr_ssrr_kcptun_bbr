@@ -385,29 +385,31 @@ install_kernel(){
 }
 
 detele_kernel(){
+    echo
+    echo "${green}Info:${plain}scanning surplus kernel..."
     if [[ "${release}" == "centos" ]]; then
         rpm_total=`rpm -qa | grep kernel | grep -v "${local_kernel_version}" | grep -v "noarch" | wc -l`
 	    if (( "${rpm_total}" >= "1" )); then
-	        echo -e "${green}Info:${plain}found ${rpm_total} surplus kernel,starting remove..."
+	        echo -e "Found ${rpm_total} surplus kernel,starting remove..."
 		    for((integer = 1; integer <= ${rpm_total}; integer++)); do
 		        rpm_del=`rpm -qa | grep kernel | grep -v "${local_kernel_version}" | grep -v "noarch" | head -${integer}`
 			yum remove -y ${rpm_del}
 		    done
-		    echo -e "all surplus kernel removed"
+		    echo -e "${green}Info:${plain}all surplus kernel has been removed"
 	    else
-	        echo -e "${green}Info:${plain}found no surplus kernel,or erorr to scan surplus kernel"
+	        echo -e "Found no surplus kernel,or erorr to scan surplus kernel"
 	    fi
     elif [[ "${release}" == "debian" || "${release}" == "ubuntu" ]]; then
         deb_total=`dpkg -l | grep linux-image | awk '{print $2}' | grep -v "${local_kernel_version}" | wc -l`
 	if [ "${deb_total}" > "1" ]; then
-	    echo -e "found ${rpm_total} surplus kernel,starting remove..."
+	    echo -e "Found ${deb_total} surplus kernel,starting remove..."
 	        for((integer = 1; integer <= ${deb_total}; integer++)); do
 		    deb_del=`dpkg -l|grep linux-image | awk '{print $2}' | grep -v "${local_kernel_version}" | head -${integer}`
 		    apt-get purge -y ${deb_del}
 		done
-		    echo -e "all surplus kernel removed"
+		    echo -e "${green}Info:${plain}all surplus kernel has been removed"
 	else
-	    echo -e "${green}Info:${plain}found no surplus kernel,or erorr to scan surplus kernel"
+	    echo -e "Found no surplus kernel,or erorr to scan surplus kernel"
 	fi
     fi
 }
@@ -420,7 +422,7 @@ install_bbr() {
     check_bbr_status
     if [ $? -eq 0 ]; then
         echo
-        echo -e "${green}Info:${plain} TCP BBR_TCP_nanqinlang has already been installed. nothing to do..."
+        echo -e "${green}Info:${plain} TCP BBR_TCP_nanqinlang has already been installed. nothing to do！"
         rm -f /root/bbr_kvm.sh
 	exit 0
     fi
