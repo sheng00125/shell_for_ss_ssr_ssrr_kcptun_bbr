@@ -301,14 +301,12 @@ update_grub() {
         if centosversion 6; then
             if [ ! -f "/boot/grub/grub.conf" ]; then
                 echo -e "${red}Error:${plain} /boot/grub/grub.conf not found, please check it."
-                rm -f bbr_kvm.sh
                 exit 1
             fi
             sed -i 's/^default=.*/default=0/g' /boot/grub/grub.conf
         elif centosversion 7; then
             if [ ! -f "/boot/grub2/grub.cfg" ]; then
                 echo -e "${red}Error:${plain} /boot/grub2/grub.cfg not found, please check it."
-                rm -f bbr_kvm.sh
                 exit 1
             fi
             grub2-set-default 0
@@ -324,11 +322,9 @@ reboot_os() {
     #read -p "Do you want to restart system? [y/n]" is_reboot
     is_reboot="n"
     if [[ ${is_reboot} == "y" || ${is_reboot} == "Y" ]]; then
-        rm -f bbr_kvm.sh
         reboot
     else
         echo -e "${green}Info:${plain} Reboot has been canceled..."
-        rm -f bbr_kvm.sh
         exit 0
     fi
 }
@@ -357,7 +353,6 @@ install_kernel(){
 	    yum -y install http://mirror.rc.usf.edu/compute_lock/elrepo/kernel/el6/x86_64/RPMS/kernel-ml-${remote_kernel_version}-1.el6.elrepo.x86_64.rpm
             if [ $? -ne 0 ]; then
                 echo -e "${red}Error:${plain} Install latest kernel failed, please check it."
-                rm -f bbr_kvm.sh
                 exit 1
             fi
         fi
@@ -378,7 +373,6 @@ install_kernel(){
         wget -c -t3 -T60 -O ${deb_kernel_name} ${deb_kernel_url}
         if [ $? -ne 0 ]; then
             echo -e "${red}Error:${plain} Download ${deb_kernel_name} failed, please check it."
-            rm -f bbr_kvm.sh
             exit 1
         fi
         [ -f ${deb_kernel_modules_name} ] && dpkg -i ${deb_kernel_modules_name}
@@ -386,7 +380,6 @@ install_kernel(){
         rm -f ${deb_kernel_name} ${deb_kernel_modules_name}
     else
         echo -e "${red}Error:${plain} OS is not be supported, please change to CentOS/Debian/Ubuntu and try again."
-        rm -f bbr_kvm.sh
         exit 1
     fi
 }
@@ -428,7 +421,7 @@ install_bbr() {
     if [ $? -eq 0 ]; then
         echo
         echo -e "${green}Info:${plain} TCP BBR_TCP_nanqinlang has already been installed. nothing to do..."
-        #rm -f /root/bbr_kvm.sh
+        rm -f /root/bbr_kvm.sh
 	exit 0
     fi
     if [ ${local_kernel_version} = "${remote_kernel_version}" ]; then
@@ -437,7 +430,7 @@ install_bbr() {
 	install_tcp_nanqinlang
         sysctl_config
         echo -e "${green}Info:${plain} Setting BBR_TCP_nanqinlang completed..."
-        #rm -f /root/bbr_kvm.sh
+        rm -f /root/bbr_kvm.sh
 	reboot
     else
         echo -e "${green}Info:${plain} You will install kernel(ver:${remote_kernel_version}),please rerun this shell to config BBR_TCP_nanqinlang after system reboot!"
