@@ -190,29 +190,15 @@ centosversion() {
 }
 
 check_bbr_status() {
-    local param=$(sysctl net.ipv4.tcp_congestion_control | awk '{print $3}')
-    if [[ x"${param}" == x"bbr" ]]; then
-        return 1
-    elif [[ x"${param}" == x"tsunami" ]]; then
-        return 2
-    elif [[ x"${param}" == x"nanqinlang" ]]; then
-        return 3
-    else
+    run_status=`lsmod | grep "nanqinlang" | awk '{print $1}'`
+    if [[ ${run_status} == "tcp_nanqinlang" ]]; then
         return 0
-    fi
-}
-
-check_kernel_version() {
-    local kernel_version=$(uname -r | cut -d- -f1)
-    if [ ${kernel_version} = "4.12.10"]; then
-        return 0
-    else
+    else 
         return 1
     fi
 }
 
 install_elrepo() {
-
     if centosversion 5; then
         echo -e "${red}Error:${plain} not supported CentOS 5."
         exit 1
@@ -310,7 +296,7 @@ net.ipv4.tcp_congestion_control=nanqinlang">>/etc/sysctl.conf
     echo 3 > /proc/sys/net/ipv4/tcp_fastopen
 }
 
-install_config() {
+update_grub() {
     if [[ x"${release}" == x"centos" ]]; then
         if centosversion 6; then
             if [ ! -f "/boot/grub/grub.conf" ]; then
@@ -357,16 +343,23 @@ install_tcp_nanqinlang(){
     cp -rf ./tcp_nanqinlang.ko /lib/modules/$(uname -r)/kernel/net/ipv4
     insmod tcp_nanqinlang.ko
     depmod -a
+    rm -rf /root/bbrmod
 }
 
 install_kernel(){
     if [[ x"${release}" == x"centos" ]]; then
-        remote_kernel_version=4.12.10
-        yum -y install http://mirror.rc.usf.edu/compute_lock/elrepo/kernel/el6/x86_64/RPMS/kernel-ml-${remote_kernel_version}-1.el6.elrepo.x86_64.rpm
-        if [ $? -ne 0 ]; then
-            echo -e "${red}Error:${plain} Install latest kernel failed, please check it."
-            rm -f bbr_kvm.sh
-            exit 1
+        if rpm -qa | grep kernel-ml-4.12.10>/dev/null 2>&1 ;then
+            echo "kernel-ml-4.12.10 already installed."
+	    yum remove -y kernel-headers kernel-ml-devel-${remote_kernel_version} kernel-ml-headers-${remote_kernel_version}
+	    yum install -y http://mirror.rc.usf.edu/compute_lock/elrepo/kernel/el6/x86_64/RPMS/kernel-ml-devel-${remote_kernel_version}-1.el6.elrepo.x86_64.rpm
+	    yum install -y http://mirror.rc.usf.edu/compute_lock/elrepo/kernel/el6/x86_64/RPMS/kernel-ml-headers-${remote_kernel_version}-1.el6.elrepo.x86_64.rpm
+	else
+	    yum -y install http://mirror.rc.usf.edu/compute_lock/elrepo/kernel/el6/x86_64/RPMS/kernel-ml-${remote_kernel_version}-1.el6.elrepo.x86_64.rpm
+            if [ $? -ne 0 ]; then
+                echo -e "${red}Error:${plain} Install latest kernel failed, please check it."
+                rm -f bbr_kvm.sh
+                exit 1
+            fi
         fi
         yum remove -y kernel-headers
         yum install -y http://mirror.rc.usf.edu/compute_lock/elrepo/kernel/el6/x86_64/RPMS/kernel-ml-devel-${remote_kernel_version}-1.el6.elrepo.x86_64.rpm
@@ -400,52 +393,54 @@ install_kernel(){
 
 detele_kernel(){
     if [[ "${release}" == "centos" ]]; then
-        rpm_total=`rpm -qa | grep kernel | grep -v "${kernel_version}" | grep -v "noarch" | wc -l`
-	    if [ "${rpm_total}" > "1" ]; then
-	        echo -e "found ${rpm_total} surplus kernel，starting remove..."
+        rpm_total=`rpm -qa | grep kernel | grep -v "${local_kernel_version}" | grep -v "noarch" | wc -l`
+	    if (( "${rpm_total}" >= "1" )); then
+	        echo -e "${green}Info:${plain}found ${rpm_total} surplus kernel,starting remove..."
 		    for((integer = 1; integer <= ${rpm_total}; integer++)); do
-		        rpm_del=`rpm -qa | grep kernel | grep -v "${kernel_version}" | grep -v "noarch" | head -${integer}`
+		        rpm_del=`rpm -qa | grep kernel | grep -v "${local_kernel_version}" | grep -v "noarch" | head -${integer}`
 			yum remove -y ${rpm_del}
 		    done
 		    echo -e "all surplus kernel removed"
 	    else
-	        echo -e "Erorr to scan surplus kernel" && exit 1
+	        echo -e "${green}Info:${plain}found no surplus kernel,or erorr to scan surplus kernel"
 	    fi
     elif [[ "${release}" == "debian" || "${release}" == "ubuntu" ]]; then
-        deb_total=`dpkg -l | grep linux-image | awk '{print $2}' | grep -v "${kernel_version}" | wc -l`
+        deb_total=`dpkg -l | grep linux-image | awk '{print $2}' | grep -v "${local_kernel_version}" | wc -l`
 	if [ "${deb_total}" > "1" ]; then
-	    echo -e "found ${rpm_total} surplus kernel，starting remove..."
+	    echo -e "found ${rpm_total} surplus kernel,starting remove..."
 	        for((integer = 1; integer <= ${deb_total}; integer++)); do
-		    deb_del=`dpkg -l|grep linux-image | awk '{print $2}' | grep -v "${kernel_version}" | head -${integer}`
+		    deb_del=`dpkg -l|grep linux-image | awk '{print $2}' | grep -v "${local_kernel_version}" | head -${integer}`
 		    apt-get purge -y ${deb_del}
 		done
 		    echo -e "all surplus kernel removed"
 	else
-	    echo -e "Erorr to scan surplus kernel" && exit 1
+	    echo -e "${green}Info:${plain}found no surplus kernel,or erorr to scan surplus kernel"
 	fi
     fi
 }
 
 
 install_bbr() {
+    local_kernel_version=$(uname -r | cut -d- -f1)
+    remote_kernel_version=4.12.10
+    detele_kernel
     check_bbr_status
     if [ $? -eq 0 ]; then
         echo
-        echo -e "${green}Info:${plain} TCP BBR_ has already been installed. nothing to do..."
-        exit 0
+        echo -e "${green}Info:${plain} TCP BBR_TCP_nanqinlang has already been installed. nothing to do..."
+        #rm -f /root/bbr_kvm.sh
+	exit 0
     fi
-    check_kernel_version
-    if [ $? -eq 0 ]; then
+    if [ ${local_kernel_version} = "${remote_kernel_version}" ]; then
         echo
-        echo -e "${green}Info:${plain} Your kernel version is equal to 4.12.10, directly setting TCP BBR..."
+        echo -e "${green}Info:${plain} Your kernel version is equal to ${remote_kernel_version}, directly setting BBR_TCP_nanqinlang..."
 	install_tcp_nanqinlang
         sysctl_config
-        echo -e "${green}Info:${plain} Setting TCP BBR completed..."
-        rm -f bbr_kvm.sh
-	delete_kernel
+        echo -e "${green}Info:${plain} Setting BBR_TCP_nanqinlang completed..."
+        #rm -f /root/bbr_kvm.sh
 	reboot
-        exit 0
     else
+        echo -e "${green}Info:${plain} You will install kernel(ver:${remote_kernel_version}),please rerun this shell to config BBR_TCP_nanqinlang after system reboot!"
         install_kernel
         update_grub
         reboot
@@ -458,11 +453,8 @@ echo " OS      : $opsy"
 echo " Arch    : $arch ($lbit Bit)"
 echo " Kernel  : $kern"
 echo "----------------------------------------"
-echo " Auto install latest kernel for TCP BBR"
-echo "----------------------------------------"
 echo
 echo "Press any key to start...or Press Ctrl+C to cancel"
 #char=`get_char`
 
-#install_bbr 2>&1 | tee ${cur_dir}/install_bbr.log
-install_bbr
+install_bbr 2>&1 | tee ${cur_dir}/install_bbr.log
