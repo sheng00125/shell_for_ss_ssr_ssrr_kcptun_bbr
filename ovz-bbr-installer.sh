@@ -28,7 +28,8 @@ HAPROXY_LKL_SERVICE_FILE_REDHAT_URL="${BASE_URL}/startup/haproxy-lkl.init.redhat
 HAPROXY_LKL_SYSTEMD_FILE_URL="${BASE_URL}/startup/haproxy-lkl.systemd"
 #LKL_LIB_URL="${BASE_URL}/lib64/liblkl-hijack.so-20170724"
 LKL_LIB_URL="https://raw.githubusercontent.com/tcp-nanqinlang/lkl-haproxy/master/mod/tcp_nanqinlang.so"
-LKL_LIB_MD5='b50fc6a7ccfc70c76f44506814e7e18b'
+#LKL_LIB_MD5='b50fc6a7ccfc70c76f44506814e7e18b'
+LKL_LIB_MD5='fdfd4e67418fce80ac3fb8755e2bcda4'
 
 bbr_port=12130
 
