@@ -31,8 +31,6 @@ LKL_LIB_URL="https://raw.githubusercontent.com/tcp-nanqinlang/lkl-haproxy/master
 #LKL_LIB_MD5='b50fc6a7ccfc70c76f44506814e7e18b'
 LKL_LIB_MD5='fdfd4e67418fce80ac3fb8755e2bcda4'
 
-bbr_port=12130
-
 # 需要 BBR 加速的端口
 ACCELERATE_PORT=
 
