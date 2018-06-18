@@ -34,20 +34,6 @@ LKL_LIB_MD5='fdfd4e67418fce80ac3fb8755e2bcda4'
 # 需要 BBR 加速的端口
 ACCELERATE_PORT=
 
-clear
-
-cat >&2 <<-'EOF'
-#######################################################
-# OpenVZ BBR 一键安装脚本                             #
-# 该脚本用于在 OpenVZ 服务器上安装配置 Google BBR     #
-# 脚本作者: Xingwang Liao <kuoruan@gmail.com>         #
-# 作者博客: https://blog.kuoruan.com/                 #
-# Github: https://github.com/kuoruan/shell-scripts    #
-# QQ交流群: 43391448, 68133628                        #
-#           633945405                                 #
-#######################################################
-EOF
-
 command_exists() {
 	command -v "$@" >/dev/null 2>&1
 }
@@ -73,54 +59,53 @@ check_ovz() {
 }
 
 check_ldd() {
-	local ldd_version="$(ldd --version 2>/dev/null | grep 'ldd' | rev | cut -d ' ' -f1 | rev)"
-	if [ -n "$ldd_version" ]; then
-		if [ "${ldd_version%.*}" -eq "2" -a "${ldd_version#*.}" -lt "14" ] || \
-		[ "${ldd_version%.*}" -lt "2" ]; then
-			cat >&2 <<-EOF
-			当前服务器的 glibc 版本为 $ldd_version。
-			最低版本需求 2.14，低于这个版本无法正常使用。
-			请先更新 glibc 之后再运行脚本。
-			EOF
-			exit 1
-	  fi
-	else
+    local ldd_version="$(ldd --version 2>/dev/null | grep 'ldd' | rev | cut -d ' ' -f1 | rev)"
+    if [ -n "$ldd_version" ]; then
+        if [ "${ldd_version%.*}" -eq "2" -a "${ldd_version#*.}" -lt "14" ] || \
+	    [ "${ldd_version%.*}" -lt "2" ]; then
 		cat >&2 <<-EOF
-		获取 glibc 版本失败，请手动检查：
-		    ldd --version
-		最低版本需求 2.14，低于这个版本可能无法正常使用。
+		当前服务器的 glibc 版本为 $ldd_version。
+		最低版本需求 2.14，低于这个版本无法正常使用。
+		请先更新 glibc 之后再运行脚本。
 		EOF
-
-		( set -x; ldd --version 2>/dev/null )
-		any_key_to_continue
-	fi
+		exit 1
+        fi
+    else
+	cat >&2 <<-EOF
+	获取 glibc 版本失败，请手动检查：
+	ldd --version
+	最低版本需求 2.14，低于这个版本可能无法正常使用。
+	EOF
+	( set -x; ldd --version 2>/dev/null )
+	any_key_to_continue
+    fi
 }
 
 check_arch() {
-	architecture=$(uname -m)
-	case $architecture in
-		amd64|x86_64)
-			;;
-		*)
-			cat 1>&2 <<-EOF
-			当前脚本仅支持 64 位系统，你的系统为: $architecture
-			你可以尝试从源码编译安装 Linux Kernel Library
-			    https://github.com/lkl/linux
-			EOF
-			exit 1
-			;;
-	esac
+    architecture=$(uname -m)
+    case $architecture in
+        amd64|x86_64)
+    ;;
+    *)
+        cat 1>&2 <<-EOF
+	当前脚本仅支持 64 位系统，你的系统为: $architecture
+	你可以尝试从源码编译安装 Linux Kernel Library
+	https://github.com/lkl/linux
+	EOF
+	exit 1
+    ;;
+    esac
 }
 
 any_key_to_continue() {
-	echo "请按任意键继续或 Ctrl + C 退出"
-	local saved="$(stty -g)"
-	stty -echo
-	stty cbreak
-	dd if=/dev/tty bs=1 count=1 2> /dev/null
-	stty -raw
-	stty echo
-	stty $saved
+    echo "请按任意键继续或 Ctrl + C 退出"
+    local saved="$(stty -g)"
+    stty -echo
+    stty cbreak
+    dd if=/dev/tty bs=1 count=1 2> /dev/null
+    stty -raw
+    stty echo
+    stty $saved
 }
 
 get_os_info() {
@@ -213,7 +198,6 @@ get_os_info() {
 	if [ -z "$lsb_dist" -o -z "$dist_version" ]; then
 		cat >&2 <<-EOF
 		无法确定服务器系统版本信息。
-		请联系脚本作者。
 		EOF
 		exit 1
 	fi
@@ -369,12 +353,11 @@ download_file() {
 
 	( set -x; wget -O "$file" --no-check-certificate "$url" )
 	if [ "$?" != "0" ]; then
-		cat >&2 <<-EOF
-		一些文件下载失败！安装脚本需要能访问到 github.com，请检查服务器网络。
-		注意: 一些国内服务器可能无法正常访问 github.com。
-		EOF
-
-		exit 1
+	    cat >&2 <<-EOF
+	    一些文件下载失败！安装脚本需要能访问到 github.com，请检查服务器网络。
+	    注意: 一些国内服务器可能无法正常访问 github.com。
+	    EOF
+	    exit 1
 	fi
 }
 
@@ -676,10 +659,6 @@ end_install() {
 	cat >&2 <<-EOF
 
 	服务已自动加入开机启动，请放心使用。
-
-	如果这个脚本帮到了你，你可以请作者喝瓶可乐:
-	  https://blog.kuoruan.com/donate
-
 	享受加速的快感吧！
 	EOF
 }
