@@ -11,17 +11,31 @@ ssrr_config="/usr/local/shadowsocksRR/user-config.json"
 kcptun_config="/usr/local/kcptun/config.json"
 export def_port=$(shuf -i 10000-65534 -n 1)
 
+# Set text color
+COLOR_RED='\E[1;31m'
+COLOR_RED_DEEP='\033[0;31m'
+COLOR_GREEN='\E[1;32m'
+COLOR_GREEN_DEEP='\033[0;32m'
+COLOR_GREEN_LIGHTNING='\033[32m \033[05m'
+COLOR_YELLOW='\E[1;33m'
+COLOR_BLUE='\E[1;34m'
+COLOR_PINK='\E[1;35m'
+COLOR_PINKBACK_WHITEFONT='\033[45;37m'
+COLOR_END='\E[0m'
+
 # Check if user is root
 if [ $(id -u) != "0" ]; then
-    echo "Error: You must be root to run this script, please use root to install SS/SSR/SSRR/kcptun/BBR"
+    echo "${COLOR_RED}Error: You must be root to run this script, please use root to install SS/SSR/SSRR/kcptun/BBR!${COLOR_END}"
     exit 1
 fi
-set_timezone(){
-    echo -e "${COLOR_YELLOW}Set timezone...${COLOR_END}"
-    rm -rf /etc/localtime
+
+if [[ ! `grep -a CST-8 /etc/localtime` ]]; then 
+    echo -e "${COLOR_YELLOW}Setting timezone...${COLOR_END}"
+    rm -rf /etc/localtime  
     ln -s /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
     echo "done."
-}
+fi
+
 shell_update(){
     clear
     echo "+ Check updates for shell..."
@@ -60,16 +74,6 @@ shell_update(){
         fi
     fi
 }
-set_text_color(){
-    COLOR_RED='\E[1;31m'
-    COLOR_GREEN='\E[1;32m'
-    COLOR_YELLOW='\E[1;33m'
-    COLOR_BLUE='\E[1;34m'
-    COLOR_PINK='\E[1;35m'
-    COLOR_PINKBACK_WHITEFONT='\033[45;37m'
-    COLOR_GREEN_LIGHTNING='\033[32m \033[05m'
-    COLOR_END='\E[0m'
-}
 # Check OS
 version_ge(){
     test "$(echo "$@" | tr " " "\n" | sort -rV | head -n 1)" == "$1"
@@ -77,13 +81,9 @@ version_ge(){
 version_gt(){
     test "$(echo "$@" | tr " " "\n" | sort -V | head -n 1)" != "$1"
 }
-check_kernel_version() {
-    local kernel_version=$(uname -r | cut -d- -f1)
-    if version_gt ${kernel_version} 3.7.0; then
-        return 0
-    else
-        return 1
-    fi
+
+version_lt() {
+    test "$(echo "$@" | tr " " "\n" | sort -rV | head -n 1)" != "$1"
 }
 Get_Dist_Name(){
     release=''
@@ -197,8 +197,8 @@ debianversion(){
         return 1
     fi
 }
+# Check OS system
 Check_OS_support(){
-    # Check OS system
     if [ "${release}" == "unknow" ]; then
         echo
         echo -e "${COLOR_RED}Error: Unable to get Linux distribution name, or do NOT support the current distribution.${COLOR_END}"
@@ -255,13 +255,13 @@ error_detect_depends(){
     local depend=`echo "${command}" | awk '{print $4}'`
     ${command}
     if [ $? != 0 ]; then
-        echo -e "[${red}Error${COLOR_END} Failed to install ${red}${depend}${plain}"
+        echo -e "${COLOR_RED}Error,Failed to install ${depend}${COLOR_END}"
         exit 1
     fi
 }
-pre_install_packs(){
+install_dependencies_packs(){
     if check_sys packageManager yum; then
-        echo -e "[${COLOR_GREEN}Info${COLOR_END} Checking the EPEL repository..."
+        echo -e "[${COLOR_GREEN}Info${COLOR_END}] Checking the EPEL repository..."
         if [ ! -f /etc/yum.repos.d/epel.repo ]; then
             yum install -y epel-release > /dev/null 2>&1
         fi
@@ -272,15 +272,11 @@ pre_install_packs(){
         yum_depends=(
             unzip gzip openssl openssl-devel gcc python python-devel python-setuptools pcre pcre-devel libtool libevent
             autoconf automake make curl curl-devel zlib-devel perl perl-devel cpio expat-devel gettext-devel
-            libev-devel c-ares-devel git qrencode
+            libev-devel c-ares-devel git qrencode nss
         )
         for depend in ${yum_depends[@]}; do
             error_detect_depends "yum -y install ${depend}"
         done
-        if centosversion 6; then
-	    update_autoconf
-	    yum update nss -y	    
-	fi
 	yum update -y
     elif check_sys packageManager apt; then
         apt_depends=(
@@ -294,8 +290,9 @@ pre_install_packs(){
 	apt-get upgrade -y
     fi
 }
+#Upgrade glibc to ver 2.15
 update_glibc(){
-    echo -e "+ Update glibc...."
+    echo -e "upgrading glibc...."
     yum install kernel-headers -y
     wget -c http://ftp.redsleeve.org/pub/steam/glibc-2.15-60.el6.x86_64.rpm \
     http://ftp.redsleeve.org/pub/steam/glibc-common-2.15-60.el6.x86_64.rpm \
@@ -308,10 +305,11 @@ update_glibc(){
     glibc-headers-2.15-60.el6.x86_64.rpm \
     nscd-2.15-60.el6.x86_64.rpm
 }
+#Upgrade autoconf to ver 2.69
 update_autoconf(){
-    echo -e "+ Update autoconf...."
+    echo -e "upgrading autoconf...."
     cd ${cur_dir}
-    rpm -e --nodeps autoconf-2.63
+    rpm -e --nodeps autoconf-*
     wget ftp://ftp.gnu.org/gnu/autoconf/autoconf-2.69.tar.gz
     tar zxvf autoconf-2.69.tar.gz
     cd autoconf-2.69
@@ -438,89 +436,53 @@ Simple_obfs_option(){
     fi
 }
 BBR_Selection(){
-    echo
-    if [ -d "/proc/vz" ] ;then
-        echo -e "Your VPS is based on OpenVZ."
-        BBR_Selection_OpenVZ
-        BBR_option
-    else
-        echo -e "Your VPS is based on KVM or Others type."
-	BBR_Selection_NotOpenVZ
-    fi
-}
-BBR_Selection_NotOpenVZ(){
-    def_bbr_install="N"
-    echo -e "${COLOR_YELLOW}Do you want to install BBR?[Y/N]${COLOR_END} "
-    read -p "Enter your choice for BBR installation. default [${def_bbr_install}]: " bbr_install
+    if [ -d "/proc/vz" ] && [[ "$(cat /dev/net/tun 2>&1)" == "cat: /dev/net/tun: File descriptor in bad state" ]]; then
+        echo
+        echo -e "${COLOR_GREEN}System is based on OpenVZ and Tap/tun enabled${COLOR_END}"
+        def_bbr_install="Y"
+	echo -e "${COLOR_YELLOW}Do you want to install BBR?[Y/N]${COLOR_END} "
+	read -p "Enter your choice for BBR installation. default [${def_bbr_install}]: " bbr_install
 
-    case "${bbr_install}" in
-        [yY])
+        case "${bbr_install}" in
+            [yY])
             echo
             echo -e "${COLOR_PINK}You will install BBR${COLOR_END}"
             ;;
-        [nN])
+            [nN])
             echo
             echo -e "${COLOR_PINK}You will not install BBR${COLOR_END}"
              ;;
-        *)
+            *)
             echo
             echo -e "${COLOR_PINK}No input or input error,You will install BBR${COLOR_END}"
             bbr_install="${def_bbr_install}"
-    esac
-}
-BBR_Selection_OpenVZ(){
-    def_bbr_select="2"
-    echo -e "${COLOR_YELLOW}You have 3 options for BBR install${COLOR_END}"
-    echo "1: Install BBR with Rinetd"
-    echo "2: Install BBR with LML (default)"
-    echo "3: Not install any BBR"
-    read -p "Enter your choice (1, 2 or exit. default [${def_bbr_select}]): " bbr_select
-
-    case "${bbr_select}" in
-        1)
-            echo
-            echo -e "${COLOR_PINK}You will install BBR with Rinetd${COLOR_END}"
-            ;;
-        2)
-            echo
-            echo -e "${COLOR_PINK}You will install BBR with LKL${COLOR_END}"
-            ;;
-        3)
-            echo
-            echo -e "${COLOR_PINK}You will not install any BBR${COLOR_END}"
-            ;;
-        *)
-            echo
-            echo -e "${COLOR_PINK}No input or input error,You will install BBR with LML${COLOR_END}"
-            bbr_select="${def_bbr_select}"
-    esac
-}
-BBR_option(){
-    def_bbr_port=${def_port}
-    if [ ${bbr_select} == "1" ] || [ ${bbr_select} == "2" ];then
-        while true
-        do
-            echo
-            echo -e "Please input port for BBR [1-65535]"
-            read -p "(Default port: ${def_bbr_port}):" bbr_port
-            [ -z "$bbr_port" ] && bbr_port="${def_bbr_port}"
-            expr ${bbr_port} + 0 &>/dev/null
-            if [ $? -eq 0 ]; then
-                if [ ${bbr_port} -ge 1 ] && [ ${bbr_port} -le 65535 ]; then
-                    echo
-                    echo "---------------------------------------"
-                    echo "BBR port = ${bbr_port}"
-                    echo "---------------------------------------"
-                    echo
-                    break
+        esac
+        if [ ${bbr_install} == "y" ] || [ ${bbr_install} == "Y" ];then
+            def_bbr_port=${def_port}
+            while true
+            do
+                echo
+                echo -e "Please input port for BBR [1-65535]"
+                read -p "(Default port: ${def_bbr_port}):" bbr_port
+                [ -z "$bbr_port" ] && bbr_port="${def_bbr_port}"
+                expr ${bbr_port} + 0 &>/dev/null
+                if [ $? -eq 0 ]; then
+                    if [ ${bbr_port} -ge 1 ] && [ ${bbr_port} -le 65535 ]; then
+                        echo
+                        echo "---------------------------------------"
+                        echo "BBR port = ${bbr_port}"
+                        echo "---------------------------------------"
+                        echo
+                        break
+                    else
+                        echo "${COLOR_RED}Input error, please input correct number"${COLOR_END}
+                    fi
                 else
                     echo "${COLOR_RED}Input error, please input correct number"${COLOR_END}
                 fi
-            else
-                echo "${COLOR_RED}Input error, please input correct number"${COLOR_END}
-            fi
-        done
-        export bbr_port
+            done
+            export bbr_port
+        fi
     fi
 }
 # Install cleanup
@@ -738,10 +700,7 @@ down_ss_ssr_ssrr_kcptun(){
 }
 config_ss_ssr_ssrr_kcptun(){
     fast_open="false"
-    if check_kernel_version; then
-        fast_open="true"
-    fi
-    if [ "${bbr_install}" == "y" ] || [ "${bbr_install}" == "Y" ]; then
+    if version_ge $(uname -r | cut -d- -f1) 3.7.0; then
         fast_open="true"
     fi
     if [[ "${ss_libev_installed_flag}" == "false" && "${shell_action}" =~ ^[Ii]|[Ii][Nn]|[Ii][Nn][Ss][Tt][Aa][Ll][Ll]|-[Ii]|--[Ii]$ ]]; then
@@ -1001,112 +960,42 @@ install_ss_ssr_ssrr_kcptun(){
     install_cleanup
 }
 install_simple_obfs(){
-    cd ${cur_dir}
-    if check_sys packageManager yum; then
-        if centosversion 6; then
-            update_autoconf
-	          cd ${cur_dir}
-	          wget --no-check-certificate -O simple-obfs.tar.gz https://raw.githubusercontent.com/Jenking-Zhang/shell_for_ss_ssr_ssrr_kcptun_bbr/master/centos6_simple-obfs.tar.gz
-           tar -zxvpf simple-obfs.tar.gz
-	         cd /root/simple-obfs
-	         ./autogen.sh
-           ./configure --disable-documentation
-	         make
-           make install
-	         if [ ! "$(command -v obfs-server)" ]; then
-               echo -e "[${COLOR_RED}Error:simple-obfs for Shadowsocks-libev install failed${COLOR_RED}"
-               install_cleanup
-               exit 1
-           fi
-           [ -f /usr/local/bin/obfs-server ] && ln -s /usr/local/bin/obfs-server /usr/bin
-        else
-	          git clone https://github.com/shadowsocks/simple-obfs.git
-            cd simple-obfs
-            git submodule update --init --recursive
-            ./autogen.sh
-            ./configure --disable-documentation
-            make
-            make install
-	          if [ ! "$(command -v obfs-server)" ]; then
-                echo -e "[${COLOR_RED}Error:simple-obfs for Shadowsocks-libev install failed${COLOR_RED}"
-                install_cleanup
-                exit 1
-            fi
-            [ -f /usr/local/bin/obfs-server ] && ln -s /usr/local/bin/obfs-server /usr/bin
-       	fi
-    elif check_sys packageManager apt; then
-        git clone https://github.com/shadowsocks/simple-obfs.git
-        cd simple-obfs
-        git submodule update --init --recursive
-        ./autogen.sh
-        ./configure --disable-documentation
-        make
-        make install
-        if [ ! "$(command -v obfs-server)" ]; then
-            echo -e "[${COLOR_RED}Error:simple-obfs for Shadowsocks-libev install failed${COLOR_RED}"
-            install_cleanup
-            exit 1
-        fi
-        [ -f /usr/local/bin/obfs-server ] && ln -s /usr/local/bin/obfs-server /usr/bin
+    local autoconf_ver=$(autoconf --version | grep autoconf | grep -oE "[0-9.]+")
+    if version_lt ${autoconf_ver} 2.67; then
+        update_autoconf
     fi
+    cd ${cur_dir}
+    git clone https://github.com/shadowsocks/simple-obfs.git
+    cd simple-obfs
+    git submodule update --init --recursive
+    if centosversion 6; then
+        if [ ! "$(command -v autoconf268)" ]; then
+            echo -e "Starting install autoconf268..."
+            yum install -y autoconf268 > /dev/null 2>&1 || echo -e "${COLOR_RED}Error,Failed to install autoconf268${COLOR_END}"
+        fi
+        # replace command autoreconf to autoreconf268
+        sed -i 's/autoreconf/autoreconf268/' autogen.sh
+        # replace #include <ev.h> to #include <libev/ev.h>
+        sed -i 's@^#include <ev.h>@#include <libev/ev.h>@' src/local.h
+        sed -i 's@^#include <ev.h>@#include <libev/ev.h>@' src/server.h
+    fi
+    ./autogen.sh
+    ./configure --disable-documentation
+    make && make install
+    if [ ! "$(command -v obfs-server)" ]; then
+        echo -e "[${COLOR_RED}Error:simple-obfs for Shadowsocks-libev install failed${COLOR_RED}"
+	install_cleanup
+	exit 1
+    fi
+    [ -f /usr/local/bin/obfs-server ] && ln -s /usr/local/bin/obfs-server /usr/bin
 }
 install_bbr(){
-    if [ -d "/proc/vz" ] ;then
-        update_glibc
-	if [ "${bbr_select}" == "1" ] ;then
-            echo -e "+ Install BBR with Rinetd..."
-            install_rinetd_bbr
-        elif [ "${bbr_select}" == "2" ] ;then
-            echo -e "+ Install BBR with LKL..."
+    if [ ${bbr_install} == "y" ] || [ ${bbr_install} == "Y" ];then
+	local ldd_version="$(ldd --version 2>/dev/null | grep 'ldd' | rev | cut -d ' ' -f1 | rev)"
+        if version_lt ${ldd_version} 2.14; then
+	    update_glibc
+	fi
             install_lkl_bbr
-        fi
-    else
-        install_bbr_sys
-    fi
-}
-install_bbr_sys(){
-    if [ "${bbr_install}" == "y" ] || [ "${bbr_install}" == "Y" ]; then
-        wget --no-check-certificate https://raw.githubusercontent.com/Jenking-Zhang/shell_for_ss_ssr_ssrr_kcptun_bbr/master/bbr_kvm.sh
-        chmod +x ./bbr_kvm.sh
-        ./bbr_kvm.sh
-    fi
-}
-install_rinetd_bbr(){
-    cd ${cur_dir}
-    #Get Rinetd-BBR version.
-    remote_bbr_version=$(wget --no-check-certificate -qO- https://api.github.com/repos/linhua55/lkl_study/releases/latest | grep 'tag_name' | cut -d\" -f4 | sed s/v//g )
-    RINET_BBR_URL="https://github.com/linhua55/lkl_study/releases/download/v${remote_bbr_version}/rinetd_bbr_powered"
-    BBR_INIT_URL="https://raw.githubusercontent.com/Jenking-Zhang/shell_for_ss_ssr_ssrr_kcptun_bbr/master/bbr.init"
-    #Download Rinetd-BBR.
-    echo -e "Get the Rinetd-BBR version:${COLOR_GREEN}${remote_bbr_version}${COLOR_END}"
-    echo " Download Rinetd-BBR from $RINET_BBR_URL"
-    curl -L "${RINET_BBR_URL}" >/usr/bin/rinetd-bbr
-    chmod +x /usr/bin/rinetd-bbr
-    #Config Rinetd-BBR.
-    echo "Config Rinetd-BBR..."
-    [ ! -d /etc/rinetd-bbr/ ] && mkdir /etc/rinetd-bbr/
-    [ -d /etc/rinetd-bbr/bbr.conf ] && rm -rf /etc/rinetd-bbr/bbr.conf
-    if [ ! -f rinetd_bbr.conf ];then
-        mv rinetd_bbr.conf /etc/rinetd-bbr/bbr.conf
-    else
-    cat <<EOF > /etc/rinetd-bbr/bbr.conf
-#bbr_version="${remote_bbr_version}"
-# bindadress bindport connectaddress connectport
-0.0.0.0 ${bbr_port} 0.0.0.0 ${bbr_port}
-EOF
-    fi
-    #Config Rinetd-BBR service.
-    echo "config Rinetd-BBR service..."
-    wget --no-check-certificate "${BBR_INIT_URL}" -O /etc/init.d/bbr
-    chmod +x /etc/init.d/bbr
-    chkconfig --add bbr
-    chkconfig bbr on
-    /etc/init.d/bbr start
-    if [ $? -eq 0 ]; then
-        [ -x /etc/init.d/bbr ] && ln -s /etc/init.d/bbr /usr/bin/rinetd-bbr
-        echo -e "${COLOR_GREEN}Rinetd-BBR start success!${COLOR_END}"
-    else
-        echo -e "${COLOR_RED}Rinetd-BBR start failure!${COLOR_END}"
     fi
 }
 install_lkl_bbr(){
@@ -1127,9 +1016,7 @@ set_crontab(){
 	    if [ "${Install_Select}" == "2" ] || [ "${Install_Select}" == "5" ]; then echo "28 3 * * * /etc/init.d/ssr restart" >> /var/spool/cron/root; fi
 	    if [ "${Install_Select}" == "6" ] || [ "${Install_Select}" == "7" ]; then echo "28 3 * * * /etc/init.d/ssrr restart" >> /var/spool/cron/root; fi
 	    if [ "${Install_Select}" == "3" ] || [ "${Install_Select}" == "4" ] || [ "${Install_Select}" == "5" ] || [ "${Install_Select}" == "7" ]; then echo "29 3 * * * /etc/init.d/kcptun restart" >> /var/spool/cron/root; fi
-	    if [ "${bbr_select}" == "1" ] ;then
-	        echo "29 3 * * * /etc/init.d/bbr restart" >> /var/spool/cron/root
-            elif [ "${bbr_select}" == "2" ] ;then
+	    if [ "${bbr_install}" == "y" ] || [ "${bbr_install}" == "Y" ];then
                 echo "29 3 * * * service haproxy-lkl restart" >> /var/spool/cron/root
             fi
             service crond restart
@@ -1143,9 +1030,7 @@ set_crontab(){
         if [ "${Install_Select}" == "2" ] || [ "${Install_Select}" == "5" ]; then echo "28 3 * * * /etc/init.d/ssr restart" >> /var/spool/cron/crontabs/root; fi
         if [ "${Install_Select}" == "6" ] || [ "${Install_Select}" == "7" ]; then echo "28 3 * * * /etc/init.d/ssrr restart" >> /var/spool/cron/crontabs/root; fi
         if [ "${Install_Select}" == "3" ] || [ "${Install_Select}" == "4" ] || [ "${Install_Select}" == "5" ] || [ "${Install_Select}" == "7" ]; then echo "29 3 * * * /etc/init.d/kcptun restart" >> /var/spool/cron/crontabs/root; fi
-        if [ "${bbr_select}" == "1" ] ;then
-            echo "29 3 * * * /etc/init.d/bbr restart" >> /var/spool/cron/crontabs/root
-        elif [ "${bbr_select}" == "2" ] ;then
+	if [ "${bbr_install}" == "y" ] || [ "${bbr_install}" == "Y" ];then
             echo "29 3 * * * service haproxy-lkl restart" >> /var/spool/cron/crontabs/root
         fi
         /etc/init.d/cron restart
@@ -1380,7 +1265,7 @@ pre_install_ss_ssr_ssrr_kcptun(){
     Simple_obfs_option
     BBR_Selection
     Press_Install
-    pre_install_packs
+    install_dependencies_packs
     get_install_version
     Print_Sys_Info
     set_timezone
@@ -2313,7 +2198,7 @@ configure_ss_ssr_ssrr_kcptun(){
 reconfig_ss_ssr_ssrr_kcptun(){
     cd ${cur_dir}
     reconfig_flag="false"
-    echo -e "+ Reconfig ss_ssr_ssrr_kcp_bbr..."
+    echo -e "reconfig software..."
     if [ -f ${ss_libev_config} ];then
         if [ -f shadowsocks-libev.json ];then
             if [ "${Install_obfs}" != "y" ] && [ ! "${Install_obfs}" != "Y" ]; then
@@ -2583,7 +2468,7 @@ update_ss_ssr_ssrr_kcptun(){
         exit 1
     fi
 }
-set_text_color
+
 shell_update
 # Initialization
 shell_action=$1
@@ -2594,7 +2479,6 @@ Check_OS_support
 [  -z ${shell_action} ] && shell_action="install"
 case "${shell_action}" in
 [Ii]|[Ii][Nn]|[Ii][Nn][Ss][Tt][Aa][Ll][Ll]|-[Ii]|--[Ii])
-    #pre_install_ss_ssr_ssrr_kcptun 2>&1 | tee ${cur_dir}/ss-ssr-kcptun-install.log
     pre_install_ss_ssr_ssrr_kcptun
     reconfig_ss_ssr_ssrr_kcptun
     set_tool
@@ -2602,19 +2486,16 @@ case "${shell_action}" in
     set_crontab
     show_ss_ssr_ssr_kcptun
     install_cleanup
-    if [ -f /root/install.sh ]; then rm -f /root/install.sh; fi
-    if [ -f /root/firewall_set.sh ]; then rm -f /root/firewall_set.sh; fi
-    reboot
+    if [ -f /root/install.sh ]; then rm -rf /root/install.sh; fi
+    if [ -f /root/firewall_set.sh ]; then rm -rf /root/firewall_set.sh; fi
     ;;
 [Cc]|[Cc][Oo][Nn][Ff][Ii][Gg]|-[Cc]|--[Cc])
     configure_ss_ssr_ssrr_kcptun
     ;;
 [Uu][Nn]|[Uu][Nn][Ii][Nn][Ss][Tt][Aa][Ll][Ll]|[Uu][Nn]|-[Uu][Nn]|--[Uu][Nn])
-    #uninstall_ss_ssr_ssrr_kcptun 2>&1 | tee ${cur_dir}/ss-ssr-kcptun-uninstall.log
     uninstall_ss_ssr_ssrr_kcptun
     ;;
 [Uu]|[Uu][Pp][Dd][Aa][Tt][Ee]|-[Uu]|--[Uu]|[Uu][Pp]|-[Uu][Pp]|--[Uu][Pp])
-    #update_ss_ssr_ssrr_kcptun 2>&1 | tee ${cur_dir}/ss-ssr-kcptun-update.log
     update_ss_ssr_ssrr_kcptun
     ;;
 *)
