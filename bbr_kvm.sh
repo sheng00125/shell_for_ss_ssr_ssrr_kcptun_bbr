@@ -386,7 +386,7 @@ install_kernel(){
 
 detele_kernel(){
     echo
-    echo "${green}Info:${plain}scanning surplus kernel..."
+    echo -e "${green}Info:${plain}scanning surplus kernel..."
     if [[ "${release}" == "centos" ]]; then
         rpm_total=`rpm -qa | grep kernel | grep -v "${local_kernel_version}" | grep -v "noarch" | wc -l`
 	    if (( "${rpm_total}" >= "1" )); then
