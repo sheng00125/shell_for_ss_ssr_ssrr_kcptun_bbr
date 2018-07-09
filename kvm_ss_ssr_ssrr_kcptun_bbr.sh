@@ -23,7 +23,7 @@ set_timezone(){
 }
 shell_update(){
     clear
-    echo "+ Check updates for shell..."
+    echo "checking updates for shell..."
     echo
     remote_shell_version=`wget --no-check-certificate -qO- ${shell_download_link} | sed -n '/'^version'/p' | cut -d\" -f2`
     echo -e "Shell remote version :${COLOR_GREEN}${remote_shell_version}${COLOR_END}"
@@ -297,7 +297,7 @@ pre_install_packs(){
     fi
 }
 update_glibc(){
-    echo -e "+ Update glibc...."
+    echo -e "update glibc...."
     wget -c http://ftp.redsleeve.org/pub/steam/glibc-2.15-60.el6.x86_64.rpm \
     http://ftp.redsleeve.org/pub/steam/glibc-common-2.15-60.el6.x86_64.rpm \
     http://ftp.redsleeve.org/pub/steam/glibc-devel-2.15-60.el6.x86_64.rpm \
@@ -310,7 +310,7 @@ update_glibc(){
     nscd-2.15-60.el6.x86_64.rpm
 }
 update_autoconf(){
-    echo -e "+ Update autoconf...."
+    echo -e "update autoconf...."
     cd ${cur_dir}
     rpm -e --nodeps autoconf-2.63
     wget ftp://ftp.gnu.org/gnu/autoconf/autoconf-2.69.tar.gz
@@ -761,7 +761,7 @@ install_ss_ssr_ssrr_kcptun(){
     if [ ! -f /usr/lib/libsodium.a ] && [ ! -L /usr/local/lib/libsodium.so ]; then
         cd ${cur_dir}
 	echo
-        echo "+ Install libsodium for SS-Libev/SSR/SSRR/KCPTUN"
+        echo "Install libsodium for SS-Libev/SSR/SSRR/KCPTUN"
         tar xzf ${libsodium_laster_ver}.tar.gz
         cd ${libsodium_laster_ver}
         ./configure --prefix=/usr && make && make install
@@ -778,7 +778,7 @@ install_ss_ssr_ssrr_kcptun(){
         if [ ! -f /usr/lib/libmbedtls.a ]; then
             cd ${cur_dir}
 	    echo
-            echo "+ Install mbedtls for Shadowsocks-libev..."
+            echo "Install mbedtls for Shadowsocks-libev..."
             tar xzf ${mbedtls_laster_ver}-gpl.tgz
             cd ${mbedtls_laster_ver}
             make SHARED=1 CFLAGS=-fPIC
@@ -794,7 +794,7 @@ install_ss_ssr_ssrr_kcptun(){
         fi
         cd ${cur_dir}
 	echo
-	echo "+ Shadowsocks-libev..."
+	echo "Install Shadowsocks-libev..."
         tar zxf ${shadowsocks_libev_ver}.tar.gz
         cd ${shadowsocks_libev_ver}
         ./configure --disable-documentation
@@ -975,7 +975,7 @@ install_bbr(){
 set_crontab(){
     if check_sys packageManager yum; then
         if centosversion 6; then
-            echo -e "+ Set crontab..."
+            echo -e "Set crontab..."
 	    yum install -y cronie
             chkconfig crond on
             service crond start
@@ -987,7 +987,7 @@ set_crontab(){
             service crond restart
         fi
     elif check_sys packageManager apt; then
-        echo -e "+ Set crontab..."
+        echo -e "Set crontab..."
 	apt-get install cron -y
         /etc/init.d/cron start
         echo "27 3 * * 2,5 /sbin/reboot" >> /var/spool/cron/crontabs/root
@@ -1001,7 +1001,7 @@ set_crontab(){
 # Firewall set
 firewall_set(){
     if [ "${kcptun_install_flag}" == "true" ] || [ "${ss_libev_install_flag}" == "true" ] || [ "${ssr_install_flag}" == "true" ] || [ "${ssrr_install_flag}" == "true" ]; then
-        echo "+ firewall set start..."
+        echo "firewall set start..."
         firewall_set_flag="false"
         if centosversion 6; then
             /etc/init.d/iptables status > /dev/null 2>&1
@@ -1013,7 +1013,7 @@ firewall_set(){
                         iptables -I INPUT -m state --state NEW -m udp -p udp --dport ${set_ss_libev_port} -j ACCEPT
                         firewall_set_flag="true"
                     else
-                        echo "+ port ${set_ss_libev_port} has been set up."
+                        echo "port ${set_ss_libev_port} has been set up."
                     fi
                 fi
                 if [ "${ssr_install_flag}" == "true" ]; then
@@ -1023,7 +1023,7 @@ firewall_set(){
                         iptables -I INPUT -m state --state NEW -m udp -p udp --dport ${set_ssr_port} -j ACCEPT
                         firewall_set_flag="true"
                     else
-                        echo "+ port ${set_ssr_port} has been set up."
+                        echo "port ${set_ssr_port} has been set up."
                     fi
                 fi
                 if [ "${ssrr_install_flag}" == "true" ]; then
@@ -1033,7 +1033,7 @@ firewall_set(){
                         iptables -I INPUT -m state --state NEW -m udp -p udp --dport ${set_ssrr_port} -j ACCEPT
                         firewall_set_flag="true"
                     else
-                        echo "+ port ${set_ssrr_port} has been set up."
+                        echo "port ${set_ssrr_port} has been set up."
                     fi
                 fi
                 if [ "${kcptun_install_flag}" == "true" ]; then
@@ -1042,7 +1042,7 @@ firewall_set(){
                         iptables -I INPUT -m state --state NEW -m udp -p udp --dport ${set_kcptun_port} -j ACCEPT
                         firewall_set_flag="true"
                     else
-                        echo "+ port ${set_kcptun_port} has been set up."
+                        echo "port ${set_kcptun_port} has been set up."
                     fi
                 fi
                 if [ "${firewall_set_flag}" == "true" ]; then
@@ -1078,7 +1078,7 @@ firewall_set(){
                     firewall-cmd --reload
                 fi
             else
-                echo "+ Firewalld looks like not running, try to start..."
+                echo "Firewalld looks like not running, try to start..."
                 systemctl start firewalld
                 if [ $? -eq 0 ]; then
                     if [ "${ss_libev_install_flag}" == "true" ]; then
@@ -1108,7 +1108,7 @@ firewall_set(){
                 fi
             fi
         fi
-        echo "+ firewall set completed..."
+        echo "Firewall set completed..."
     fi
 }
 show_ss_ssr_ssr_kcptun(){
@@ -2123,7 +2123,7 @@ configure_ss_ssr_ssrr_kcptun(){
 reconfig_ss_ssr_ssrr_kcptun(){
     cd ${cur_dir}
     reconfig_flag="false"
-    echo -e "+ Reconfig ss_ssr_ssrr_kcp_bbr..."
+    echo -e "Reconfig ss_ssr_ssrr_kcp_bbr..."
     if [ -f ${ss_libev_config} ];then
         if [ -f shadowsocks-libev.json ];then
             if [ "${Install_obfs}" != "y" ] && [ ! "${Install_obfs}" != "Y" ]; then
@@ -2169,7 +2169,7 @@ reconfig_ss_ssr_ssrr_kcptun(){
     fi
 }
 set_tool(){
-    echo -e "+ Set tool.sh..."
+    echo -e "Set tool.sh..."
     wget --no-check-certificate -O /root/tool.sh https://raw.githubusercontent.com/Jenking-Zhang/shell_for_ss_ssr_ssrr_kcptun_bbr/master/openvz_tool.sh
     chmod +x /root/tool.sh
 }
