@@ -398,7 +398,7 @@ Dispaly_Selection(){
         def_Install_obfs="Y"
         echo
         echo -e "${COLOR_YELLOW}Do you want to install simple-obfs for Shadowsocks-libev?[Y/N]${COLOR_END}"
-        read -p "Enter your choice for simple-obf.default: ${def_Install_obfs}:" Install_obfs
+        read -p "Enter your choice for simple-obf installation. default: ${def_Install_obfs}:" Install_obfs
 
         case "${Install_obfs}" in
             [yY])
