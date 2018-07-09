@@ -38,7 +38,7 @@ fi
 
 shell_update(){
     clear
-    echo "+ Check updates for shell..."
+    echo "Check updates for shell..."
     echo
     remote_shell_version=`wget --no-check-certificate -qO- ${shell_download_link} | sed -n '/'^version'/p' | cut -d\" -f2`
     echo -e "Shell remote version :${COLOR_GREEN}${remote_shell_version}${COLOR_END}"
@@ -46,15 +46,17 @@ shell_update(){
     if [ ! -z ${remote_shell_version} ]; then
         if [[ "${shell_version}" != "${remote_shell_version}" ]];then
             echo -e "${COLOR_GREEN}Found a new version of shell(ver:${remote_shell_version})!${COLOR_END}"
+	    echo
+	    def_shell_update_Select=1
 	    echo -e "${COLOR_YELLOW}You have 2 options for your shell update.${COLOR_END}"
-            echo "1: Continue with currently shell"
+            echo "1: Continue with currently shell (default)"
             echo "2: Exit to update shell"
             echo
 	    read -p "Enter your choice (1, 2 or exit. default [${def_shell_update_Select}]): " shell_update_Select
 	    case "${shell_update_Select}" in
                 1)
                     echo
-                    echo -e "${COLOR_PINK}You will continue with currently shell ${SS_LIBEV_VER}${COLOR_END}"
+                    echo -e "${COLOR_PINK}You will continue with currently shell ${shell_version}${COLOR_END}"
                     ;;
                 2)
                     echo
