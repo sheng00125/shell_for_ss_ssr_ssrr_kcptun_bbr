@@ -292,9 +292,9 @@ install_dependencies_packs(){
 	apt-get upgrade -y
     fi
 }
-#Upgrade glibc to ver 2.15
+#update glibc to ver 2.15
 update_glibc(){
-    echo -e "upgrading glibc...."
+    echo -e "update glibc...."
     yum install kernel-headers -y
     wget -c http://ftp.redsleeve.org/pub/steam/glibc-2.15-60.el6.x86_64.rpm \
     http://ftp.redsleeve.org/pub/steam/glibc-common-2.15-60.el6.x86_64.rpm \
@@ -307,9 +307,9 @@ update_glibc(){
     glibc-headers-2.15-60.el6.x86_64.rpm \
     nscd-2.15-60.el6.x86_64.rpm
 }
-#Upgrade autoconf to ver 2.69
+#update autoconf to ver 2.69
 update_autoconf(){
-    echo -e "upgrading autoconf...."
+    echo -e "update autoconf...."
     cd ${cur_dir}
     rpm -e --nodeps autoconf-*
     wget ftp://ftp.gnu.org/gnu/autoconf/autoconf-2.69.tar.gz
@@ -490,7 +490,7 @@ BBR_Selection(){
 # Install cleanup
 install_cleanup(){
     cd ${cur_dir}
-    rm -rf .version.sh ${shadowsocks_libev_ver} ${shadowsocks_libev_ver}.tar.gz manyuser.zip shadowsocksr-manyuser shadowsocks-manyuser ${kcptun_latest_file} ${libsodium_laster_ver} ${libsodium_laster_ver}.tar.gz ${mbedtls_laster_ver} ${mbedtls_laster_ver}-gpl.tgz shadowsocksr-akkariiin-master ssrr.zip ovz-bbr-installer.sh glibc-2.15-60.el6.x86_64.rpm glibc-common-2.15-60.el6.x86_64.rpm glibc-devel-2.15-60.el6.x86_64.rpm glibc-headers-2.15-60.el6.x86_64.rpm nscd-2.15-60.el6.x86_64.rpm simple-obfs simple-obfs.tar.gz autoconf-2.69.tar.gz autoconf-2.69 autoconf-2.69.tar.gz.1
+    rm -rf .version.sh ${shadowsocks_libev_ver} ${shadowsocks_libev_ver}.tar.gz manyuser.zip shadowsocksr-manyuser shadowsocks-manyuser ${kcptun_latest_file} ${libsodium_laster_ver} ${libsodium_laster_ver}.tar.gz ${mbedtls_laster_ver} ${mbedtls_laster_ver}-gpl.tgz shadowsocksr-akkariiin-master ssrr.zip ovz-bbr-installer.sh glibc-2.15-60.el6.x86_64.rpm glibc-common-2.15-60.el6.x86_64.rpm glibc-devel-2.15-60.el6.x86_64.rpm glibc-headers-2.15-60.el6.x86_64.rpm nscd-2.15-60.el6.x86_64.rpm simple-obfs simple-obfs.tar.gz autoconf-2.69.tar.gz autoconf-2.69
 }
 check_ss_ssr_ssrr_kcptun_installed(){
     ss_libev_installed_flag=""
