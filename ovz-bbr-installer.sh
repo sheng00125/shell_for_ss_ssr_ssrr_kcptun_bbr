@@ -1,17 +1,5 @@
-#!/bin/bash
+#!/bin/sh
 
-: <<-'EOF'
-Copyright 2017 Xingwang Liao <kuoruan@gmail.com>
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-	http://www.apache.org/licenses/LICENSE-2.0
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-EOF
 
 export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 
@@ -33,7 +21,7 @@ LKL_LIB_MD5='fdfd4e67418fce80ac3fb8755e2bcda4'
 
 # 需要 BBR 加速的端口
 ACCELERATE_PORT=
-
+#clear
 command_exists() {
 	command -v "$@" >/dev/null 2>&1
 }
@@ -59,53 +47,54 @@ check_ovz() {
 }
 
 check_ldd() {
-    local ldd_version="$(ldd --version 2>/dev/null | grep 'ldd' | rev | cut -d ' ' -f1 | rev)"
-    if [ -n "$ldd_version" ]; then
-        if [ "${ldd_version%.*}" -eq "2" -a "${ldd_version#*.}" -lt "14" ] || \
-	    [ "${ldd_version%.*}" -lt "2" ]; then
+	local ldd_version="$(ldd --version 2>/dev/null | grep 'ldd' | rev | cut -d ' ' -f1 | rev)"
+	if [ -n "$ldd_version" ]; then
+		if [ "${ldd_version%.*}" -eq "2" -a "${ldd_version#*.}" -lt "14" ] || \
+		[ "${ldd_version%.*}" -lt "2" ]; then
+			cat >&2 <<-EOF
+			当前服务器的 glibc 版本为 $ldd_version。
+			最低版本需求 2.14，低于这个版本无法正常使用。
+			请先更新 glibc 之后再运行脚本。
+			EOF
+			exit 1
+	  fi
+	else
 		cat >&2 <<-EOF
-		当前服务器的 glibc 版本为 $ldd_version。
-		最低版本需求 2.14，低于这个版本无法正常使用。
-		请先更新 glibc 之后再运行脚本。
+		获取 glibc 版本失败，请手动检查：
+		    ldd --version
+		最低版本需求 2.14，低于这个版本可能无法正常使用。
 		EOF
-		exit 1
-        fi
-    else
-	cat >&2 <<-EOF
-	获取 glibc 版本失败，请手动检查：
-	ldd --version
-	最低版本需求 2.14，低于这个版本可能无法正常使用。
-	EOF
-	( set -x; ldd --version 2>/dev/null )
-	any_key_to_continue
-    fi
+
+		( set -x; ldd --version 2>/dev/null )
+		any_key_to_continue
+	fi
 }
 
 check_arch() {
-    architecture=$(uname -m)
-    case $architecture in
-        amd64|x86_64)
-    ;;
-    *)
-        cat 1>&2 <<-EOF
-	当前脚本仅支持 64 位系统，你的系统为: $architecture
-	你可以尝试从源码编译安装 Linux Kernel Library
-	https://github.com/lkl/linux
-	EOF
-	exit 1
-    ;;
-    esac
+	architecture=$(uname -m)
+	case $architecture in
+		amd64|x86_64)
+			;;
+		*)
+			cat 1>&2 <<-EOF
+			当前脚本仅支持 64 位系统，你的系统为: $architecture
+			你可以尝试从源码编译安装 Linux Kernel Library
+			    https://github.com/lkl/linux
+			EOF
+			exit 1
+			;;
+	esac
 }
 
 any_key_to_continue() {
-    echo "请按任意键继续或 Ctrl + C 退出"
-    local saved="$(stty -g)"
-    stty -echo
-    stty cbreak
-    dd if=/dev/tty bs=1 count=1 2> /dev/null
-    stty -raw
-    stty echo
-    stty $saved
+	echo "请按任意键继续或 Ctrl + C 退出"
+	local saved="$(stty -g)"
+	stty -echo
+	stty cbreak
+	dd if=/dev/tty bs=1 count=1 2> /dev/null
+	stty -raw
+	stty echo
+	stty $saved
 }
 
 get_os_info() {
@@ -353,11 +342,12 @@ download_file() {
 
 	( set -x; wget -O "$file" --no-check-certificate "$url" )
 	if [ "$?" != "0" ]; then
-	    cat >&2 <<-EOF
-	    一些文件下载失败！安装脚本需要能访问到 github.com，请检查服务器网络。
-	    注意: 一些国内服务器可能无法正常访问 github.com。
-	    EOF
-	    exit 1
+		cat >&2 <<-EOF
+		一些文件下载失败！安装脚本需要能访问到 github.com，请检查服务器网络。
+		注意: 一些国内服务器可能无法正常访问 github.com。
+		EOF
+
+		exit 1
 	fi
 }
 
