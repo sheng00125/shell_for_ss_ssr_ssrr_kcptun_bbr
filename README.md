@@ -1,4 +1,5 @@
 # shell_for_ss_ssr_ssrr_kcptun_bbr
+参数设置已屏蔽，如需指定参数，取消参数设置部分“read”部分注释即可！
 <a name="Install_command">安装命令
 ```Bash
 wget --no-check-certificate -O /root/ss_ssr_ssrr_kcp_bbr.sh https://raw.githubusercontent.com/Jenking-Zhang/shell_for_ss_ssr_ssrr_kcptun_bbr/master/ss_ssr_ssrr_kcp_bbr.sh
