@@ -2482,10 +2482,10 @@ Check_OS_support
 case "${shell_action}" in
 [Ii]|[Ii][Nn]|[Ii][Nn][Ss][Tt][Aa][Ll][Ll]|-[Ii]|--[Ii])
     pre_install_ss_ssr_ssrr_kcptun
-    reconfig_ss_ssr_ssrr_kcptun
-    set_tool
-    install_bbr
-    set_crontab
+    #reconfig_ss_ssr_ssrr_kcptun
+    #set_tool
+    #install_bbr
+    #set_crontab
     show_ss_ssr_ssr_kcptun
     install_cleanup
     if [ -f /root/install.sh ]; then rm -rf /root/install.sh; fi
