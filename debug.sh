@@ -394,26 +394,26 @@ Dispaly_Selection(){
             echo -e "${COLOR_PINK}No input or input error,You will install Shadowsocks-libev${COLOR_END}"
             Install_Select="${def_Install_Select}"
     esac
-    if [ "${Install_Select}" == "1" ] || [ "${Install_Select}" == "4" ]; then
-        def_Install_obfs="Y"
-        echo
-        echo -e "${COLOR_YELLOW}Do you want to install simple-obfs for Shadowsocks-libev?[Y/N]${COLOR_END}"
-        read -p "Enter your choice for simple-obf installation. default: ${def_Install_obfs}:" Install_obfs
+#    if [ "${Install_Select}" == "1" ] || [ "${Install_Select}" == "4" ]; then
+#        def_Install_obfs="Y"
+#        echo
+#        echo -e "${COLOR_YELLOW}Do you want to install simple-obfs for Shadowsocks-libev?[Y/N]${COLOR_END}"
+#        read -p "Enter your choice for simple-obf installation. default: ${def_Install_obfs}:" Install_obfs
 
-        case "${Install_obfs}" in
-            [yY])
-                echo
-                echo -e "${COLOR_PINK}You will install Simple-obfs for Shadowsocks-libev${COLOR_END}"
-                ;;
-            [nN])
-                echo
-                echo -e "${COLOR_PINK}You will not install Simple-obfs for Shadowsocks-libev${COLOR_END}"
-                ;;
-            *)
-               echo -e "${COLOR_PINK}No input or input error,You will not install Simple-obfs for Shadowsocks-libev${COLOR_END}"
-               Install_obfs="${def_Install_obfs}"
-        esac
-    fi
+#        case "${Install_obfs}" in
+#            [yY])
+#                echo
+#                echo -e "${COLOR_PINK}You will install Simple-obfs for Shadowsocks-libev${COLOR_END}"
+#                ;;
+#            [nN])
+#                echo
+#                echo -e "${COLOR_PINK}You will not install Simple-obfs for Shadowsocks-libev${COLOR_END}"
+#                ;;
+#            *)
+#               echo -e "${COLOR_PINK}No input or input error,You will not install Simple-obfs for Shadowsocks-libev${COLOR_END}"
+#               Install_obfs="${def_Install_obfs}"
+#        esac
+#    fi
 }
 Simple_obfs_option(){
     if [ "${Install_obfs}" == "y" ] || [ "${Install_obfs}" == "Y" ]; then
@@ -853,9 +853,9 @@ install_ss_ssr_ssrr_kcptun(){
             elif check_sys packageManager apt; then
                 update-rc.d -f shadowsocks defaults
             fi
-            if [ "${Install_obfs}" == "y" ] || [ "${Install_obfs}" == "Y" ]; then
-	              install_simple_obfs
-            fi
+            #if [ "${Install_obfs}" == "y" ] || [ "${Install_obfs}" == "Y" ]; then
+	     #         install_simple_obfs
+            #fi
             # Run shadowsocks in the background
             /etc/init.d/shadowsocks start
             if [ $? -eq 0 ]; then
@@ -1264,7 +1264,7 @@ EOF
 pre_install_ss_ssr_ssrr_kcptun(){
     clear
     Dispaly_Selection
-    Simple_obfs_option
+    #Simple_obfs_option
     #BBR_Selection
     Press_Install
     install_dependencies_packs
