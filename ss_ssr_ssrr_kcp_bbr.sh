@@ -56,11 +56,11 @@ shell_update(){
 	    case "${shell_update_Select}" in
                 1)
                     echo
-                    echo -e "${COLOR_PINK}You will continue with currently shell ${shell_version}${COLOR_END}"
+                    echo -e "${COLOR_PINK}You will continue with currently shell${COLOR_END}"
                     ;;
                 2)
                     echo
-                    echo -e "${COLOR_PINK}You will exit ${SSR_VER}${COLOR_END}"
+                    echo -e "${COLOR_PINK}You will exit to update shell${COLOR_END}"
                     exit 1
                     ;;
                 [eE][xX][iI][tT])
@@ -233,7 +233,7 @@ Press_Start(){
 }
 Press_Exit(){
     echo ""
-    echo -e "${COLOR_GREEN}Press any key to Exit...or Press Ctrl+C cancel${COLOR_END}"
+    echo -e "${COLOR_GREEN}Press any key to Exit...or Press Ctrl+C to cancel${COLOR_END}"
     OLDCONFIG=`stty -g`
     stty -icanon -echo min 1 time 0
     dd count=1 2>/dev/null
@@ -279,7 +279,7 @@ install_dependencies_packs(){
         for depend in ${yum_depends[@]}; do
             error_detect_depends "yum -y install ${depend}"
         done
-	yum update -y
+	#yum update -y
     elif check_sys packageManager apt; then
         apt_depends=(
             gettext build-essential unzip gzip python python-dev python-setuptools curl openssl libssl-dev
@@ -289,7 +289,7 @@ install_dependencies_packs(){
         for depend in ${apt_depends[@]}; do
             error_detect_depends "apt-get -y install ${depend}"
         done
-	apt-get upgrade -y
+	#apt-get upgrade -y
     fi
 }
 #update glibc to ver 2.15
@@ -297,15 +297,15 @@ update_glibc(){
     echo -e "update glibc...."
     yum install kernel-headers -y
     wget -c http://ftp.redsleeve.org/pub/steam/glibc-2.15-60.el6.x86_64.rpm \
-    http://ftp.redsleeve.org/pub/steam/glibc-common-2.15-60.el6.x86_64.rpm \
-    http://ftp.redsleeve.org/pub/steam/glibc-devel-2.15-60.el6.x86_64.rpm \
-    http://ftp.redsleeve.org/pub/steam/glibc-headers-2.15-60.el6.x86_64.rpm \
-    http://ftp.redsleeve.org/pub/steam/nscd-2.15-60.el6.x86_64.rpm
+        http://ftp.redsleeve.org/pub/steam/glibc-common-2.15-60.el6.x86_64.rpm \
+        http://ftp.redsleeve.org/pub/steam/glibc-devel-2.15-60.el6.x86_64.rpm \
+        http://ftp.redsleeve.org/pub/steam/glibc-headers-2.15-60.el6.x86_64.rpm \
+        http://ftp.redsleeve.org/pub/steam/nscd-2.15-60.el6.x86_64.rpm
     rpm -Uvh glibc-2.15-60.el6.x86_64.rpm \
-    glibc-common-2.15-60.el6.x86_64.rpm \
-    glibc-devel-2.15-60.el6.x86_64.rpm \
-    glibc-headers-2.15-60.el6.x86_64.rpm \
-    nscd-2.15-60.el6.x86_64.rpm
+        glibc-common-2.15-60.el6.x86_64.rpm \
+        glibc-devel-2.15-60.el6.x86_64.rpm \
+        glibc-headers-2.15-60.el6.x86_64.rpm \
+        nscd-2.15-60.el6.x86_64.rpm
 }
 #update autoconf to ver 2.69
 update_autoconf(){
@@ -407,10 +407,10 @@ Dispaly_Selection(){
                 ;;
             [nN])
                 echo
-                echo -e "${COLOR_PINK}You will not install Simple-obfs for Shadowsocks-libev${COLOR_END}"
+                echo -e "${COLOR_PINK}You will not install Simple-obfs${COLOR_END}"
                 ;;
             *)
-               echo -e "${COLOR_PINK}No input or input error,You will not install Simple-obfs for Shadowsocks-libev${COLOR_END}"
+               echo -e "${COLOR_PINK}No input or input error,You will install Simple-obfs for Shadowsocks-libev${COLOR_END}"
                Install_obfs="${def_Install_obfs}"
         esac
     fi
@@ -432,7 +432,7 @@ Simple_obfs_option(){
                 ofbs_option="tls"
                 ;;
             *)
-                echo -e "${COLOR_PINK}No input or input error,You Simple-obfs will be set to:http${COLOR_END}"
+                echo -e "${COLOR_PINK}No input or input error,Simple-obfs will be set to:http${COLOR_END}"
                 ofbs_option="http"
         esac
     fi
@@ -477,10 +477,10 @@ BBR_Selection(){
                         echo
                         break
                     else
-                        echo "${COLOR_RED}Input error, please input correct number"${COLOR_END}
+                        echo -e "${COLOR_RED}Input error, please input correct number"${COLOR_END}
                     fi
                 else
-                    echo "${COLOR_RED}Input error, please input correct number"${COLOR_END}
+                    echo -e "${COLOR_RED}Input error, please input correct number"${COLOR_END}
                 fi
             done
             export bbr_port
@@ -490,7 +490,7 @@ BBR_Selection(){
 # Install cleanup
 install_cleanup(){
     cd ${cur_dir}
-    rm -rf .version.sh ${shadowsocks_libev_ver} ${shadowsocks_libev_ver}.tar.gz manyuser.zip shadowsocksr-manyuser shadowsocks-manyuser ${kcptun_latest_file} ${libsodium_laster_ver} ${libsodium_laster_ver}.tar.gz ${mbedtls_laster_ver} ${mbedtls_laster_ver}-gpl.tgz shadowsocksr-akkariiin-master ssrr.zip ovz-bbr-installer.sh glibc-2.15-60.el6.x86_64.rpm glibc-common-2.15-60.el6.x86_64.rpm glibc-devel-2.15-60.el6.x86_64.rpm glibc-headers-2.15-60.el6.x86_64.rpm nscd-2.15-60.el6.x86_64.rpm simple-obfs simple-obfs.tar.gz autoconf-2.69.tar.gz autoconf-2.69
+    rm -rf .version.sh shadowsocks-libev-* manyuser.zip shadowsocksr-manyuser shadowsocks-manyuser kcptun-linux-* libsodium-* mbedtls-* shadowsocksr-akkariiin-master ssrr.zip ovz-bbr-installer.sh glibc-2.15-60.el6.x86_64.rpm glibc-common-2.15-60.el6.x86_64.rpm glibc-devel-2.15-60.el6.x86_64.rpm glibc-headers-2.15-60.el6.x86_64.rpm nscd-2.15-60.el6.x86_64.rpm simple-obfs simple-obfs.tar.gz autoconf-2.69.tar.gz autoconf-2.69
 }
 check_ss_ssr_ssrr_kcptun_installed(){
     ss_libev_installed_flag=""
