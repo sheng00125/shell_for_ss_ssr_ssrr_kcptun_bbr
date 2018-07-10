@@ -1265,7 +1265,7 @@ pre_install_ss_ssr_ssrr_kcptun(){
     clear
     Dispaly_Selection
     Simple_obfs_option
-    BBR_Selection
+    #BBR_Selection
     Press_Install
     install_dependencies_packs
     get_install_version
