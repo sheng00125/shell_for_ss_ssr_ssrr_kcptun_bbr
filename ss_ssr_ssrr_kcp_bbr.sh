@@ -1171,9 +1171,9 @@ show_ss_ssr_ssr_kcptun(){
             echo -e "SS-libev plugin            : ${COLOR_GREEN}obfs-server${COLOR_END}"
             echo -e "SS-libev plugin_opts       : ${COLOR_GREEN}obfs=${ofbs_option}${COLOR_END}"
 	    if  [ "${ofbs_option}" == "tls" ] ;then
-                ss_libev_url="ss://$(echo -n "${set_ss_libev_method}:${set_ss_libev_pwd}" | base64 -w0)@${SERVER_IP}:${set_ss_libev_port}?plugin=obfs-local%3Bobfs-host%3Dwww.cloudflare.com%3Bobfs%3Dtls#${SERVER_IP}"
+                ss_libev_url="ss://$(echo -n "${set_ss_libev_method}:${set_ss_libev_pwd}" | base64 -w0)@${SERVER_IP}:${set_ss_libev_port}?plugin=obfs-local%3Bobfs%3Dtls%3Bobfs-host%3Dwww.cloudflare.com#${SERVER_IP}"
 	    else
-	        ss_libev_url="ss://$(echo -n "${set_ss_libev_method}:${set_ss_libev_pwd}" | base64 -w0)@${SERVER_IP}:${set_ss_libev_port}?plugin=obfs-local%3Bobbfs-host%3Dwww.cloudflare.com%3Bobfs%3Dhttp#${SERVER_IP}"
+	        ss_libev_url="ss://$(echo -n "${set_ss_libev_method}:${set_ss_libev_pwd}" | base64 -w0)@${SERVER_IP}:${set_ss_libev_port}?plugin=obfs-local%3Bobfs%3Dhttp%3Bobfs-host%3Dwww.cloudflare.com#${SERVER_IP}"
 	    fi
 	else
 	    ss_libev_url="ss://$(echo -n "${set_ss_libev_method}:${set_ss_libev_pwd}" | base64 -w0)@${SERVER_IP}:${set_ss_libev_port}#${SERVER_IP}"
