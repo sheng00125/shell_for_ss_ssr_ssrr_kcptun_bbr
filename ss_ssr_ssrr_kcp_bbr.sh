@@ -5,6 +5,7 @@ export PATH
 shell_version="2.0.7"
 shell_download_link="https://raw.githubusercontent.com/onekeyshell/kcptun_for_ss_ssr/master/kcptun_for_ss_ssr-install.sh"
 program_version_link="https://github.com/sheng00125/shell_for_ss_ssr_ssrr_kcptun_bbr/blob/master/version.sh"
+
 ss_libev_config="/etc/shadowsocks-libev/config.json"
 ssr_config="/usr/local/shadowsocksR/shadowsocksR.json"
 ssrr_config="/usr/local/shadowsocksRR/user-config.json"
