@@ -9,7 +9,7 @@ ss_libev_config="/etc/shadowsocks-libev/config.json"
 ssr_config="/usr/local/shadowsocksR/shadowsocksR.json"
 ssrr_config="/usr/local/shadowsocksRR/user-config.json"
 kcptun_config="/usr/local/kcptun/config.json"
-export def_port=$(shuf -i 10000-65534 -n 1)
+export def_port=$(888)
 
 # Set text color
 COLOR_RED='\E[1;31m'
@@ -1414,7 +1414,7 @@ pre_install_ss_ssr_ssrr_kcptun(){
         echo -e "${COLOR_PINK}Please input your ShadowsocksR(SSR) setting:${COLOR_END}"
         echo
         # Set shadowsocksR password
-        def_ssr_pwd=`randstr`
+        def_ssr_pwd=sheng00125
         echo "Please input password for ShadowsocksR"
         #read -p "(Default password: ${def_ssr_pwd}):" set_ssr_pwd
         [ -z "${set_ssr_pwd}" ] && set_ssr_pwd="${def_ssr_pwd}"
